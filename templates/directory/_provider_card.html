@@ -1,0 +1,31 @@
+<div class="col-md-6 col-xl-4">
+  <article class="provider-card h-100">
+    <div class="provider-badge-row">
+      <span class="badge provider-badge">{{ provider.category.name }}</span>
+      {% if provider.is_verified %}
+        <span class="badge text-bg-success">Contacto confirmado</span>
+      {% endif %}
+    </div>
+    <h3 class="h5 mt-3 mb-1">{{ provider.business_name }}</h3>
+    <p class="text-muted small mb-2">{{ provider.sector }}, {{ provider.commune.name }}</p>
+    <p>{{ provider.short_description }}</p>
+    <div class="d-flex flex-wrap gap-2 mt-auto">
+      {% if provider.is_featured %}
+        <span class="mini-pill">Destacado</span>
+      {% endif %}
+      <span class="mini-pill">{{ provider.service_area|default:"Atiende en Maipú" }}</span>
+    </div>
+    <div class="review-status {% if provider.is_verified %}is-reviewed{% endif %}">
+      {% if provider.is_verified %}
+        Datos revisados
+      {% else %}
+        Información pendiente de revisión
+      {% endif %}
+    </div>
+    <p class="provider-note">Contacto directo con el prestador. SERVIPLACE no cobra comisión por trabajo.</p>
+    <div class="provider-actions">
+      <a class="btn btn-primary" href="{{ provider.get_absolute_url }}">Ver perfil</a>
+      <a class="btn btn-outline-success" href="{% url 'directory:whatsapp_redirect' provider.slug %}" target="_blank" rel="noopener">Contactar</a>
+    </div>
+  </article>
+</div>

@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="page-header">
+  <div class="container py-4">
+    <span class="eyebrow">Directorio local</span>
+    <h1 class="h2 mt-2 mb-1">Encuentra prestadores en Maipú</h1>
+    <p class="text-muted mb-0">Busca por categoría, comuna o palabra clave y contacta directo al prestador.</p>
+  </div>
+</section>
+
+<section class="container py-4">
+  <form class="filter-bar" method="get">
+    <div class="row g-2">
+      <div class="col-lg-5">
+        <label class="form-label" for="q">Buscar</label>
+        <input class="form-control form-control-lg" id="q" name="q" value="{{ query }}" type="search" placeholder="Servicio, sector o prestador">
+      </div>
+      <div class="col-lg-3">
+        <label class="form-label" for="categoria">Categoría</label>
+        <select class="form-select form-select-lg" id="categoria" name="categoria">
+          <option value="">Todas</option>
+          {% for category in categories %}
+            <option value="{{ category.slug }}" {% if selected_category.slug == category.slug %}selected{% endif %}>{{ category.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-lg-2">
+        <label class="form-label" for="comuna">Comuna</label>
+        <select class="form-select form-select-lg" id="comuna" name="comuna">
+          {% for commune in communes %}
+            <option value="{{ commune.slug }}" {% if selected_commune.slug == commune.slug %}selected{% endif %}>{{ commune.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-lg-2 d-grid align-self-end">
+        <button class="btn btn-primary btn-lg" type="submit">Buscar</button>
+      </div>
+    </div>
+  </form>
+
+  <div class="results-summary">
+    <div>
+      <p class="mb-0"><strong>{{ providers|length }}</strong> resultado{{ providers|length|pluralize }} activo{{ providers|length|pluralize }}</p>
+      <small>Contacta directamente por WhatsApp. SERVIPLACE no cobra comisión.</small>
+    </div>
+    <a class="small" href="{% url 'directory:provider_list' %}">Limpiar filtros</a>
+  </div>
+
+  <div class="row g-3">
+    {% for provider in providers %}
+      {% include "directory/_provider_card.html" %}
+    {% empty %}
+      <div class="empty-state">
+        <h2 class="h5">No encontramos servicios con esos filtros</h2>
+        <p class="text-muted mb-0">Prueba con otra categoría o búsqueda.</p>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

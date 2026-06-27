@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="page-header">
+  <div class="container py-4">
+    <a class="small" href="{% url 'directory:provider_list' %}">Volver a servicios</a>
+    <div class="provider-detail-hero mt-3">
+      <div>
+        <div class="provider-badge-row mb-3">
+          <span class="badge provider-badge">{{ provider.category.name }}</span>
+          {% if provider.is_verified %}<span class="badge text-bg-success">Contacto confirmado</span>{% endif %}
+          {% if provider.is_featured %}<span class="badge text-bg-primary">Destacado</span>{% endif %}
+        </div>
+        <h1 class="display-6 fw-bold mb-2">{{ provider.business_name }}</h1>
+        <p class="lead text-muted mb-0">{{ provider.short_description }}</p>
+      </div>
+      <div class="detail-location">
+        <span>{{ provider.category.name }}</span>
+        <strong>{{ provider.sector }}, {{ provider.commune.name }}</strong>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="container py-4">
+  <div class="row g-4">
+    <div class="col-lg-8">
+      <div class="detail-block">
+        <h2 class="h4">Sobre este servicio</h2>
+        <p>{{ provider.description|linebreaksbr }}</p>
+      </div>
+
+      <div class="detail-block">
+        <h2 class="h4">Zona de atención</h2>
+        <p class="mb-0">{{ provider.service_area|default:"Atiende en Maipú y sectores cercanos." }}</p>
+      </div>
+
+      <div class="detail-block">
+        <h2 class="h4">Cómo contactar</h2>
+        <p>Escríbele por WhatsApp con el mensaje sugerido y cuéntale qué necesitas, en qué sector estás y cuándo necesitas el servicio.</p>
+        <p class="safety-note mb-0">SERVIPLACE conecta vecinos con prestadores, pero la coordinación, precio y ejecución del trabajo se acuerdan directamente entre ambas partes.</p>
+      </div>
+
+      <div class="detail-block">
+        <h2 class="h4">Recomendaciones antes de contratar</h2>
+        <p class="mb-0">Recomendamos confirmar precio, disponibilidad, materiales y alcance antes de contratar.</p>
+      </div>
+
+      <div class="detail-block">
+        <h2 class="h4">Fotos</h2>
+        <div class="row g-3">
+          {% for image in provider.images.all %}
+            <div class="col-sm-6">
+              <img class="provider-image" src="{{ image.image.url }}" alt="{{ image.alt_text|default:provider.business_name }}">
+            </div>
+          {% empty %}
+            <div class="placeholder-photo">Este perfil aún no tiene fotos publicadas.</div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <aside class="col-lg-4">
+      <div class="contact-card">
+        <h2 class="h4">Contactar</h2>
+        <dl class="info-list">
+          <dt>Contacto</dt>
+          <dd>{{ provider.contact_name }}</dd>
+          <dt>Sector</dt>
+          <dd>{{ provider.sector }}, {{ provider.commune.name }}</dd>
+          <dt>Teléfono</dt>
+          <dd>{{ provider.phone }}</dd>
+          {% if provider.email %}
+            <dt>Email</dt>
+            <dd>{{ provider.email }}</dd>
+          {% endif %}
+          {% if provider.address %}
+            <dt>Dirección</dt>
+            <dd>{{ provider.address }}</dd>
+          {% endif %}
+          <dt>Área de atención</dt>
+          <dd>{{ provider.service_area|default:"Maipú" }}</dd>
+        </dl>
+        <a class="btn btn-success btn-lg w-100 desktop-whatsapp-button" href="{% url 'directory:whatsapp_redirect' provider.slug %}" target="_blank" rel="noopener">
+          Contactar por WhatsApp
+        </a>
+        <p class="small text-muted mt-3 mb-0">Mensaje sugerido: "Hola, vi tu servicio en SERVIPLACE Maipú y necesito una cotización."</p>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<div class="mobile-whatsapp-bar">
+  <a class="btn btn-success btn-lg w-100" href="{% url 'directory:whatsapp_redirect' provider.slug %}" target="_blank" rel="noopener">Contactar por WhatsApp</a>
+</div>
+{% endblock %}

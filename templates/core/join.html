@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="page-header">
+  <div class="container py-5">
+    <span class="eyebrow">Para prestadores</span>
+    <h1 class="display-6 fw-bold mt-2">Haz que vecinos de Maipú encuentren tu servicio</h1>
+    <p class="lead text-muted">La inscripción inicial es gratuita mientras construimos una primera red local de prestadores en Maipú.</p>
+    <div class="d-flex flex-column flex-sm-row gap-2">
+      <a class="btn btn-success btn-lg" href="#postular">Postular mi servicio</a>
+      <a class="btn btn-outline-primary btn-lg" href="{{ whatsapp_url }}" target="_blank" rel="noopener">Consultar por WhatsApp</a>
+    </div>
+  </div>
+</section>
+
+<section class="container py-5">
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-success mb-4" role="alert">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+
+  <div class="row g-4">
+    <div class="col-lg-5">
+      <div class="section-heading mb-3">
+        <h2>Beneficios para prestadores</h2>
+      </div>
+      <div class="confidence-block mb-3">
+        <h3 class="h5">Inscripción inicial gratuita</h3>
+        <p>Por ahora la inscripción es gratuita mientras validamos la red inicial de Maipú.</p>
+      </div>
+      <div class="benefit-box">
+        <ul class="benefit-list">
+          <li>Aparece en búsquedas locales cuando tu perfil esté aprobado.</li>
+          <li>Recibe contactos directos por WhatsApp.</li>
+          <li>Muestra tu servicio de forma clara y profesional.</li>
+          <li>SERVIPLACE no cobra comisión por trabajo.</li>
+        </ul>
+        <p>Revisaremos manualmente cada solicitud antes de publicarla o destacarla.</p>
+      </div>
+    </div>
+
+    <div class="col-lg-7" id="postular">
+      <div class="application-card">
+        <h2 class="h3">Solicita aparecer gratis</h2>
+        <p class="text-muted">Cuéntanos sobre tu servicio. Revisaremos la información y te contactaremos antes de publicar el perfil.</p>
+        <p class="form-microcopy">Revisamos manualmente cada solicitud antes de publicarla.</p>
+        <form method="post" novalidate>
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label" for="{{ form.nombre_negocio.id_for_label }}">{{ form.nombre_negocio.label }}</label>
+              {{ form.nombre_negocio }}
+              {{ form.nombre_negocio.errors }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="{{ form.nombre_contacto.id_for_label }}">{{ form.nombre_contacto.label }}</label>
+              {{ form.nombre_contacto }}
+              {{ form.nombre_contacto.errors }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="{{ form.categoria.id_for_label }}">{{ form.categoria.label }}</label>
+              {{ form.categoria }}
+              {{ form.categoria.errors }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="{{ form.sector.id_for_label }}">{{ form.sector.label }}</label>
+              {{ form.sector }}
+              {{ form.sector.errors }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="{{ form.telefono.id_for_label }}">{{ form.telefono.label }}</label>
+              {{ form.telefono }}
+              {{ form.telefono.errors }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="{{ form.whatsapp.id_for_label }}">{{ form.whatsapp.label }}</label>
+              {{ form.whatsapp }}
+              {{ form.whatsapp.errors }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="{{ form.instagram.id_for_label }}">{{ form.instagram.label }}</label>
+              {{ form.instagram }}
+              {{ form.instagram.errors }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="{{ form.website.id_for_label }}">{{ form.website.label }}</label>
+              {{ form.website }}
+              {{ form.website.errors }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="{{ form.anos_experiencia.id_for_label }}">{{ form.anos_experiencia.label }}</label>
+              {{ form.anos_experiencia }}
+              {{ form.anos_experiencia.errors }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="{{ form.horario_atencion.id_for_label }}">{{ form.horario_atencion.label }}</label>
+              {{ form.horario_atencion }}
+              {{ form.horario_atencion.errors }}
+            </div>
+            <div class="col-12">
+              <label class="form-label" for="{{ form.descripcion_servicio.id_for_label }}">{{ form.descripcion_servicio.label }}</label>
+              {{ form.descripcion_servicio }}
+              {{ form.descripcion_servicio.errors }}
+            </div>
+            <div class="col-12">
+              <div class="form-check">
+                {{ form.acepta_contacto }}
+                <label class="form-check-label" for="{{ form.acepta_contacto.id_for_label }}">{{ form.acepta_contacto.label }}</label>
+              </div>
+              {{ form.acepta_contacto.errors }}
+            </div>
+            <div class="col-12 d-grid d-sm-flex gap-2">
+              <button class="btn btn-primary btn-lg" type="submit">Enviar solicitud gratuita</button>
+              <a class="btn btn-outline-primary btn-lg" href="{{ whatsapp_url }}" target="_blank" rel="noopener">Tengo una duda</a>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,74 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ page_title|default:"SERVIPLACE Maipú" }}</title>
+  <meta name="description" content="{{ meta_description|default:'Servicios locales en Maipú para contactar directo con prestadores.' }}">
+  <meta property="og:title" content="{{ og_title|default:page_title|default:'SERVIPLACE Maipú' }}">
+  <meta property="og:description" content="{{ og_description|default:meta_description|default:'Encuentra servicios locales y contacta directo por WhatsApp.' }}">
+  <meta property="og:type" content="website">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/site.css' %}">
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg site-navbar sticky-top">
+    <div class="container">
+      <a class="navbar-brand site-brand" href="{% url 'core:home' %}">
+        <span class="brand-mark">S</span>
+        <span class="brand-copy">
+          <span>SERVIPLACE <strong>Maipú</strong></span>
+          <small>Directorio local</small>
+        </span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Abrir menú">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="mainNav">
+        <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+          <li class="nav-item"><a class="nav-link" href="{% url 'directory:provider_list' %}">Servicios</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'core:about' %}">Sobre</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'core:contact' %}">Contacto</a></li>
+          <li class="nav-item"><a class="btn btn-primary nav-cta" href="{% url 'core:join' %}">Súmate gratis</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer mt-5">
+    <div class="container py-5">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <span class="fw-semibold">SERVIPLACE Maipú</span>
+          <p class="text-muted mb-0">SERVIPLACE Maipú es un MVP local en validación.</p>
+        </div>
+        <nav class="footer-column" aria-label="Para vecinos">
+          <strong>Para vecinos</strong>
+          <a href="{% url 'directory:provider_list' %}">Buscar servicios</a>
+          <a href="{% url 'core:trust_and_safety' %}">Seguridad y confianza</a>
+        </nav>
+        <nav class="footer-column" aria-label="Para prestadores">
+          <strong>Para prestadores</strong>
+          <a href="{% url 'core:join' %}">Súmate gratis</a>
+          <a href="{% url 'core:contact' %}">Contacto</a>
+        </nav>
+        <nav class="footer-column" aria-label="Seguridad">
+          <strong>Seguridad</strong>
+          <a href="{% url 'core:trust_and_safety' %}">Recomendaciones</a>
+          <a href="{% url 'core:about' %}">Sobre el proyecto</a>
+        </nav>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
