@@ -151,6 +151,14 @@ MEDIA_ROOT = BASE_DIR / 'media'
 SITE_NAME = 'SERVIPLACE'
 SITE_DESCRIPTION = 'Encuentra gasfiter, cerrajero, electricista y otros servicios locales en tu comuna.'
 DEFAULT_CONTACT_WHATSAPP = os.environ.get('DEFAULT_CONTACT_WHATSAPP', '56900000000')
+GOOGLE_MAPS_API_KEY = os.environ.get('GOOGLE_MAPS_API_KEY', '')
+GOOGLE_MAPS_REGION = 'CL'
+
+# Media: Cloudinary en producción, local en desarrollo
+CLOUDINARY_URL = os.environ.get('CLOUDINARY_URL', '')
+if CLOUDINARY_URL:
+    INSTALLED_APPS += ['cloudinary', 'cloudinary_storage']
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 

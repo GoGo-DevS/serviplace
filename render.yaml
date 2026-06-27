@@ -1,0 +1,41 @@
+# Blueprint de Render para SERVIPLACE
+# En Render: New + > Blueprint > conecta el repo serviplace.
+# Luego pega los valores marcados "sync: false" en el dashboard (Environment).
+#
+# BASE DE DATOS: Postgres GRATIS externa (Neon, neon.tech) — misma estrategia que
+# GoGoCRM. Render solo permite 1 DB free por cuenta. Pega la cadena de conexión
+# de Neon en DATABASE_URL. Sin DATABASE_URL → SQLite efímero (NO usar en producción).
+#
+# IMPORTANTE antes de deployar:
+#   - CLOUDINARY_URL: crear cuenta en cloudinary.com (plan free), copiar la API URL.
+#   - DATABASE_URL: crear DB en neon.tech, copiar la connection string (postgresql://...).
+#   - DEFAULT_CONTACT_WHATSAPP: tu número de WhatsApp con código de país (ej: 56912345678).
+#   - GOOGLE_MAPS_API_KEY: para seed_providers_nacional (Places API New habilitada).
+
+services:
+  - type: web
+    name: serviplace
+    runtime: python
+    plan: free
+    branch: main
+    buildCommand: "bash build.sh"
+    startCommand: "gunicorn config.wsgi:application --bind 0.0.0.0:$PORT"
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.13.4"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: RENDER
+        value: "true"          # → DEBUG=False, activa WhiteNoise middleware
+      - key: WEB_CONCURRENCY
+        value: "4"
+      - key: ALLOWED_HOSTS
+        value: ""              # Render agrega RENDER_EXTERNAL_HOSTNAME automáticamente
+      - key: DATABASE_URL
+        sync: false            # pega la cadena de Neon (postgresql://...)
+      - key: CLOUDINARY_URL
+        sync: false            # cloudinary://api_key:api_secret@cloud_name
+      - key: DEFAULT_CONTACT_WHATSAPP
+        sync: false            # tu número sin espacios: 56912345678
+      - key: GOOGLE_MAPS_API_KEY
+        sync: false            # Places API (New) — para seed_providers_nacional
