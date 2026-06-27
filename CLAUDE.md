@@ -5,8 +5,8 @@
 ════════════════════════════════════════════════
 ## ⚠️ NOTAS CRÍTICAS — LEER PRIMERO
 ════════════════════════════════════════════════
-1. Este proyecto vive en `C:\Users\diego\Documents\serviplace\` — Django, NO está en git todavía.
-   Primer commit es tarea #1 de esta sesión.
+1. Este proyecto vive en `C:\Users\diego\Documents\serviplace\` — Django, git activo, 8 commits.
+   App `accounts` nueva (autoservicio estilo Yapo). 209 providers en DB (10 comunas).
 2. NO está deployado en ningún lado. SQLite local únicamente. Settings ya son
    production-ready (env vars, dj-database-url) pero falta Render+Postgres+Cloudinary.
 3. La idea NO es original — existe un competidor real: kalabazaapp.com (ver análisis abajo).
@@ -201,25 +201,26 @@ ya advierte que media necesita Cloudinary antes de producción.
 [x] build.sh: incluye seed_regiones_chile — 346 comunas disponibles desde primer deploy.
 [x] settings.py: GOOGLE_MAPS_API_KEY, GOOGLE_MAPS_REGION=CL, Cloudinary condicional.
 
-🔵 PIVOT 27-06-2026 — nueva prioridad #1 (ver sección PIVOT DE PRODUCTO arriba):
-[ ] Rediseño visual completo — identidad propia, cards premium, paleta/tipografía con
-    personalidad. Sacar el look Bootstrap genérico.
-[ ] Correr `seed_providers_nacional` YA con comunas grandes reales (Santiago, Ñuñoa,
-    Providencia, Las Condes, Maipú, Viña del Mar, Valparaíso, Concepción, La Florida,
-    Puente Alto) — sin pedir permiso previo, info pública de Google Maps. Llenar de
-    contenido real antes de seguir puliendo features.
-[ ] Modelo de autoservicio estilo Yapo:
-    - Agregar `Provider.owner` (FK User, null=True, blank=True).
-    - Registro/login de usuarios + dashboard "Mi perfil" para crear/editar su propio
-      Provider directamente, sin pasar por `ProviderApplication`.
-    - Flujo de "reclamar perfil" para los Provider scrapeados sin owner.
-    - Página de Términos/Responsabilidad (modelo Yapo: la responsabilidad del contenido
-      es del usuario que publica, no de ServiPlace).
-[ ] Scaffolding de monetización futura (SOLO estructura, sin pasarela real):
-    - Campos de suscripción/verificación pagada en Provider (o modelo Subscription aparte).
-    - Página "Hazte Verificado" que derive a WhatsApp manual por ahora.
-[ ] Mecanismos de crecimiento: botón compartir WhatsApp en cada perfil, OG tags con buena
-    preview al compartir, programa de referidos simple (link único por usuario).
+🔵 PIVOT 27-06-2026 — COMPLETADO en sesión 27-06-2026:
+[x] Rediseño visual completo — Space Grotesk + Plus Jakarta Sans, paleta índigo/esmeralda,
+    provider cards con accent bar + avatar letra, hero con stats card, toast messages.
+[x] seed_providers_offline: 177 providers sintéticos en 10 comunas grandes (sin API key).
+    PENDIENTE: cuando Diego tenga GOOGLE_MAPS_API_KEY, correr seed_providers_nacional real.
+[x] Modelo autoservicio estilo Yapo:
+    - Provider.owner (FK User, null=True) + claimed_at + subscription_status/expires_at.
+    - App `accounts`: registro, login, logout, dashboard, publicar, editar, reclamar perfil.
+    - UserProfile con referral_code único para programa de referidos.
+    - Página Términos de Uso (responsabilidad en usuario, modelo Yapo).
+[x] Scaffolding monetización: subscription_status/expires_at en Provider,
+    página "Hazte Verificado" → WhatsApp manual, badge en cards y detail.
+[x] Mecanismos de crecimiento: compartir WhatsApp en detail, copiar enlace,
+    OG tags completos (og:image/url/description), referral links con ?ref=CODE.
+
+⏸️ PENDIENTE (próxima sesión):
+[ ] Reemplazar seed offline por datos reales de Google Maps (cuando Diego tenga API key).
+    Comando listo: `python manage.py seed_providers_nacional`.
+[ ] Subir imágenes de portada para los providers (Cloudinary ya configurado).
+[ ] Deploy a Render (espera confirmación de Diego — ver sección confirmación).
 
 ⏸️ REQUIERE CONFIRMACIÓN DE DIEGO antes de proceder:
 [ ] Crear cuenta Neon (DB Postgres) y copiar DATABASE_URL.
@@ -313,4 +314,62 @@ Archivos modificados: config/settings.py, requirements.txt, build.sh, render.yam
 Decisiones tomadas: render.yaml listo pero SIN deployar — espera confirmación Diego.
 Bugs encontrados/resueltos: Región RM duplicada del seed antiguo → eliminada.
 Próxima tarea: Deploy (con Diego). Luego: seed_providers_nacional con API key real.
+---
+
+---
+[27-06-2026] 01:00 — Modo: tryhard (sesión nocturna — pivot completo)
+Tarea completada: TODAS las tareas 🔵 PIVOT completadas en una sola sesión.
+
+1. REDISEÑO VISUAL v3:
+   - Fuentes: Space Grotesk (headings) + Plus Jakarta Sans (body) — personalidad real.
+   - Paleta: índigo profundo (#1a4fd6) + verde esmeralda (#059669).
+   - Provider cards: accent bar superior (azul/verde/ámbar según estado), avatar letra,
+     layout con header+tags+desc+actions bien jerarquizado.
+   - Hero: stats card animada a la derecha, eyebrow con punto verde pulsante.
+   - Toast messages: slide-in desde derecha, auto-dismiss 4.5s.
+   - Contact card sidebar: header gradiente azul, CTA verde prominente.
+   - Share row en detail: WhatsApp + copiar enlace.
+   - Join band: gradiente azul con decoración geométrica, call-to-action fuerte.
+
+2. CONTENIDO (sin Google Maps API):
+   - seed_providers_offline: 177 providers ficticios pero plausibles en 10 comunas.
+     Total BD: 209 providers, 10 comunas activas.
+   - Emojis en categorías: cerrajería, gasfitería, electricidad, etc.
+
+3. MODELO AUTOSERVICIO (estilo Yapo):
+   - Provider.owner (FK User, null) + subscription_status + claimed_at.
+   - App accounts: UserProfile (referral_code único auto-generado).
+   - Flujos: registro, login, logout, dashboard, publicar, editar, reclamar perfil.
+   - Sin moderación previa — publica de inmediato.
+   - Términos de Uso: responsabilidad en el usuario publicante.
+
+4. MONETIZACIÓN (scaffolding):
+   - subscription_status/expires_at en Provider.
+   - Página "Hazte Verificado" → WhatsApp manual.
+   - Badge en cards y detail page para promover verificación.
+
+5. CRECIMIENTO:
+   - Compartir por WhatsApp desde cualquier provider detail.
+   - Copiar enlace directo.
+   - OG tags completos: og:title, og:description, og:image, og:url, twitter:card.
+   - Programa de referidos: ?ref=CODE en registro, UserProfile.referred_by.
+   - Referral link en dashboard de cada usuario.
+
+Archivos modificados: 31 archivos, 2344 inserciones, 1057 eliminaciones.
+Commit: 41e3d61 feat: pivot Yapo — autoservicio, rediseno visual v3, seed 177 providers
+
+Bugs encontrados/resueltos:
+  - |default:meta_description sin comillas → VariableDoesNotExist. Fix: {% firstof %}.
+  - Emojis en Windows cp1252 → usar unicode escapes en Python inline.
+
+Decisiones tomadas:
+  - Provider.owner SET_NULL (no CASCADE) — si el usuario se borra, el perfil sobrevive.
+  - Seed offline sintético es suficiente para demostración; datos reales vía Google Maps
+    cuando Diego active la API key.
+  - UserProfile se crea vía signal post_save en User — transparente.
+
+Próxima tarea:
+  - Deploy a Render (requiere confirmación Diego).
+  - Cuando haya API key: correr seed_providers_nacional con comunas reales.
+  - Subir fotos de portada a algunos providers para ver cards con imágenes.
 ---
