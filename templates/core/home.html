@@ -1,30 +1,29 @@
 {% extends "base.html" %}
 
 {% block content %}
+<!-- HERO -->
 <section class="hero-section">
   <div class="container py-5">
-    <div class="row align-items-center g-4">
+    <div class="row align-items-center g-5">
       <div class="col-lg-7">
-        <span class="eyebrow">Servicios locales en Chile</span>
-        <h1 class="display-5 fw-bold mt-3">Encuentra servicios locales confiables cerca de ti</h1>
-        <p class="lead text-muted mt-3">Gasfitería, cerrajería, electricidad, maestros de construcción, limpieza, climatización y más servicios locales en un solo lugar.</p>
-        <p class="hero-trust">Servicios locales, contacto directo y datos revisados manualmente.</p>
-        <div class="d-flex flex-column flex-sm-row gap-2 mt-4">
-          <a class="btn btn-primary btn-lg" href="{% url 'directory:provider_list' %}">Buscar servicio</a>
-          <a class="btn btn-outline-primary btn-lg" href="{% url 'core:join' %}">Sumar mi servicio gratis</a>
-        </div>
+        <span class="hero-eyebrow">Servicios locales en Chile</span>
+        <h1 class="mt-3 mb-3">Encuentra el profesional que necesitas, <span style="color:var(--sp-blue-mid)">cerca de ti</span></h1>
+        <p class="lead mb-3">Gasfitería, cerrajería, electricidad, limpieza, climatización y más — sin intermediarios, contacto directo por WhatsApp.</p>
+        <span class="hero-trust-badge mb-4 d-inline-block">Sin comisión para el prestador ni para ti</span>
+
+        <!-- Buscador -->
         <form class="search-panel mt-4" action="{% url 'directory:provider_list' %}" method="get">
           <div class="row g-2">
             <div class="col-md-6">
               <label class="form-label" for="q">¿Qué necesitas?</label>
-              <input class="form-control form-control-lg" id="q" name="q" type="search" placeholder="Ej: gasfiter, pintura o Pajaritos">
+              <input class="form-control form-control-lg" id="q" name="q" type="search" placeholder="Ej: gasfitero, electricista…">
             </div>
             <div class="col-md-4">
               <label class="form-label" for="categoria">Categoría</label>
               <select class="form-select form-select-lg" id="categoria" name="categoria">
                 <option value="">Todas</option>
                 {% for category in categories %}
-                  <option value="{{ category.slug }}">{{ category.name }}</option>
+                  <option value="{{ category.slug }}">{{ category.icon }} {{ category.name }}</option>
                 {% endfor %}
               </select>
             </div>
@@ -33,16 +32,38 @@
             </div>
           </div>
         </form>
+
+        <div class="d-flex flex-wrap gap-2 mt-4">
+          <a class="btn btn-outline-primary" href="{% url 'accounts:provider_create' %}">Publicar mi servicio gratis</a>
+          <a class="btn btn-outline-primary" href="{% url 'directory:provider_list' %}">Ver todos los servicios</a>
+        </div>
       </div>
+
+      <!-- Stats card -->
       <div class="col-lg-5">
-        <div class="trust-panel hero-card">
-          <span class="eyebrow">Red local en construcción</span>
-          <strong class="d-block h4 mt-2">Una forma simple de encontrar servicios y contactar directo.</strong>
-          <p>Ordenamos prestadores locales en Chile para que vecinos y negocios puedan conectarse con más claridad.</p>
-          <div class="trust-metrics">
-            <span><strong>{{ categories|length }}</strong> categorías</span>
-            <span><strong>{{ featured_providers|length }}</strong> prestadores activos</span>
-            <span><strong>{{ communes|length }}</strong> comunas disponibles</span>
+        <div class="stats-card">
+          <span class="eyebrow">Red en crecimiento</span>
+          <p class="mt-2 mb-0" style="font-size:.95rem;color:var(--sp-muted)">Prestadores locales verificados manualmente, contacto directo, sin intermediarios.</p>
+          <div class="stats-grid">
+            <div class="stat-item">
+              <strong>{{ categories|length }}</strong>
+              <span>categorías</span>
+            </div>
+            <div class="stat-item">
+              <strong>{{ total_providers }}</strong>
+              <span>prestadores</span>
+            </div>
+            <div class="stat-item">
+              <strong>{{ communes_count }}</strong>
+              <span>comunas</span>
+            </div>
+            <div class="stat-item">
+              <strong>$0</strong>
+              <span>comisión</span>
+            </div>
+          </div>
+          <div class="mt-3 pt-3" style="border-top:1px solid var(--sp-line-soft)">
+            <p style="font-size:.85rem;color:var(--sp-muted);margin:0">¿Ofreces un servicio? <a href="{% url 'accounts:provider_create' %}">Publícalo gratis →</a></p>
           </div>
         </div>
       </div>
@@ -50,73 +71,80 @@
   </div>
 </section>
 
+<!-- CATEGORÍAS -->
 <section class="container py-5">
   <div class="section-heading">
-    <h2>¿Cómo funciona?</h2>
-  </div>
-  <div class="row g-3 mt-2">
-    <div class="col-md-4">
-      <div class="step-card">
-        <span class="step-icon">1</span>
-        <h3 class="h5">Busca el servicio que necesitas</h3>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="step-card">
-        <span class="step-icon">2</span>
-        <h3 class="h5">Revisa prestadores disponibles en tu comuna</h3>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="step-card">
-        <span class="step-icon">3</span>
-        <h3 class="h5">Contacta directo por WhatsApp</h3>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="container py-4">
-  <div class="section-heading">
     <h2>Servicios más buscados</h2>
-    <a href="{% url 'directory:provider_list' %}">Ver servicios</a>
+    <a href="{% url 'directory:provider_list' %}">Ver todos →</a>
   </div>
-  <div class="category-grid mt-3">
+  <div class="category-grid">
     {% for category in popular_categories %}
       <a class="category-tile" href="{% url 'directory:provider_list' %}?categoria={{ category.slug }}">
-        <span class="category-icon">{{ category.icon|default:"+" }}</span>
-        <span class="fw-semibold">{{ category.name }}</span>
-        <small>{{ category.description }}</small>
+        <span class="category-icon">{{ category.icon|default:"🔧" }}</span>
+        <span style="font-weight:700;font-size:.95rem">{{ category.name }}</span>
+        {% if category.description %}<small>{{ category.description }}</small>{% endif %}
       </a>
     {% endfor %}
   </div>
 </section>
 
+<!-- CÓMO FUNCIONA -->
 <section class="container py-4">
   <div class="section-heading">
-    <h2>Prestadores destacados</h2>
-    <a href="{% url 'directory:provider_list' %}">Explorar servicios</a>
+    <h2>¿Cómo funciona?</h2>
   </div>
-  <div class="row g-3 mt-2">
-    {% for provider in featured_providers %}
-      {% include "directory/_provider_card.html" %}
-    {% empty %}
-      <p class="text-muted">Aún no hay prestadores destacados. Estamos revisando perfiles antes de mostrarlos en esta sección.</p>
-    {% endfor %}
+  <div class="row g-3 mt-1">
+    <div class="col-md-4">
+      <div class="step-card">
+        <span class="step-num">1</span>
+        <h3 class="h5 mb-1">Busca el servicio</h3>
+        <p class="text-muted mb-0" style="font-size:.9rem">Filtra por categoría, comuna o palabra clave.</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="step-card">
+        <span class="step-num">2</span>
+        <h3 class="h5 mb-1">Revisa el perfil</h3>
+        <p class="text-muted mb-0" style="font-size:.9rem">Lee la descripción, zona de atención y badge de verificación.</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="step-card">
+        <span class="step-num">3</span>
+        <h3 class="h5 mb-1">Contacta por WhatsApp</h3>
+        <p class="text-muted mb-0" style="font-size:.9rem">Directo al prestador. Sin intermediarios ni comisiones.</p>
+      </div>
+    </div>
   </div>
 </section>
 
+<!-- PRESTADORES DESTACADOS -->
+{% if featured_providers %}
+<section class="container py-4">
+  <div class="section-heading">
+    <h2>Prestadores destacados</h2>
+    <a href="{% url 'directory:provider_list' %}">Explorar todos →</a>
+  </div>
+  <div class="row g-3 mt-1">
+    {% for provider in featured_providers %}
+      {% include "directory/_provider_card.html" %}
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<!-- JOIN CTA -->
 <section class="container py-5">
   <div class="confidence-block mb-4">
-    <h2 class="h4">Confianza, cercanía y contacto directo</h2>
-    <p>Contacto directo con el prestador. SERVIPLACE no cobra comisión por trabajo y la información se revisa manualmente antes de destacarse.</p>
+    <h2 class="h4">¿Por qué SERVIPLACE?</h2>
+    <p>Sin comisión. Sin aprobación previa. Publicas tu perfil en minutos y los clientes te contactan directo por WhatsApp. <a href="{% url 'accounts:hazte_verificado' %}">Obtén el badge de verificado</a> para destacar sobre la competencia.</p>
   </div>
   <div class="join-band">
-    <div>
+    <div style="position:relative;z-index:1">
       <h2>¿Ofreces un servicio local?</h2>
-      <p>Súmate gratis al directorio y recibe consultas de vecinos que necesitan cotizar.</p>
+      <p>Publica tu perfil gratis en segundos. Sin trámites, sin comisión.</p>
     </div>
-    <a class="btn btn-light btn-lg" href="{% url 'core:join' %}">Sumarme gratis</a>
+    <a class="btn btn-light btn-lg" href="{% url 'accounts:provider_create' %}" style="position:relative;z-index:1;flex-shrink:0">Publicar gratis →</a>
   </div>
 </section>
 {% endblock %}

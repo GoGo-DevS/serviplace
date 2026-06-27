@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="page-header">
+  <div class="container py-4">
+    <a class="small" href="{{ provider.get_absolute_url }}">← Volver al perfil</a>
+    <h1 class="h2 mt-2 mb-1">Reclamar perfil</h1>
+    <p class="text-muted mb-0">Este perfil fue creado automáticamente. Si es tu negocio, puedes reclamarlo y editarlo.</p>
+  </div>
+</section>
+
+<section class="container py-5">
+  <div class="claim-card">
+    <div style="display:flex;gap:.75rem;align-items:flex-start;margin-bottom:1.5rem">
+      <div class="provider-card-avatar" style="width:56px;height:56px;font-size:1.4rem;flex-shrink:0">{{ provider.business_name|first|upper }}</div>
+      <div>
+        <h2 class="h4 mb-1">{{ provider.business_name }}</h2>
+        <p class="text-muted mb-0">{{ provider.category.name }} — {{ provider.sector }}, {{ provider.commune.name }}</p>
+      </div>
+    </div>
+
+    <div class="safety-note mb-4">
+      Al reclamar este perfil confirmas que eres el dueño o representante autorizado de este negocio. La información pasa a ser tu responsabilidad desde este momento.
+    </div>
+
+    {% if user.is_authenticated %}
+      <form method="post">
+        {% csrf_token %}
+        <p class="mb-3">El perfil quedará asociado a tu cuenta <strong>{{ user.username }}</strong> y podrás editarlo de inmediato.</p>
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-primary btn-lg">Sí, reclamar este perfil</button>
+          <a class="btn btn-outline-primary btn-lg" href="{{ provider.get_absolute_url }}">Cancelar</a>
+        </div>
+      </form>
+    {% else %}
+      <p class="mb-3">Necesitas una cuenta para reclamar este perfil.</p>
+      <a class="btn btn-primary btn-lg" href="{% url 'accounts:register' %}?next={% url 'accounts:claim_profile' provider.slug %}">Crear cuenta gratis</a>
+      <a class="btn btn-outline-primary btn-lg ms-2" href="{% url 'accounts:login' %}?next={% url 'accounts:claim_profile' provider.slug %}">Iniciar sesión</a>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

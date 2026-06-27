@@ -8,22 +8,26 @@ from directory.models import Category, Commune, Provider
 
 
 def home(request):
+    ref_code = request.GET.get('ref', '')
     categories = Category.objects.filter(is_active=True)
     featured_providers = (
         Provider.objects.filter(is_active=True)
         .select_related('category', 'commune')
         .order_by('-is_featured', '-is_verified', 'business_name')[:6]
     )
-    communes = Commune.objects.filter(is_active=True)
+    total_providers = Provider.objects.filter(is_active=True).count()
+    communes_count = Commune.objects.filter(is_active=True, providers__is_active=True).distinct().count()
 
     context = {
         'categories': categories,
-        'popular_categories': categories[:6],
-        'communes': communes,
+        'popular_categories': categories[:9],
         'featured_providers': featured_providers,
-        'page_title': 'SERVIPLACE | Servicios locales cerca de ti en Chile',
-        'meta_description': 'Encuentra gasfitería, cerrajería, electricidad, limpieza, climatización y otros servicios locales en tu comuna.',
-        'og_title': 'Encuentra servicios locales cerca de ti en Chile',
+        'total_providers': total_providers,
+        'communes_count': communes_count,
+        'ref_code': ref_code,
+        'page_title': 'SERVIPLACE | Encuentra servicios locales en Chile — Contacto directo',
+        'meta_description': 'Encuentra gasfitería, cerrajería, electricidad, limpieza, climatización y otros servicios locales en tu comuna. Contacto directo por WhatsApp.',
+        'og_title': 'SERVIPLACE — Servicios locales en Chile',
         'og_description': settings.SITE_DESCRIPTION,
     }
     return render(request, 'core/home.html', context)
@@ -75,6 +79,17 @@ def contact(request):
             'page_title': 'Contacto | SERVIPLACE',
             'meta_description': 'Contacta al equipo de SERVIPLACE.',
             'join_url': reverse('core:join'),
+        },
+    )
+
+
+def terms(request):
+    return render(
+        request,
+        'core/terms.html',
+        {
+            'page_title': 'Términos de Uso | SERVIPLACE',
+            'meta_description': 'Términos de uso de SERVIPLACE — directorio de servicios locales en Chile.',
         },
     )
 

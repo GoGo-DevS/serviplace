@@ -46,7 +46,12 @@ INSTALLED_APPS = [
     'core',
     'directory',
     'leads',
+    'accounts',
 ]
+
+LOGIN_URL = '/cuenta/login/'
+LOGIN_REDIRECT_URL = '/cuenta/dashboard/'
+LOGOUT_REDIRECT_URL = '/'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="page-header">
+  <div class="container py-4">
+    <span class="eyebrow">Legal</span>
+    <h1 class="h2 mt-2 mb-1">Términos de Uso</h1>
+    <p class="text-muted mb-0">Vigentes desde el 27 de junio de 2026.</p>
+  </div>
+</section>
+
+<section class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="detail-block terms-body">
+        <h2>1. Qué es SERVIPLACE</h2>
+        <p>SERVIPLACE es una vitrina digital que conecta a personas que buscan servicios con prestadores de servicios locales en Chile. Funciona como Yapo, Mercado Libre o Google Maps: somos un intermediario que facilita el contacto, no una empresa de servicios.</p>
+
+        <h2>2. Responsabilidad del contenido</h2>
+        <p><strong>Cada usuario es responsable de la veracidad e integridad de la información que publica.</strong> SERVIPLACE no verifica ni modera los perfiles antes de que sean publicados (excepto para los perfiles con badge "Verificado").</p>
+        <p>Al publicar un perfil, el usuario declara:</p>
+        <ul>
+          <li>Que la información de contacto es correcta y vigente.</li>
+          <li>Que ofrece efectivamente el servicio descrito.</li>
+          <li>Que tiene derecho a representar al negocio listado.</li>
+          <li>Que no publicará información falsa, engañosa o que infrinja derechos de terceros.</li>
+        </ul>
+
+        <h2>3. Perfiles de terceros y datos públicos</h2>
+        <p>SERVIPLACE puede incluir perfiles de negocios basados en información pública (como la que aparece en Google Maps, redes sociales u otras fuentes de acceso público). Esta práctica es legal y habitual en directorios, plataformas de reseñas y buscadores.</p>
+        <p>Si eres el dueño de un negocio listado y deseas reclamar, editar o eliminar tu perfil, puedes hacerlo desde la opción "Reclamar perfil" en la página del negocio, o escribiéndonos directamente.</p>
+
+        <h2>4. No somos parte de la transacción</h2>
+        <p>SERVIPLACE no forma parte de ningún acuerdo, contrato o transacción entre usuarios y prestadores. El precio, condiciones, materiales, plazos y garantías del servicio se acuerdan directamente entre las partes.</p>
+        <p>SERVIPLACE no es responsable por la calidad, seguridad, legalidad o resultado de los servicios contratados a través del directorio.</p>
+
+        <h2>5. Conducta prohibida</h2>
+        <p>No está permitido:</p>
+        <ul>
+          <li>Publicar información falsa o engañosa.</li>
+          <li>Hacerse pasar por otra persona o negocio.</li>
+          <li>Publicar contenido ofensivo, discriminatorio o ilegal.</li>
+          <li>Usar el directorio para spam o actividades fraudulentas.</li>
+        </ul>
+        <p>SERVIPLACE se reserva el derecho de eliminar cualquier perfil que viole estas normas, sin previo aviso.</p>
+
+        <h2>6. Modificaciones</h2>
+        <p>Estos términos pueden actualizarse. La versión vigente siempre estará disponible en esta página. El uso continuado del sitio implica aceptación de los términos vigentes.</p>
+
+        <h2>7. Contacto</h2>
+        <p>Para consultas sobre estos términos, reclamos o solicitudes de eliminación de perfil: <a href="{% url 'core:contact' %}">contáctanos aquí</a>.</p>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

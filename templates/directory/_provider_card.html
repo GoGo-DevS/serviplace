@@ -1,31 +1,45 @@
 <div class="col-md-6 col-xl-4">
-  <article class="provider-card h-100">
-    <div class="provider-badge-row">
-      <span class="badge provider-badge">{{ provider.category.name }}</span>
-      {% if provider.is_verified %}
-        <span class="badge text-bg-success">Contacto confirmado</span>
-      {% endif %}
-    </div>
-    <h3 class="h5 mt-3 mb-1">{{ provider.business_name }}</h3>
-    <p class="text-muted small mb-2">{{ provider.sector }}, {{ provider.commune.name }}</p>
-    <p>{{ provider.short_description }}</p>
-    <div class="d-flex flex-wrap gap-2 mt-auto">
-      {% if provider.is_featured %}
-        <span class="mini-pill">Destacado</span>
-      {% endif %}
-      <span class="mini-pill">{% if provider.service_area %}{{ provider.service_area }}{% else %}{{ provider.commune.name }}{% endif %}</span>
-    </div>
-    <div class="review-status {% if provider.is_verified %}is-reviewed{% endif %}">
-      {% if provider.is_verified %}
-        Datos revisados
-      {% else %}
-        Información pendiente de revisión
-      {% endif %}
-    </div>
-    <p class="provider-note">Contacto directo con el prestador. SERVIPLACE no cobra comisión por trabajo.</p>
-    <div class="provider-actions">
-      <a class="btn btn-primary" href="{{ provider.get_absolute_url }}">Ver perfil</a>
-      <a class="btn btn-outline-success" href="{% url 'directory:whatsapp_redirect' provider.slug %}" target="_blank" rel="noopener">Contactar</a>
+  <article class="provider-card{% if provider.is_featured %} is-featured{% elif provider.is_verified %} is-verified{% endif %} h-100">
+    <div class="provider-card-accent"></div>
+    <div class="provider-card-body">
+      <div class="provider-card-header">
+        <div class="provider-card-avatar">{{ provider.business_name|first|upper }}</div>
+        <div class="provider-card-meta">
+          <h3>{{ provider.business_name }}</h3>
+          <span class="location">{{ provider.sector }}, {{ provider.commune.name }}</span>
+        </div>
+      </div>
+
+      <div class="provider-card-tags">
+        <span class="badge badge-category">{{ provider.category.icon|default:"🔧" }} {{ provider.category.name }}</span>
+        {% if provider.is_verified %}
+          <span class="badge badge-verified">✓ Verificado</span>
+        {% endif %}
+        {% if provider.is_featured %}
+          <span class="badge badge-featured">⭐ Destacado</span>
+        {% endif %}
+      </div>
+
+      <p class="provider-card-desc">{{ provider.short_description }}</p>
+
+      <div class="d-flex gap-2 flex-wrap mb-2">
+        <span class="mini-pill">📍 {{ provider.commune.name }}</span>
+        {% if provider.service_area %}
+          <span class="mini-pill">{{ provider.service_area }}</span>
+        {% endif %}
+      </div>
+
+      <div class="review-status {% if provider.is_verified %}is-reviewed{% endif %}" style="margin-top:.6rem">
+        {% if provider.is_verified %}✓ Datos revisados{% else %}Información pendiente de revisión{% endif %}
+      </div>
+
+      <div class="provider-card-actions mt-3">
+        <a class="btn btn-outline-primary" href="{{ provider.get_absolute_url }}">Ver perfil</a>
+        <a class="btn btn-success" href="{% url 'directory:whatsapp_redirect' provider.slug %}" target="_blank" rel="noopener">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.555 4.117 1.528 5.845L0 24l6.335-1.652A11.95 11.95 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.943 0-3.771-.52-5.344-1.424l-.383-.226-3.963 1.033 1.055-3.857-.248-.396A9.928 9.928 0 012 12c0-5.514 4.486-10 10-10s10 4.486 10 10-4.486 10-10 10z"/></svg>
+          WhatsApp
+        </a>
+      </div>
     </div>
   </article>
 </div>

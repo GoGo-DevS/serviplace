@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="dashboard-header">
+  <div class="container">
+    <h1>Hola, {{ user.username }} 👋</h1>
+    <p>Gestiona tus perfiles y monitorea tu actividad en SERVIPLACE.</p>
+  </div>
+</div>
+
+<section class="container py-4">
+  <div class="row g-3 mb-4">
+    <div class="col-sm-6 col-lg-3">
+      <div class="dashboard-stat">
+        <strong>{{ my_providers|length }}</strong>
+        <span>perfil{{ my_providers|length|pluralize }} publicado{{ my_providers|length|pluralize }}</span>
+      </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+      <div class="dashboard-stat">
+        {% with total_views=my_providers|length %}
+        <strong>—</strong>
+        {% endwith %}
+        <span>vistas este mes</span>
+      </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+      <div class="dashboard-stat">
+        <strong>—</strong>
+        <span>clicks WhatsApp</span>
+      </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+      <div class="dashboard-stat" style="border-color:rgba(245,158,11,.25);background:linear-gradient(135deg,#fff,#fef3c7)">
+        <strong style="color:#b45309">{{ my_providers|length|yesno:"activo,—" }}</strong>
+        <span>estado verificado</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <!-- Mis perfiles -->
+    <div class="col-lg-8">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <h2 class="h4 mb-0">Mis perfiles</h2>
+        <a class="btn btn-primary btn-sm" href="{% url 'accounts:provider_create' %}">+ Publicar nuevo</a>
+      </div>
+
+      {% if my_providers %}
+        <div class="d-flex flex-column gap-3">
+          {% for provider in my_providers %}
+          <div class="detail-block d-flex align-items-start gap-3">
+            <div class="provider-card-avatar" style="width:52px;height:52px;font-size:1.2rem;flex-shrink:0">{{ provider.business_name|first|upper }}</div>
+            <div class="flex-grow-1 min-w-0">
+              <div class="d-flex flex-wrap gap-2 mb-1">
+                <span class="badge badge-category">{{ provider.category.name }}</span>
+                {% if provider.is_verified %}<span class="badge badge-verified">✓ Verificado</span>{% endif %}
+                {% if provider.is_featured %}<span class="badge badge-featured">⭐ Destacado</span>{% endif %}
+              </div>
+              <h3 class="h6 mb-0">{{ provider.business_name }}</h3>
+              <p class="text-muted mb-2" style="font-size:.85rem">{{ provider.sector }}, {{ provider.commune.name }}</p>
+              <div class="d-flex flex-wrap gap-2">
+                <a class="btn btn-sm btn-outline-primary" href="{{ provider.get_absolute_url }}">Ver perfil</a>
+                <a class="btn btn-sm btn-outline-primary" href="{% url 'accounts:provider_edit' provider.slug %}">Editar</a>
+                {% if not provider.is_verified %}
+                  <a class="btn btn-sm" href="{% url 'accounts:hazte_verificado' %}" style="background:#fef3c7;color:#92400e;border:1px solid rgba(245,158,11,.30)">Obtener verificado →</a>
+                {% endif %}
+              </div>
+            </div>
+            <div class="text-end flex-shrink-0" style="font-size:.82rem;color:var(--sp-muted)">
+              <div><strong style="color:var(--sp-ink)">{{ provider.views_count }}</strong> vistas</div>
+              <div><strong style="color:var(--sp-green)">{{ provider.whatsapp_clicks_count }}</strong> clicks WA</div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty-state text-center">
+          <p style="font-size:2.5rem;margin-bottom:.5rem">🚀</p>
+          <h2 class="h5 mb-2">Aún no tienes perfiles publicados</h2>
+          <p class="text-muted mb-3">Publica tu primer servicio gratis en menos de 2 minutos.</p>
+          <a class="btn btn-primary" href="{% url 'accounts:provider_create' %}">Publicar mi servicio →</a>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+      <!-- Referidos -->
+      <div class="referral-box mb-3">
+        <h4>Tu enlace de referido</h4>
+        <p style="font-size:.85rem;color:var(--sp-muted);margin-bottom:.65rem">Comparte este enlace y gana visibilidad cuando alguien se registre con tu código.</p>
+        <code class="referral-url">{{ request.scheme }}://{{ request.get_host }}{% url 'accounts:register' %}?ref={{ profile.referral_code }}</code>
+        <button class="btn btn-sm btn-outline-primary" onclick="navigator.clipboard.writeText('{{ request.scheme }}://{{ request.get_host }}{% url 'accounts:register' %}?ref={{ profile.referral_code }}').then(()=>alert('¡Enlace copiado!'))">
+          Copiar enlace
+        </button>
+      </div>
+
+      <!-- Hazte verificado -->
+      <div class="benefit-box">
+        <h4 class="h6 mb-2">⭐ Hazte Verificado</h4>
+        <p style="font-size:.85rem;color:var(--sp-muted);margin-bottom:.75rem">Destaca sobre la competencia con el badge de negocio verificado. Más vistas, más confianza.</p>
+        <a class="btn btn-sm btn-primary w-100" href="{% url 'accounts:hazte_verificado' %}">Saber más →</a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

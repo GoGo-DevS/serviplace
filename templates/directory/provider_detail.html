@@ -1,22 +1,27 @@
 {% extends "base.html" %}
 
+{% block extra_head %}
+<meta property="og:image" content="{{ og_image|default:'' }}">
+{% endblock %}
+
 {% block content %}
 <section class="page-header">
   <div class="container py-4">
-    <a class="small" href="{% url 'directory:provider_list' %}">Volver a servicios</a>
-    <div class="provider-detail-hero mt-3">
-      <div>
-        <div class="provider-badge-row mb-3">
-          <span class="badge provider-badge">{{ provider.category.name }}</span>
-          {% if provider.is_verified %}<span class="badge text-bg-success">Contacto confirmado</span>{% endif %}
-          {% if provider.is_featured %}<span class="badge text-bg-primary">Destacado</span>{% endif %}
+    <a class="small" href="{% url 'directory:provider_list' %}">← Volver a servicios</a>
+    <div class="provider-detail-top mt-3">
+      <div class="provider-detail-avatar">{{ provider.business_name|first|upper }}</div>
+      <div class="provider-detail-info">
+        <div class="d-flex flex-wrap gap-2 mb-2 align-items-center">
+          <span class="badge badge-category">{{ provider.category.icon|default:"🔧" }} {{ provider.category.name }}</span>
+          {% if provider.is_verified %}<span class="badge badge-verified">✓ Verificado</span>{% endif %}
+          {% if provider.is_featured %}<span class="badge badge-featured">⭐ Destacado</span>{% endif %}
+          {% if not provider.owner %}
+            <a class="badge badge-new" href="{% url 'accounts:claim_profile' provider.slug %}" style="cursor:pointer">🔑 Reclamar perfil</a>
+          {% endif %}
         </div>
-        <h1 class="display-6 fw-bold mb-2">{{ provider.business_name }}</h1>
-        <p class="lead text-muted mb-0">{{ provider.short_description }}</p>
-      </div>
-      <div class="detail-location">
-        <span>{{ provider.category.name }}</span>
-        <strong>{{ provider.sector }}, {{ provider.commune.name }}</strong>
+        <h1 class="mb-1" style="font-size:clamp(1.65rem,4vw,2.75rem);letter-spacing:-.025em">{{ provider.business_name }}</h1>
+        <p class="lead mb-0">{{ provider.short_description }}</p>
+        <p class="text-muted mt-1" style="font-size:.9rem">📍 {{ provider.sector }}, {{ provider.commune.name }}</p>
       </div>
     </div>
   </div>
@@ -25,72 +30,103 @@
 <section class="container py-4">
   <div class="row g-4">
     <div class="col-lg-8">
+
       <div class="detail-block">
-        <h2 class="h4">Sobre este servicio</h2>
-        <p>{{ provider.description|linebreaksbr }}</p>
+        <h2>Sobre este servicio</h2>
+        <p class="mb-0">{{ provider.description|linebreaksbr }}</p>
       </div>
 
       <div class="detail-block">
-        <h2 class="h4">Zona de atención</h2>
-        <p class="mb-0">{% if provider.service_area %}{{ provider.service_area }}{% else %}{{ provider.commune.name }} y sectores cercanos{% endif %}</p>
+        <h2>Zona de atención</h2>
+        <p class="mb-0">📍 {% if provider.service_area %}{{ provider.service_area }}{% else %}{{ provider.commune.name }} y sectores cercanos{% endif %}</p>
       </div>
 
       <div class="detail-block">
-        <h2 class="h4">Cómo contactar</h2>
-        <p>Escríbele por WhatsApp con el mensaje sugerido y cuéntale qué necesitas, en qué sector estás y cuándo necesitas el servicio.</p>
-        <p class="safety-note mb-0">SERVIPLACE conecta vecinos con prestadores, pero la coordinación, precio y ejecución del trabajo se acuerdan directamente entre ambas partes.</p>
+        <h2>Antes de contratar</h2>
+        <p>Confirma precio, disponibilidad, materiales y alcance antes de iniciar cualquier trabajo.</p>
+        <p class="safety-note mb-0">SERVIPLACE conecta vecinos con prestadores. La coordinación, precio y ejecución se acuerdan directamente entre las partes. <a href="{% url 'core:trust_and_safety' %}">Ver recomendaciones →</a></p>
       </div>
 
+      <!-- Fotos -->
+      {% if provider.images.all %}
       <div class="detail-block">
-        <h2 class="h4">Recomendaciones antes de contratar</h2>
-        <p class="mb-0">Recomendamos confirmar precio, disponibilidad, materiales y alcance antes de contratar.</p>
-      </div>
-
-      <div class="detail-block">
-        <h2 class="h4">Fotos</h2>
+        <h2>Fotos</h2>
         <div class="row g-3">
           {% for image in provider.images.all %}
             <div class="col-sm-6">
               <img class="provider-image" src="{{ image.image.url }}" alt="{{ image.alt_text|default:provider.business_name }}">
             </div>
-          {% empty %}
-            <div class="placeholder-photo">Este perfil aún no tiene fotos publicadas.</div>
           {% endfor %}
         </div>
       </div>
+      {% else %}
+      <div class="detail-block">
+        <h2>Fotos</h2>
+        <div class="placeholder-photo" style="min-height:140px">Sin fotos publicadas aún</div>
+      </div>
+      {% endif %}
+
+      <!-- Compartir -->
+      <div class="share-row mt-3">
+        <span>Compartir este perfil</span>
+        <a class="share-btn wa" href="https://wa.me/?text={{ request.build_absolute_uri|urlencode }}%20—%20{{ provider.business_name|urlencode }}%20en%20SERVIPLACE" target="_blank" rel="noopener">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.555 4.117 1.528 5.845L0 24l6.335-1.652A11.95 11.95 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.943 0-3.771-.52-5.344-1.424l-.383-.226-3.963 1.033 1.055-3.857-.248-.396A9.928 9.928 0 012 12c0-5.514 4.486-10 10-10s10 4.486 10 10-4.486 10-10 10z"/></svg>
+          WhatsApp
+        </a>
+        <button class="share-btn" onclick="navigator.clipboard.writeText(window.location.href).then(()=>alert('Enlace copiado'))">
+          🔗 Copiar enlace
+        </button>
+      </div>
+
     </div>
 
+    <!-- SIDEBAR CONTACTO -->
     <aside class="col-lg-4">
       <div class="contact-card">
-        <h2 class="h4">Contactar</h2>
-        <dl class="info-list">
-          <dt>Contacto</dt>
-          <dd>{{ provider.contact_name }}</dd>
-          <dt>Sector</dt>
-          <dd>{{ provider.sector }}, {{ provider.commune.name }}</dd>
-          <dt>Teléfono</dt>
-          <dd>{{ provider.phone }}</dd>
-          {% if provider.email %}
-            <dt>Email</dt>
-            <dd>{{ provider.email }}</dd>
+        <div class="contact-card-header">
+          <h2>Contactar</h2>
+          <p style="color:rgba(255,255,255,.8);font-size:.85rem;margin:.25rem 0 0">Habla directo con el prestador</p>
+        </div>
+        <div class="contact-card-body">
+          <dl class="info-list">
+            <dt>Contacto</dt><dd>{{ provider.contact_name }}</dd>
+            <dt>Sector</dt><dd>{{ provider.sector }}, {{ provider.commune.name }}</dd>
+            <dt>Teléfono</dt><dd>{{ provider.phone }}</dd>
+            {% if provider.email %}<dt>Email</dt><dd>{{ provider.email }}</dd>{% endif %}
+            {% if provider.address %}<dt>Dirección</dt><dd>{{ provider.address }}</dd>{% endif %}
+            <dt>Atención</dt><dd>{% if provider.service_area %}{{ provider.service_area }}{% else %}{{ provider.commune.name }}{% endif %}</dd>
+          </dl>
+
+          <a class="btn btn-success btn-lg w-100 d-flex align-items-center justify-content-center gap-2 desktop-whatsapp-button"
+             href="{% url 'directory:whatsapp_redirect' provider.slug %}" target="_blank" rel="noopener">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.555 4.117 1.528 5.845L0 24l6.335-1.652A11.95 11.95 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.943 0-3.771-.52-5.344-1.424l-.383-.226-3.963 1.033 1.055-3.857-.248-.396A9.928 9.928 0 012 12c0-5.514 4.486-10 10-10s10 4.486 10 10-4.486 10-10 10z"/></svg>
+            Contactar por WhatsApp
+          </a>
+          <p class="text-muted mt-2 mb-3" style="font-size:.8rem">Mensaje sugerido: "Hola, vi tu perfil en SERVIPLACE {{ provider.commune.name }} y necesito una cotización."</p>
+
+          {% if not provider.owner %}
+          <div style="padding:.7rem .85rem;border:1px solid rgba(26,79,214,.18);border-radius:10px;background:var(--sp-blue-light);font-size:.83rem">
+            ¿Es tu negocio? <a href="{% url 'accounts:claim_profile' provider.slug %}" style="font-weight:700">Reclama este perfil →</a>
+          </div>
           {% endif %}
-          {% if provider.address %}
-            <dt>Dirección</dt>
-            <dd>{{ provider.address }}</dd>
+
+          {% if not provider.is_verified %}
+          <div class="mt-2" style="padding:.7rem .85rem;border:1px solid rgba(245,158,11,.20);border-radius:10px;background:#fef3c7;font-size:.83rem;color:#92400e">
+            ⭐ <a href="{% url 'accounts:hazte_verificado' %}" style="color:#92400e;font-weight:700">Obtener badge verificado →</a>
+          </div>
           {% endif %}
-          <dt>Área de atención</dt>
-          <dd>{% if provider.service_area %}{{ provider.service_area }}{% else %}{{ provider.commune.name }}{% endif %}</dd>
-        </dl>
-        <a class="btn btn-success btn-lg w-100 desktop-whatsapp-button" href="{% url 'directory:whatsapp_redirect' provider.slug %}" target="_blank" rel="noopener">
-          Contactar por WhatsApp
-        </a>
-        <p class="small text-muted mt-3 mb-0">Mensaje sugerido: "Hola, vi tu perfil en SERVIPLACE {{ provider.commune.name }} y necesito una cotización."</p>
+        </div>
       </div>
     </aside>
   </div>
 </section>
 
+<!-- MOBILE FLOATING BAR -->
 <div class="mobile-whatsapp-bar">
-  <a class="btn btn-success btn-lg w-100" href="{% url 'directory:whatsapp_redirect' provider.slug %}" target="_blank" rel="noopener">Contactar por WhatsApp</a>
+  <a class="btn btn-success btn-lg w-100 d-flex align-items-center justify-content-center gap-2"
+     href="{% url 'directory:whatsapp_redirect' provider.slug %}" target="_blank" rel="noopener">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.555 4.117 1.528 5.845L0 24l6.335-1.652A11.95 11.95 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.943 0-3.771-.52-5.344-1.424l-.383-.226-3.963 1.033 1.055-3.857-.248-.396A9.928 9.928 0 012 12c0-5.514 4.486-10 10-10s10 4.486 10 10-4.486 10-10 10z"/></svg>
+    Contactar por WhatsApp
+  </a>
 </div>
 {% endblock %}

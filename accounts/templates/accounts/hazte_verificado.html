@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="verified-hero">
+  <div class="container py-5 text-center">
+    <div class="verified-badge-icon mx-auto mb-4">⭐</div>
+    <h1 style="letter-spacing:-.025em">Hazte Verificado en SERVIPLACE</h1>
+    <p class="lead mx-auto" style="max-width:600px">Destaca sobre la competencia con el badge oficial de negocio verificado. Más visibilidad, más confianza, más contactos.</p>
+    <a class="btn btn-warning btn-lg mt-3" href="{{ wa_url }}" target="_blank" rel="noopener" style="background:#f59e0b;border-color:#f59e0b;color:#1a1a1a;font-weight:800">
+      Solicitar verificación por WhatsApp →
+    </a>
+    <p class="text-muted mt-3" style="font-size:.88rem">Por ahora el proceso es manual y gratuito durante el período de lanzamiento. Te contactamos en menos de 24 horas.</p>
+  </div>
+</section>
+
+<section class="container py-5">
+  <div class="row g-4 align-items-start">
+    <div class="col-lg-6">
+      <h2 class="h3 mb-4" style="letter-spacing:-.02em">¿Qué incluye el badge verificado?</h2>
+      <ul class="benefit-list">
+        <li>Badge ✓ Verificado visible en tu tarjeta del directorio</li>
+        <li>Posición prioritaria en los resultados de búsqueda</li>
+        <li>Acento verde en tu tarjeta — destaca visualmente</li>
+        <li>Mayor confianza: los usuarios prefieren perfiles verificados</li>
+        <li>Tus datos fueron revisados y confirmados por el equipo SERVIPLACE</li>
+      </ul>
+    </div>
+    <div class="col-lg-6">
+      <div class="benefit-box">
+        <h3 class="h5 mb-3">¿Cómo solicitar?</h3>
+        <ol style="padding-left:1.25rem;display:grid;gap:.65rem">
+          <li style="font-weight:600">Haz clic en el botón de WhatsApp</li>
+          <li style="font-weight:600">Cuéntanos el nombre de tu negocio y el enlace a tu perfil en SERVIPLACE</li>
+          <li style="font-weight:600">Revisamos tu información y activamos el badge en menos de 24 horas</li>
+        </ol>
+        <div class="mt-3 pt-3" style="border-top:1px solid var(--sp-line-soft)">
+          <p style="font-size:.85rem;color:var(--sp-muted);margin-bottom:.75rem">¿Aún no tienes perfil en SERVIPLACE?</p>
+          <a class="btn btn-outline-primary btn-sm" href="{% url 'accounts:provider_create' %}">Publicar gratis primero →</a>
+        </div>
+      </div>
+
+      <div class="mt-3" style="padding:1rem 1.1rem;border:1px solid rgba(245,158,11,.25);border-radius:14px;background:#fffbeb">
+        <p style="margin:0;font-size:.88rem;color:#92400e;font-weight:600">
+          💡 Durante el período de lanzamiento la verificación es <strong>gratuita</strong>. En el futuro será parte del plan de suscripción.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="text-center mt-5">
+    <a class="btn btn-warning btn-lg" href="{{ wa_url }}" target="_blank" rel="noopener" style="background:#f59e0b;border-color:#f59e0b;color:#1a1a1a;font-weight:800">
+      Solicitar verificación gratis →
+    </a>
+  </div>
+</section>
+{% endblock %}

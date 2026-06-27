@@ -63,13 +63,14 @@ class ProviderAdmin(admin.ModelAdmin):
         'source_notes',
     )
     prepopulated_fields = {'slug': ('business_name',)}
-    readonly_fields = ('views_count', 'whatsapp_clicks_count', 'created_at', 'updated_at')
+    readonly_fields = ('views_count', 'whatsapp_clicks_count', 'claimed_at', 'created_at', 'updated_at')
     inlines = [ProviderImageInline]
     fieldsets = (
         ('Información principal', {'fields': ('business_name', 'slug', 'contact_name', 'category', 'short_description', 'description')}),
         ('Contacto', {'fields': ('phone', 'whatsapp_number', 'email')}),
         ('Ubicación y zona de atención', {'fields': ('commune', 'sector', 'address', 'service_area')}),
-        ('Estado del perfil', {'fields': ('is_verified', 'is_featured', 'is_active', 'data_status')}),
+        ('Estado del perfil', {'fields': ('is_verified', 'is_featured', 'is_active', 'data_status', 'owner', 'claimed_at')}),
+        ('Suscripción', {'fields': ('subscription_status', 'subscription_expires_at')}),
         ('Trazabilidad de fuente', {'fields': ('source_name', 'source_url', 'source_notes')}),
         ('Métricas', {'fields': ('views_count', 'whatsapp_clicks_count', 'created_at', 'updated_at')}),
     )

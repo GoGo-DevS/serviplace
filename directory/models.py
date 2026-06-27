@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 from django.urls import reverse
 from django.utils.text import slugify
@@ -62,9 +63,26 @@ class Provider(models.Model):
         (REJECTED, 'Rechazado'),
     ]
 
+    FREE = 'free'
+    VERIFIED_PAID = 'verified_paid'
+    FEATURED_PAID = 'featured_paid'
+
+    SUBSCRIPTION_CHOICES = [
+        (FREE, 'Gratuito'),
+        (VERIFIED_PAID, 'Verificado (pagado)'),
+        (FEATURED_PAID, 'Destacado (pagado)'),
+    ]
+
     business_name = models.CharField(max_length=140)
     slug = models.SlugField(max_length=170, unique=True, blank=True)
     contact_name = models.CharField(max_length=120)
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='providers',
+    )
     category = models.ForeignKey(Category, on_delete=models.PROTECT, related_name='providers')
     commune = models.ForeignKey(Commune, on_delete=models.PROTECT, related_name='providers')
     sector = models.CharField(max_length=120)
@@ -84,6 +102,9 @@ class Provider(models.Model):
     source_url = models.URLField(blank=True)
     source_notes = models.TextField(blank=True)
     data_status = models.CharField(max_length=30, choices=DATA_STATUS_CHOICES, default=PUBLIC_PROSPECT)
+    subscription_status = models.CharField(max_length=20, choices=SUBSCRIPTION_CHOICES, default=FREE)
+    subscription_expires_at = models.DateTimeField(null=True, blank=True)
+    claimed_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

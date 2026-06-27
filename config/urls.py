@@ -34,6 +34,7 @@ urlpatterns = [
     path('sitemap.xml', sitemap, {'sitemaps': SITEMAPS}, name='django.contrib.sitemaps.views.sitemap'),
     path('', include('core.urls')),
     path('', include('directory.urls')),
+    path('', include('accounts.urls')),
 ]
 
 if settings.DEBUG:

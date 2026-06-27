@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="page-header">
+  <div class="container py-4">
+    <span class="eyebrow">Únete gratis</span>
+    <h1 class="h2 mt-2 mb-1">Crea tu cuenta en SERVIPLACE</h1>
+    <p class="text-muted mb-0">Publica tu servicio en minutos y recibe consultas directas por WhatsApp.</p>
+  </div>
+</section>
+
+<section class="container py-5">
+  <div class="auth-card">
+    <p class="form-microcopy">Sin moderación previa. Publicas y queda visible de inmediato.</p>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% if ref_code %}<input type="hidden" name="ref" value="{{ ref_code }}">{% endif %}
+      {% for field in form %}
+        <div class="mb-3">
+          <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {% if field.help_text %}<div class="form-text text-muted">{{ field.help_text }}</div>{% endif %}
+          {% if field.errors %}
+            {% for error in field.errors %}<div class="text-danger mt-1" style="font-size:.85rem;font-weight:600">{{ error }}</div>{% endfor %}
+          {% endif %}
+        </div>
+      {% endfor %}
+      <button type="submit" class="btn btn-primary w-100 btn-lg mt-2">Crear cuenta gratis</button>
+    </form>
+    <p class="text-center text-muted mt-3" style="font-size:.88rem">
+      ¿Ya tienes cuenta? <a href="{% url 'accounts:login' %}">Iniciar sesión</a>
+    </p>
+  </div>
+</section>
+{% endblock %}

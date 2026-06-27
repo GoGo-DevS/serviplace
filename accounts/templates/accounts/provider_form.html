@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="page-header">
+  <div class="container py-4">
+    <a class="small" href="{% url 'accounts:dashboard' %}">← Volver al dashboard</a>
+    <h1 class="h2 mt-2 mb-1">{% if is_create %}Publicar mi servicio{% else %}Editar: {{ provider.business_name }}{% endif %}</h1>
+    <p class="text-muted mb-0">{% if is_create %}Tu perfil quedará visible de inmediato, sin moderación previa.{% else %}Los cambios se reflejan al instante.{% endif %}</p>
+  </div>
+</section>
+
+<section class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="application-card">
+        {% if is_create %}
+        <p class="form-microcopy">Tu perfil es tu responsabilidad. SERVIPLACE es una vitrina — asegúrate de que los datos de contacto sean correctos y la descripción sea veraz. <a href="{% url 'core:terms' %}">Ver términos →</a></p>
+        {% endif %}
+
+        <form method="post" novalidate>
+          {% csrf_token %}
+
+          <h3 class="h5 mb-3" style="letter-spacing:-.01em">Información del negocio</h3>
+          <div class="row g-3 mb-4">
+            <div class="col-md-8">
+              <label class="form-label" for="{{ form.business_name.id_for_label }}">{{ form.business_name.label }}</label>
+              {{ form.business_name }}
+              {% for error in form.business_name.errors %}<div class="text-danger mt-1" style="font-size:.85rem;font-weight:600">{{ error }}</div>{% endfor %}
+            </div>
+            <div class="col-md-4">
+              <label class="form-label" for="{{ form.contact_name.id_for_label }}">{{ form.contact_name.label }}</label>
+              {{ form.contact_name }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="{{ form.category.id_for_label }}">{{ form.category.label }}</label>
+              {{ form.category }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="{{ form.commune.id_for_label }}">{{ form.commune.label }}</label>
+              {{ form.commune }}
+            </div>
+            <div class="col-12">
+              <label class="form-label" for="{{ form.sector.id_for_label }}">{{ form.sector.label }}</label>
+              {{ form.sector }}
+            </div>
+          </div>
+
+          <h3 class="h5 mb-3" style="letter-spacing:-.01em;padding-top:1rem;border-top:1px solid var(--sp-line-soft)">Descripción del servicio</h3>
+          <div class="row g-3 mb-4">
+            <div class="col-12">
+              <label class="form-label" for="{{ form.short_description.id_for_label }}">{{ form.short_description.label }}</label>
+              {{ form.short_description }}
+              <div class="form-text">Resumen visible en las tarjetas del directorio.</div>
+            </div>
+            <div class="col-12">
+              <label class="form-label" for="{{ form.description.id_for_label }}">{{ form.description.label }}</label>
+              {{ form.description }}
+              <div class="form-text">Explica qué haces, cómo trabajas, qué te diferencia.</div>
+            </div>
+          </div>
+
+          <h3 class="h5 mb-3" style="letter-spacing:-.01em;padding-top:1rem;border-top:1px solid var(--sp-line-soft)">Contacto y ubicación</h3>
+          <div class="row g-3 mb-4">
+            <div class="col-md-6">
+              <label class="form-label" for="{{ form.phone.id_for_label }}">{{ form.phone.label }}</label>
+              {{ form.phone }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="{{ form.whatsapp_number.id_for_label }}">{{ form.whatsapp_number.label }}</label>
+              {{ form.whatsapp_number }}
+              <div class="form-text">Ej: 56912345678 (sin + ni espacios)</div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+              {{ form.email }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="{{ form.service_area.id_for_label }}">{{ form.service_area.label }}</label>
+              {{ form.service_area }}
+            </div>
+            <div class="col-12">
+              <label class="form-label" for="{{ form.address.id_for_label }}">{{ form.address.label }}</label>
+              {{ form.address }}
+            </div>
+          </div>
+
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary btn-lg">
+              {% if is_create %}Publicar perfil ahora{% else %}Guardar cambios{% endif %}
+            </button>
+            <a class="btn btn-outline-primary btn-lg" href="{% url 'accounts:dashboard' %}">Cancelar</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -4,7 +4,7 @@
 <section class="page-header">
   <div class="container py-4">
     <span class="eyebrow">Directorio local</span>
-    <h1 class="h2 mt-2 mb-1">Encuentra prestadores en {{ commune_name }}</h1>
+    <h1 class="h2 mt-2 mb-1" style="letter-spacing:-.02em">{{ commune_name }} — Servicios locales</h1>
     <p class="text-muted mb-0">Busca por categoría, comuna o palabra clave y contacta directo al prestador.</p>
   </div>
 </section>
@@ -21,7 +21,7 @@
         <select class="form-select form-select-lg" id="categoria" name="categoria">
           <option value="">Todas</option>
           {% for category in categories %}
-            <option value="{{ category.slug }}" {% if selected_category.slug == category.slug %}selected{% endif %}>{{ category.name }}</option>
+            <option value="{{ category.slug }}" {% if selected_category.slug == category.slug %}selected{% endif %}>{{ category.icon|default:"" }} {{ category.name }}</option>
           {% endfor %}
         </select>
       </div>
@@ -46,10 +46,12 @@
 
   <div class="results-summary">
     <div>
-      <p class="mb-0"><strong>{{ providers|length }}</strong> resultado{{ providers|length|pluralize }} activo{{ providers|length|pluralize }}</p>
-      <small>Contacta directamente por WhatsApp. SERVIPLACE no cobra comisión.</small>
+      <p class="mb-0"><strong>{{ providers|length }}</strong> resultado{{ providers|length|pluralize }}</p>
+      <small>Contacto directo por WhatsApp — sin comisión</small>
     </div>
-    <a class="small" href="{% url 'directory:provider_list' %}">Limpiar filtros</a>
+    {% if query or selected_category or selected_commune %}
+      <a class="small" href="{% url 'directory:provider_list' %}">Limpiar filtros</a>
+    {% endif %}
   </div>
 
   <div class="row g-3">
@@ -57,10 +59,20 @@
       {% include "directory/_provider_card.html" %}
     {% empty %}
       <div class="empty-state">
+        <p style="font-size:2.5rem;margin-bottom:.5rem">🔍</p>
         <h2 class="h5">No encontramos servicios con esos filtros</h2>
-        <p class="text-muted mb-0">Prueba con otra categoría o búsqueda.</p>
+        <p class="text-muted mb-3">Prueba con otra categoría, comuna, o búsqueda más general.</p>
+        <a class="btn btn-primary" href="{% url 'accounts:provider_create' %}">Publicar el primero gratis →</a>
       </div>
     {% endfor %}
   </div>
+
+  <!-- CTA publicar -->
+  {% if providers %}
+  <div class="text-center mt-5 py-4" style="border-top:1px solid var(--sp-line-soft)">
+    <p class="text-muted mb-2">¿Tu servicio no aparece aquí?</p>
+    <a class="btn btn-primary" href="{% url 'accounts:provider_create' %}">Publicar mi servicio gratis →</a>
+  </div>
+  {% endif %}
 </section>
 {% endblock %}
