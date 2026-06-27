@@ -140,9 +140,19 @@ ya advierte que media necesita Cloudinary antes de producción.
     contact, trust_and_safety, provider_list, provider_detail, _provider_card).
 [x] Dropdown comunas: ahora tiene optgroup por región (16 grupos, 346 comunas) + opción
     "Todas" al tope. UI completamente usable.
-[ ] SEO avanzado: sitemap.xml con URLs canonicas por region/commune/categoria.
-[ ] Breadcrumbs region/commune/categoria en provider_list.
-[ ] render.yaml + deploy a Render (confirmar con Diego antes).
+[x] sitemap.xml: 4 sitemaps (estáticas, providers, comunas, categoria×comuna).
+    URLs SEO hiperlocales generadas automáticamente por cada (cat, commune) con providers.
+[x] render.yaml: plan free, Neon DB, Cloudinary, Google Maps API — listo para deploy.
+[x] requirements.txt: cloudinary + django-cloudinary-storage añadidos.
+[x] build.sh: incluye seed_regiones_chile — 346 comunas disponibles desde primer deploy.
+[x] settings.py: GOOGLE_MAPS_API_KEY, GOOGLE_MAPS_REGION=CL, Cloudinary condicional.
+
+⏸️ REQUIERE CONFIRMACIÓN DE DIEGO antes de proceder:
+[ ] Crear cuenta Neon (DB Postgres) y copiar DATABASE_URL.
+[ ] Crear cuenta Cloudinary y copiar CLOUDINARY_URL.
+[ ] Conectar repo a Render (New > Blueprint > render.yaml).
+[ ] Configurar dominio serviplace.cl en Cloudflare.
+[ ] (Opcional) GitHub Action para correr seed_providers_nacional automáticamente.
 
 🟢 DEPLOY — al final, con confirmación de Diego antes de gastar:
 [ ] render.yaml (copiar patrón exacto de GoGoCRM: web service plan free + Postgres vía Neon
@@ -217,4 +227,16 @@ Archivos modificados: directory/views.py (Prefetch regions), todos los templates
 Decisiones tomadas: Ninguna nueva.
 Bugs encontrados/resueltos: Assertion test erróneo (Maipú en datos de provider es correcto).
 Próxima tarea: sitemap.xml SEO + render.yaml (requiere confirmación Diego para deploy).
+---
+[27-06-2026] 02:00 — Modo: tryhard (cierre de sesión)
+Tarea completada: TODAS las tareas 🔴 y 🟡 críticas + render.yaml listo.
+  - sitemap.xml: 4 sitemaps, genera URLs SEO hiperlocales automáticamente.
+  - render.yaml + Cloudinary + Google Maps API en settings.
+  - build.sh incluye seed_regiones_chile para deploy limpio a Postgres.
+  - 6 commits totales en esta sesión.
+Archivos modificados: config/settings.py, requirements.txt, build.sh, render.yaml,
+  core/sitemaps.py, core/views.py, directory/views.py, todos los templates HTML.
+Decisiones tomadas: render.yaml listo pero SIN deployar — espera confirmación Diego.
+Bugs encontrados/resueltos: Región RM duplicada del seed antiguo → eliminada.
+Próxima tarea: Deploy (con Diego). Luego: seed_providers_nacional con API key real.
 ---
