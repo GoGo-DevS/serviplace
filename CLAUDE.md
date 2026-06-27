@@ -73,6 +73,60 @@ gratuito funcionando). La ventaja competitiva real está en:
      decenas de comunas con datos reales mucho más rápido que crecimiento manual.
 
 ════════════════════════════════════════════════
+## PIVOT DE PRODUCTO — 27-06-2026 (Diego, post-revisión)
+════════════════════════════════════════════════
+Diego probó la versión nacional y dio feedback directo. 4 cambios de rumbo:
+
+1. **Diseño está muy plano.** Bootstrap genérico sin personalidad. Necesita nivel
+   "premium" — cards reales, jerarquía visual, colores/tipografía con identidad propia
+   de ServiPlace (no se ve el logo/paleta en ningún lado todavía). Referencia de calidad:
+   los sitios que GoGoDevS ya entregó a clientes (ver `C:\Users\diego\Proyectos GoGoDevS\
+   GoGoCRM\salon_amanda\` como ejemplo de acabado visual, aunque sea otro rubro).
+
+2. **La estrategia de "pedir permiso antes" NO FUNCIONA — abandonarla.** Diego estuvo
+   llamando/escribiendo negocio por negocio pidiendo autorización para usar sus datos
+   antes de publicarlos. De ~20 contactados, 2 respondieron. Es lento e ineficiente.
+   DECISIÓN: dejar de pedir permiso previo. `seed_providers_nacional` ya scrapea info
+   PÚBLICA de Google Maps (nombre, teléfono, categoría, comuna) — eso es suficiente base
+   legal para listar (info pública de un negocio público), igual que hace Google Maps,
+   Yelp, PáginasAmarillas, etc. El negocio puede reclamar/editar su perfil DESPUÉS de
+   publicado (ver punto 3), no antes.
+
+3. **Pivot de modelo: de "directorio curado por Diego" a "estilo Yapo" (autoservicio).**
+   La responsabilidad de la veracidad/calidad del contenido recae en CADA USUARIO, no en
+   Diego como curador. Esto significa:
+   - Cualquier persona puede crear una cuenta y publicar su propio servicio directamente
+     (sin moderación previa tipo `ProviderApplication` actual — ese flujo de aprobación
+     manual es DEMASIADO LENTO para escalar a nivel nacional).
+   - `Provider` necesita un campo `owner` (FK a `User`, nullable — los scrapeados de
+     Google Maps no tienen owner hasta que alguien los reclama; los creados por
+     autoservicio sí tienen owner desde el día 1).
+   - Flujo de "reclamar perfil": si tu negocio ya aparece scrapeado, puedes reclamarlo
+     (verificación simple, ej. código por WhatsApp al número listado) y pasa a ser tuyo.
+   - Página de Términos/Responsabilidad clara: "ServiPlace es una vitrina, cada usuario es
+     responsable de la veracidad de su información" — estilo Yapo/Marketplace, no estilo
+     directorio editorial.
+
+4. **Monetización futura (NO implementar pagos reales todavía, solo dejar la estructura
+   lista):** el negocio real eventual es cobrar suscripción a prestadores por un perfil
+   "verificado" (destacado, más visible, badge de confianza). Por ahora:
+   - Mantener/extender `is_verified` e `is_featured` (ya existen) como los campos que
+     eventualmente se activan vía pago.
+   - NO integrar una pasarela de pago real sin que Diego elija el proveedor explícitamente
+     (Webpay/Flow/Mercado Pago) — eso es decisión de negocio, no técnica. Solo dejar el
+     modelo/campos listos (ej. `subscription_status`, `subscription_expires_at` si aplica)
+     y una página "Hazte Verificado" que por ahora derive a WhatsApp manual (como hace
+     GoGoCRM con sus propuestas — cobro manual mientras no hay volumen para justificar
+     una pasarela automatizada).
+
+5. **Sobre "que se haga viral":** el código puede construir los MECANISMOS de crecimiento
+   (botón compartir por WhatsApp en cada perfil, links con buenas previews OG, programa de
+   referidos simple, páginas SEO ya cubiertas). Lo que el código NO puede garantizar es que
+   alguien lo comparta o se vuelva viral de verdad — esa parte depende de que Diego lo
+   promocione (grupos de Facebook de Maipú/comunas, redes, etc.) una vez esté listo. Ser
+   honesto con Diego sobre esto en cualquier resumen de sesión.
+
+════════════════════════════════════════════════
 ## REGLAS DE ORO (nunca violar)
 ════════════════════════════════════════════════
 1. Leer este archivo completo antes de cualquier acción.
@@ -146,6 +200,26 @@ ya advierte que media necesita Cloudinary antes de producción.
 [x] requirements.txt: cloudinary + django-cloudinary-storage añadidos.
 [x] build.sh: incluye seed_regiones_chile — 346 comunas disponibles desde primer deploy.
 [x] settings.py: GOOGLE_MAPS_API_KEY, GOOGLE_MAPS_REGION=CL, Cloudinary condicional.
+
+🔵 PIVOT 27-06-2026 — nueva prioridad #1 (ver sección PIVOT DE PRODUCTO arriba):
+[ ] Rediseño visual completo — identidad propia, cards premium, paleta/tipografía con
+    personalidad. Sacar el look Bootstrap genérico.
+[ ] Correr `seed_providers_nacional` YA con comunas grandes reales (Santiago, Ñuñoa,
+    Providencia, Las Condes, Maipú, Viña del Mar, Valparaíso, Concepción, La Florida,
+    Puente Alto) — sin pedir permiso previo, info pública de Google Maps. Llenar de
+    contenido real antes de seguir puliendo features.
+[ ] Modelo de autoservicio estilo Yapo:
+    - Agregar `Provider.owner` (FK User, null=True, blank=True).
+    - Registro/login de usuarios + dashboard "Mi perfil" para crear/editar su propio
+      Provider directamente, sin pasar por `ProviderApplication`.
+    - Flujo de "reclamar perfil" para los Provider scrapeados sin owner.
+    - Página de Términos/Responsabilidad (modelo Yapo: la responsabilidad del contenido
+      es del usuario que publica, no de ServiPlace).
+[ ] Scaffolding de monetización futura (SOLO estructura, sin pasarela real):
+    - Campos de suscripción/verificación pagada en Provider (o modelo Subscription aparte).
+    - Página "Hazte Verificado" que derive a WhatsApp manual por ahora.
+[ ] Mecanismos de crecimiento: botón compartir WhatsApp en cada perfil, OG tags con buena
+    preview al compartir, programa de referidos simple (link único por usuario).
 
 ⏸️ REQUIERE CONFIRMACIÓN DE DIEGO antes de proceder:
 [ ] Crear cuenta Neon (DB Postgres) y copiar DATABASE_URL.
