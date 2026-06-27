@@ -30,12 +30,12 @@ class ProviderApplicationForm(forms.ModelForm):
             'website': 'Sitio web',
             'anos_experiencia': 'Años de experiencia',
             'horario_atencion': 'Horario de atención',
-            'sector': 'Sector de Maipú donde atiendes',
+            'sector': 'Sector o zona donde atiendes',
             'descripcion_servicio': 'Describe tu servicio',
-            'acepta_contacto': 'Acepto que SERVIPLACE Maipú me contacte para revisar mi información.',
+            'acepta_contacto': 'Acepto que SERVIPLACE me contacte para revisar mi información.',
         }
         widgets = {
-            'nombre_negocio': forms.TextInput(attrs={'placeholder': 'Ej: Gasfiter Maipú Express'}),
+            'nombre_negocio': forms.TextInput(attrs={'placeholder': 'Ej: Gasfiter Express'}),
             'nombre_contacto': forms.TextInput(attrs={'placeholder': 'Tu nombre'}),
             'telefono': forms.TextInput(attrs={'placeholder': '+56 9 1234 5678'}),
             'whatsapp': forms.TextInput(attrs={'placeholder': '+56 9 1234 5678'}),
@@ -43,7 +43,7 @@ class ProviderApplicationForm(forms.ModelForm):
             'website': forms.URLInput(attrs={'placeholder': 'https://tusitio.cl'}),
             'anos_experiencia': forms.NumberInput(attrs={'min': 0, 'placeholder': 'Ej: 5'}),
             'horario_atencion': forms.TextInput(attrs={'placeholder': 'Ej: Lunes a sábado, 9:00 a 19:00'}),
-            'sector': forms.TextInput(attrs={'placeholder': 'Ej: Pajaritos, Rinconada, El Abrazo'}),
+            'sector': forms.TextInput(attrs={'placeholder': 'Ej: Centro, Rinconada, zona norte'}),
             'descripcion_servicio': forms.Textarea(
                 attrs={
                     'rows': 5,

@@ -147,8 +147,8 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-SITE_NAME = 'SERVIPLACE Maipú'
-SITE_DESCRIPTION = 'Encuentra gasfiter, cerrajero, electricista y otros servicios locales en Maipú.'
+SITE_NAME = 'SERVIPLACE'
+SITE_DESCRIPTION = 'Encuentra gasfiter, cerrajero, electricista y otros servicios locales en tu comuna.'
 DEFAULT_CONTACT_WHATSAPP = os.environ.get('DEFAULT_CONTACT_WHATSAPP', '56900000000')
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')

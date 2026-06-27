@@ -11,7 +11,7 @@ from .models import Category, Commune, Provider
 def provider_list(request):
     query = request.GET.get('q', '').strip()
     category_slug = request.GET.get('categoria', '').strip()
-    commune_slug = request.GET.get('comuna', 'maipu').strip() or 'maipu'
+    commune_slug = request.GET.get('comuna', '').strip()
 
     providers = Provider.objects.filter(is_active=True).select_related('category', 'commune')
 
@@ -38,8 +38,8 @@ def provider_list(request):
     selected_category = categories.filter(slug=category_slug).first() if category_slug else None
     selected_commune = communes.filter(slug=commune_slug).first() if commune_slug else None
 
-    title_tail = selected_category.name if selected_category else 'servicios'
-    commune_name = selected_commune.name if selected_commune else 'Maipú'
+    title_tail = selected_category.name if selected_category else 'Servicios'
+    commune_name = selected_commune.name if selected_commune else 'Chile'
 
     context = {
         'providers': providers,
@@ -48,7 +48,7 @@ def provider_list(request):
         'query': query,
         'selected_category': selected_category,
         'selected_commune': selected_commune,
-        'page_title': f'{title_tail} en {commune_name} | SERVIPLACE Maipú',
+        'page_title': f'{title_tail} en {commune_name} | SERVIPLACE',
         'meta_description': f'Busca {title_tail.lower()} y prestadores confiables en {commune_name}.',
     }
     return render(request, 'directory/provider_list.html', context)
@@ -69,18 +69,18 @@ def provider_detail(request, slug):
         'cover_image': provider.images.filter(is_cover=True).first(),
         'page_title': f'{provider.business_name} | {provider.category.name} en {provider.commune.name}',
         'meta_description': provider.short_description,
-        'og_title': f'{provider.business_name} en SERVIPLACE Maipú',
+        'og_title': f'{provider.business_name} en SERVIPLACE',
         'og_description': provider.short_description,
     }
     return render(request, 'directory/provider_detail.html', context)
 
 
 def whatsapp_redirect(request, slug):
-    provider = get_object_or_404(Provider, slug=slug, is_active=True)
+    provider = get_object_or_404(Provider.objects.select_related('commune'), slug=slug, is_active=True)
     Provider.objects.filter(pk=provider.pk).update(whatsapp_clicks_count=F('whatsapp_clicks_count') + 1)
     LeadEvent.objects.create(provider=provider, source_page='provider_detail', event_type=LeadEvent.WHATSAPP_CLICK)
 
-    message = 'Hola, vi tu servicio en SERVIPLACE Maipú y necesito una cotización.'
+    message = f'Hola, vi tu perfil en SERVIPLACE {provider.commune.name} y necesito una cotización.'
     return redirect(f'https://wa.me/{provider.clean_whatsapp_number}?text={quote(message)}')
 
 # Create your views here.
