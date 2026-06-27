@@ -13,7 +13,7 @@
       {% if provider.is_featured %}
         <span class="mini-pill">Destacado</span>
       {% endif %}
-      <span class="mini-pill">{{ provider.service_area|default:"Atiende en Maipú" }}</span>
+      <span class="mini-pill">{% if provider.service_area %}{{ provider.service_area }}{% else %}{{ provider.commune.name }}{% endif %}</span>
     </div>
     <div class="review-status {% if provider.is_verified %}is-reviewed{% endif %}">
       {% if provider.is_verified %}

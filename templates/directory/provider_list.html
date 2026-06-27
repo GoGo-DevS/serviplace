@@ -4,7 +4,7 @@
 <section class="page-header">
   <div class="container py-4">
     <span class="eyebrow">Directorio local</span>
-    <h1 class="h2 mt-2 mb-1">Encuentra prestadores en Maipú</h1>
+    <h1 class="h2 mt-2 mb-1">Encuentra prestadores en {{ commune_name }}</h1>
     <p class="text-muted mb-0">Busca por categoría, comuna o palabra clave y contacta directo al prestador.</p>
   </div>
 </section>
@@ -28,8 +28,13 @@
       <div class="col-lg-2">
         <label class="form-label" for="comuna">Comuna</label>
         <select class="form-select form-select-lg" id="comuna" name="comuna">
-          {% for commune in communes %}
-            <option value="{{ commune.slug }}" {% if selected_commune.slug == commune.slug %}selected{% endif %}>{{ commune.name }}</option>
+          <option value="" {% if not selected_commune %}selected{% endif %}>Todas</option>
+          {% for region in regions_with_communes %}
+            <optgroup label="{{ region.name }}">
+              {% for commune in region.active_communes %}
+                <option value="{{ commune.slug }}" {% if selected_commune.slug == commune.slug %}selected{% endif %}>{{ commune.name }}</option>
+              {% endfor %}
+            </optgroup>
           {% endfor %}
         </select>
       </div>

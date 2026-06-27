@@ -32,7 +32,7 @@
 
       <div class="detail-block">
         <h2 class="h4">Zona de atención</h2>
-        <p class="mb-0">{{ provider.service_area|default:"Atiende en Maipú y sectores cercanos." }}</p>
+        <p class="mb-0">{% if provider.service_area %}{{ provider.service_area }}{% else %}{{ provider.commune.name }} y sectores cercanos{% endif %}</p>
       </div>
 
       <div class="detail-block">
@@ -79,12 +79,12 @@
             <dd>{{ provider.address }}</dd>
           {% endif %}
           <dt>Área de atención</dt>
-          <dd>{{ provider.service_area|default:"Maipú" }}</dd>
+          <dd>{% if provider.service_area %}{{ provider.service_area }}{% else %}{{ provider.commune.name }}{% endif %}</dd>
         </dl>
         <a class="btn btn-success btn-lg w-100 desktop-whatsapp-button" href="{% url 'directory:whatsapp_redirect' provider.slug %}" target="_blank" rel="noopener">
           Contactar por WhatsApp
         </a>
-        <p class="small text-muted mt-3 mb-0">Mensaje sugerido: "Hola, vi tu servicio en SERVIPLACE Maipú y necesito una cotización."</p>
+        <p class="small text-muted mt-3 mb-0">Mensaje sugerido: "Hola, vi tu perfil en SERVIPLACE {{ provider.commune.name }} y necesito una cotización."</p>
       </div>
     </aside>
   </div>

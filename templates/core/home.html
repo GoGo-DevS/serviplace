@@ -5,8 +5,8 @@
   <div class="container py-5">
     <div class="row align-items-center g-4">
       <div class="col-lg-7">
-        <span class="eyebrow">Servicios locales en Maipu</span>
-        <h1 class="display-5 fw-bold mt-3">Encuentra servicios confiables cerca de ti en Maipú</h1>
+        <span class="eyebrow">Servicios locales en Chile</span>
+        <h1 class="display-5 fw-bold mt-3">Encuentra servicios locales confiables cerca de ti</h1>
         <p class="lead text-muted mt-3">Gasfitería, cerrajería, electricidad, maestros de construcción, limpieza, climatización y más servicios locales en un solo lugar.</p>
         <p class="hero-trust">Servicios locales, contacto directo y datos revisados manualmente.</p>
         <div class="d-flex flex-column flex-sm-row gap-2 mt-4">
@@ -38,11 +38,11 @@
         <div class="trust-panel hero-card">
           <span class="eyebrow">Red local en construcción</span>
           <strong class="d-block h4 mt-2">Una forma simple de encontrar servicios y contactar directo.</strong>
-          <p>Estamos ordenando prestadores de Maipú para que vecinos y negocios puedan conectarse con más claridad.</p>
+          <p>Ordenamos prestadores locales en Chile para que vecinos y negocios puedan conectarse con más claridad.</p>
           <div class="trust-metrics">
             <span><strong>{{ categories|length }}</strong> categorías</span>
             <span><strong>{{ featured_providers|length }}</strong> prestadores activos</span>
-            <span><strong>Maipú</strong> comuna inicial</span>
+            <span><strong>{{ communes|length }}</strong> comunas disponibles</span>
           </div>
         </div>
       </div>
@@ -64,7 +64,7 @@
     <div class="col-md-4">
       <div class="step-card">
         <span class="step-icon">2</span>
-        <h3 class="h5">Revisa prestadores disponibles en Maipú</h3>
+        <h3 class="h5">Revisa prestadores disponibles en tu comuna</h3>
       </div>
     </div>
     <div class="col-md-4">
@@ -113,8 +113,8 @@
   </div>
   <div class="join-band">
     <div>
-      <h2>¿Ofreces un servicio en Maipú?</h2>
-      <p>Súmate gratis al directorio inicial y recibe consultas de vecinos que necesitan cotizar.</p>
+      <h2>¿Ofreces un servicio local?</h2>
+      <p>Súmate gratis al directorio y recibe consultas de vecinos que necesitan cotizar.</p>
     </div>
     <a class="btn btn-light btn-lg" href="{% url 'core:join' %}">Sumarme gratis</a>
   </div>

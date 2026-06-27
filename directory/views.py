@@ -1,11 +1,11 @@
 from urllib.parse import quote
 
-from django.db.models import F, Q
+from django.db.models import F, Prefetch, Q
 from django.shortcuts import get_object_or_404, redirect, render
 
 from leads.models import LeadEvent
 
-from .models import Category, Commune, Provider
+from .models import Category, Commune, Provider, Region
 
 
 def provider_list(request):
@@ -34,9 +34,12 @@ def provider_list(request):
     providers = providers.order_by('-is_featured', '-is_verified', 'business_name')
 
     categories = Category.objects.filter(is_active=True)
-    communes = Commune.objects.filter(is_active=True)
+    active_communes_qs = Commune.objects.filter(is_active=True).order_by('name')
+    regions_with_communes = Region.objects.filter(is_active=True).prefetch_related(
+        Prefetch('communes', queryset=active_communes_qs, to_attr='active_communes')
+    ).order_by('name')
     selected_category = categories.filter(slug=category_slug).first() if category_slug else None
-    selected_commune = communes.filter(slug=commune_slug).first() if commune_slug else None
+    selected_commune = active_communes_qs.filter(slug=commune_slug).first() if commune_slug else None
 
     title_tail = selected_category.name if selected_category else 'Servicios'
     commune_name = selected_commune.name if selected_commune else 'Chile'
@@ -44,10 +47,11 @@ def provider_list(request):
     context = {
         'providers': providers,
         'categories': categories,
-        'communes': communes,
+        'regions_with_communes': regions_with_communes,
         'query': query,
         'selected_category': selected_category,
         'selected_commune': selected_commune,
+        'commune_name': commune_name,
         'page_title': f'{title_tail} en {commune_name} | SERVIPLACE',
         'meta_description': f'Busca {title_tail.lower()} y prestadores confiables en {commune_name}.',
     }
