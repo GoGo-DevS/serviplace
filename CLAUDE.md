@@ -105,42 +105,30 @@ de eventos WhatsApp/vistas).
 
 | Modelo               | Estado                                                          |
 |----------------------|------------------------------------------------------------------|
-| Region               | 1 sola: "Región Metropolitana"                                  |
-| Commune               | 1 sola: "Maipú"                                                  |
+| Region               | 16 (Chile completo, INE/SUBDERE) — seedeado 26-06-2026          |
+| Commune               | 346 (Chile completo) — seedeado 26-06-2026                       |
 | Category              | 9: Cerrajería, Gasfitería, Electricidad, Climatización,         |
 |                       | Construcción, Limpieza, Jardinería, Carpintería, Pintura        |
-| Provider              | 32, TODOS en Maipú (mezcla autorizado/prospecto_publico)         |
+| Provider              | 32, TODOS en Maipú/RM (mezcla autorizado/prospecto_publico)      |
 | ProviderApplication   | 0 (formulario de postulación gratis, nadie ha postulado aún)     |
 | LeadEvent             | tracking de whatsapp_click y detail_view por Provider            |
 
-Hardcode a Maipú detectado en:
-- `directory/views.py` → `provider_list`: default `commune_slug = 'maipu'`, título
-  "SERVIPLACE Maipú", `og_title` con "Maipú" fijo.
-- `directory/views.py` → `whatsapp_redirect`: mensaje "vi tu servicio en SERVIPLACE Maipú".
-- `core/views.py` → home/join/about/contact/trust_and_safety: TODOS tienen "Maipú" fijo en
-  `page_title`, `meta_description`, `og_title`, `og_description`.
-- `core/views.py` → `home`: featured_providers filtrado a `commune__slug='maipu'`.
-- `config/settings.py` línea 151: `SITE_DESCRIPTION` menciona "Maipú" fijo.
+Hardcode a Maipú: ELIMINADO en sesión 26-06-2026.
+- `directory/views.py`, `core/views.py`, `config/settings.py`, `directory/forms.py`: limpio.
+- Los 32 Provider de Maipú siguen intactos; FK commune→region correcta (RM).
 
-NO deployado. Sin render.yaml. Sin git. `docs/production_notes.md` ya advierte que media
-necesita Cloudinary antes de producción (mismo patrón que GoGoCRM — no reinventar, copiar).
+Git: inicializado. 2 commits. NO deployado. Sin render.yaml. `docs/production_notes.md`
+ya advierte que media necesita Cloudinary antes de producción.
 
 ════════════════════════════════════════════════
 ## LISTA DE PENDIENTES (trabajar en orden)
 ════════════════════════════════════════════════
 
 🔴 CRÍTICOS — hacer primero:
-[ ] git init + primer commit (proyecto entero, sin esto cualquier error es irrecuperable)
-[ ] Sacar TODO el hardcode "Maipú" de views.py (core y directory) y settings.py — dejar
-    genérico/dinámico según la comuna seleccionada, sin perder SEO local (cada página de
-    comuna+categoría debe seguir teniendo su propio title/meta específico, solo que generado
-    dinámicamente en vez de fijo).
-[ ] Seed de las 16 regiones + ~346 comunas de Chile (dataset estándar INE/SUBDERE) vía
-    management command (`seed_regiones_chile` o similar) — idempotente, usar get_or_create.
-[ ] Decidir y documentar en DECISIONES TOMADAS: ¿se mantienen los 32 Provider de Maipú como
-    están, o se migran de "comuna hardcodeada" a referenciar la Commune real recién seedeada?
-    (probablemente ya están bien vinculados a un FK Commune real — verificar, no hay que
-    recrearlos).
+[x] git init + primer commit (commit 1cabed9, 26-06-2026)
+[x] Sacar TODO el hardcode "Maipú" — views.py, settings.py, forms.py. SEO dinámico OK.
+[x] Seed 16 regiones + 346 comunas de Chile (seed_regiones_chile, 26-06-2026).
+[x] Decisión documentada: 32 Providers conservados, FK commune→RM corregida. No recrear.
 
 🟡 IMPORTANTES — expansión nacional:
 [ ] Adaptar el patrón de `growth/management/commands/leads_diarios.py` de GoGoCRM (Google
@@ -148,10 +136,10 @@ necesita Cloudinary antes de producción (mismo patrón que GoGoCRM — no reinv
     prestadores por comuna+categoría, no solo Maipú. Empezar por las comunas más grandes
     (Santiago, Puente Alto, Maipú, Las Condes, Viña del Mar, Valparaíso, Concepción,
     La Florida, etc.) antes de cubrir comunas chicas.
-[ ] Revisar `directory/forms.py` (ProviderApplicationForm) — confirmar que el formulario de
-    postulación gratuita ya no asuma Maipú en ningún lado (mensajes de éxito, etc.).
-[ ] Páginas de categoría+comuna indexables individualmente (SEO) — verificar que
-    `provider_list` genere URLs y meta tags únicos por combinación real, no solo Maipú.
+[ ] SEO: URLs de comuna por región en la navegación del directorio — selector de región
+    → commune dropdown, breadcrumbs región/commune/categoría.
+[ ] pages de categoría+comuna indexables: verificar que provider_list genere canonical
+    URL única por combinación y que el sitemap las incluya.
 
 🟢 DEPLOY — al final, con confirmación de Diego antes de gastar:
 [ ] render.yaml (copiar patrón exacto de GoGoCRM: web service plan free + Postgres vía Neon
@@ -166,6 +154,11 @@ necesita Cloudinary antes de producción (mismo patrón que GoGoCRM — no reinv
   Ir directo a cobertura nacional desde el inicio del rework.
 [26-06-2026] Cloudinary se configura en el render.yaml DESDE EL PRIMER DEPLOY, no se agrega
   después (lección aprendida en GoGoCRM: migrar imágenes ya subidas es trabajo extra evitable).
+[26-06-2026] Los 32 Provider de Maipú se mantienen AS-IS. Su FK commune ya apuntaba a la
+  Commune "Maipú" real — solo se corrigió el FK commune.region a "Región Metropolitana de
+  Santiago". No se recrearon ni se borraron datos.
+[26-06-2026] seed_regiones_chile.py usa get_or_create por slug de comuna (no por nombre)
+  para ser resiliente a tildes y variantes tipográficas. El slug es la clave canónica.
 
 ════════════════════════════════════════════════
 ## RUTINA DE ARRANQUE
@@ -193,4 +186,19 @@ Bugs encontrados/resueltos:
 Próxima tarea:
 ---
 
-(vacío — primera entrada la escribe la sesión tryhard que arranque el trabajo)
+---
+[26-06-2026] 00:00 — Modo: tryhard
+Tarea completada: Las 3 tareas 🔴 CRÍTICAS en orden.
+  1. git init + .gitignore + .gitattributes (LF) + primer commit (58 archivos).
+  2. Hardcode "Maipú" eliminado: directory/views.py (3 puntos), core/views.py (5 vistas),
+     config/settings.py (SITE_NAME/SITE_DESCRIPTION), directory/forms.py (labels+placeholders).
+     Django check limpio post-cambios. provider_list ahora muestra Chile completo sin filtro.
+  3. seed_regiones_chile: 16 regiones + 346 comunas INE/SUBDERE. Idempotente (get_or_create
+     por slug). Antigua "Región Metropolitana" huérfana eliminada. 32 providers intactos.
+Archivos modificados: directory/views.py, core/views.py, config/settings.py,
+  directory/forms.py, CLAUDE.md + nuevo: .gitignore, .gitattributes,
+  directory/management/commands/seed_regiones_chile.py
+Decisiones tomadas: 32 providers conservados. FK region corregida automáticamente por seed.
+Bugs encontrados/resueltos: Región duplicada ("RM" vs "RM de Santiago") — eliminada la vieja.
+Próxima tarea: 🟡 seed_providers_nacional (adaptar leads_diarios.py de GoGoCRM).
+---
