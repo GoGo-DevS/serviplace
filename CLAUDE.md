@@ -136,10 +136,13 @@ ya advierte que media necesita Cloudinary antes de producción.
     prestadores por comuna+categoría, no solo Maipú. Empezar por las comunas más grandes
     (Santiago, Puente Alto, Maipú, Las Condes, Viña del Mar, Valparaíso, Concepción,
     La Florida, etc.) antes de cubrir comunas chicas.
-[ ] SEO: URLs de comuna por región en la navegación del directorio — selector de región
-    → commune dropdown, breadcrumbs región/commune/categoría.
-[ ] pages de categoría+comuna indexables: verificar que provider_list genere canonical
-    URL única por combinación y que el sitemap las incluya.
+[x] Templates: cero hardcode "Maipú" en todos los templates (base, home, join, about,
+    contact, trust_and_safety, provider_list, provider_detail, _provider_card).
+[x] Dropdown comunas: ahora tiene optgroup por región (16 grupos, 346 comunas) + opción
+    "Todas" al tope. UI completamente usable.
+[ ] SEO avanzado: sitemap.xml con URLs canonicas por region/commune/categoria.
+[ ] Breadcrumbs region/commune/categoria en provider_list.
+[ ] render.yaml + deploy a Render (confirmar con Diego antes).
 
 🟢 DEPLOY — al final, con confirmación de Diego antes de gastar:
 [ ] render.yaml (copiar patrón exacto de GoGoCRM: web service plan free + Postgres vía Neon
@@ -201,4 +204,17 @@ Archivos modificados: directory/views.py, core/views.py, config/settings.py,
 Decisiones tomadas: 32 providers conservados. FK region corregida automáticamente por seed.
 Bugs encontrados/resueltos: Región duplicada ("RM" vs "RM de Santiago") — eliminada la vieja.
 Próxima tarea: 🟡 seed_providers_nacional (adaptar leads_diarios.py de GoGoCRM).
+---
+[26-06-2026] 01:00 — Modo: tryhard (continuación)
+Tarea completada: Tareas 🟡 iniciadas.
+  - seed_providers_nacional.py: command completo, Google Maps Places API inline.
+    Top 20 comunas × todas las categorías. --dry-run, --comunas, --categorias, --max-per-query.
+    Requiere GOOGLE_MAPS_API_KEY en env. Dedup por business_name+commune.
+  - Templates: 100% sin hardcode. Todas las views funcionales verificadas con test client.
+  - Dropdown comunas: optgroup por región. 346 comunas en 16 grupos + opción "Todas".
+Archivos modificados: directory/views.py (Prefetch regions), todos los templates HTML,
+  + nuevo: directory/management/commands/seed_providers_nacional.py
+Decisiones tomadas: Ninguna nueva.
+Bugs encontrados/resueltos: Assertion test erróneo (Maipú en datos de provider es correcto).
+Próxima tarea: sitemap.xml SEO + render.yaml (requiere confirmación Diego para deploy).
 ---
