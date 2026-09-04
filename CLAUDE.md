@@ -5,7 +5,11 @@
 ════════════════════════════════════════════════
 ## ⚠️ NOTAS CRÍTICAS — LEER PRIMERO
 ════════════════════════════════════════════════
-1. Este proyecto vive en `C:\Users\diego\Documents\serviplace\` — Django, git activo, 8 commits.
+1. Este proyecto vive en `C:\Users\diego\Desktop\backup-gogodevs\Proyectos GoGoDevS\GoGoCRM\serviplace\`
+   (se movió desde Documents\serviplace). Django, git activo, remote PRIVADO en
+   https://github.com/GoGo-DevS/serviplace — subido el 04-09-2026; hasta ese día eran 10 commits
+   con los 32 prestadores reales de Maipú en UNA sola copia del disco. El venv es el de GoGoCRM:
+   `..\venv\Scripts\python.exe`.
    App `accounts` nueva (autoservicio estilo Yapo). 209 providers en DB (10 comunas).
 2. NO está deployado en ningún lado. SQLite local únicamente. Settings ya son
    production-ready (env vars, dj-database-url) pero falta Render+Postgres+Cloudinary.
@@ -145,7 +149,8 @@ Diego probó la versión nacional y dio feedback directo. 4 cambios de rumbo:
 ════════════════════════════════════════════════
 Proyecto: ServiPlace — Directorio/marketplace de servicios locales en Chile
 Desarrollador: Diego Dinamarca (fundador GoGoDevS)
-Ubicación: C:\Users\diego\Documents\serviplace
+Ubicación: C:\Users\diego\Desktop\backup-gogodevs\Proyectos GoGoDevS\GoGoCRM\serviplace
+Repo: https://github.com/GoGo-DevS/serviplace (privado, desde 04-09-2026)
 Dominio objetivo: serviplace.cl
 Stack: Django 5.2 + PostgreSQL (prod) / SQLite (local) + Render + Cloudflare + WhiteNoise
 Visión: piloto inicial pensado en Ciudad de los Valles / Maipú (notas de GoGoCRM), pero
