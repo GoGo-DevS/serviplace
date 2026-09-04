@@ -3,6 +3,13 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# .env local (nunca se commitea). En Render las variables vienen del dashboard.
+try:
+    from dotenv import load_dotenv
+    load_dotenv(BASE_DIR / '.env')
+except ImportError:  # pragma: no cover
+    pass
+
 
 def env_bool(name, default=False):
     value = os.environ.get(name)

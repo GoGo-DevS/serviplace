@@ -105,6 +105,15 @@ class Provider(models.Model):
     subscription_status = models.CharField(max_length=20, choices=SUBSCRIPTION_CHOICES, default=FREE)
     subscription_expires_at = models.DateTimeField(null=True, blank=True)
     claimed_at = models.DateTimeField(null=True, blank=True)
+    # Moderación (modelo Yapo con freno de emergencia)
+    spam_flag = models.BooleanField(
+        default=False,
+        help_text='Marcado por el filtro antispam al publicar. Se guarda igual; un moderador decide.',
+    )
+    spam_reasons = models.CharField(max_length=200, blank=True)
+    moderation_note = models.TextField(blank=True)
+    hidden_at = models.DateTimeField(null=True, blank=True)
+    created_ip = models.GenericIPAddressField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -140,6 +149,20 @@ class Provider(models.Model):
     @property
     def clean_whatsapp_number(self):
         return ''.join(character for character in self.whatsapp_number if character.isdigit())
+
+    @property
+    def has_whatsapp(self):
+        """Solo un móvil chileno (569 + 8 dígitos) recibe WhatsApp. Un fijo no."""
+        digits = self.clean_whatsapp_number
+        return len(digits) == 11 and digits.startswith('569')
+
+    @property
+    def is_claimed(self):
+        return self.owner_id is not None
+
+    @property
+    def is_synthetic(self):
+        return self.source_name == 'seed_offline'
 
 
 class ProviderImage(models.Model):
@@ -193,3 +216,39 @@ class ProviderApplication(models.Model):
 
     def __str__(self):
         return f'{self.nombre_negocio} - {self.get_status_display()}'
+
+
+class ProviderReport(models.Model):
+    """Reporte, solicitud de baja o corrección sobre un perfil. Lo llena el público."""
+    REPORT = 'reporte'
+    REMOVAL = 'baja'
+    CORRECTION = 'correccion'
+    KIND_CHOICES = [
+        (REPORT, 'Reportar perfil'),
+        (REMOVAL, 'Solicitar baja (soy el titular)'),
+        (CORRECTION, 'Corregir datos'),
+    ]
+
+    provider = models.ForeignKey(Provider, on_delete=models.CASCADE, related_name='reports')
+    kind = models.CharField(max_length=20, choices=KIND_CHOICES, default=REPORT)
+    reporter_name = models.CharField(max_length=120, blank=True)
+    reporter_contact = models.CharField(max_length=160, blank=True)
+    message = models.TextField()
+    created_ip = models.GenericIPAddressField(null=True, blank=True)
+    spam_flag = models.BooleanField(default=False)
+    spam_reasons = models.CharField(max_length=200, blank=True)
+    resolved_at = models.DateTimeField(null=True, blank=True)
+    resolution_note = models.CharField(max_length=200, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'reporte de perfil'
+        verbose_name_plural = 'reportes de perfiles'
+
+    def __str__(self):
+        return f'{self.get_kind_display()} · {self.provider}'
+
+    @property
+    def is_resolved(self):
+        return self.resolved_at is not None

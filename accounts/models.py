@@ -13,6 +13,9 @@ class UserProfile(models.Model):
     referred_by = models.ForeignKey(
         User, on_delete=models.SET_NULL, null=True, blank=True, related_name='referrals'
     )
+    spam_flag = models.BooleanField(default=False, help_text='El registro disparó el filtro antispam.')
+    spam_reasons = models.CharField(max_length=200, blank=True)
+    created_ip = models.GenericIPAddressField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

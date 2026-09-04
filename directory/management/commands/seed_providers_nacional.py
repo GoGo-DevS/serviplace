@@ -106,7 +106,7 @@ def _buscar_google_maps(query: str, max_items: int = 20) -> list[dict]:
 
 
 def _short_desc(nombre: str, categoria_nombre: str, commune_name: str) -> str:
-    txt = f'{categoria_nombre} en {commune_name}. Dato público obtenido de Google Maps.'
+    txt = f'{categoria_nombre} en {commune_name}. Perfil no reclamado: los datos vienen de fuentes públicas.'
     return txt[:220]
 
 
@@ -116,7 +116,7 @@ def _desc(nombre: str, categoria_nombre: str, commune_name: str, direccion: str,
         partes.append(f'Dirección referencial: {direccion}.')
     if rating:
         partes.append(f'Calificación en Google Maps: {rating}/5 ({reviews} reseñas).')
-    partes.append('Perfil importado como prospecto público — pendiente de verificación.')
+    partes.append('Este perfil no ha sido reclamado por su titular: la información proviene de fuentes públicas y puede estar desactualizada. Si es tu negocio puedes reclamarlo o pedir su baja desde esta misma página.')
     return ' '.join(partes)
 
 
@@ -143,7 +143,13 @@ class Command(BaseCommand):
         parser.add_argument(
             '--dry-run',
             action='store_true',
-            help='No guarda nada — muestra qué importaría.',
+            help='NO llama a la API ni guarda nada: informa cuántas llamadas haría y qué costarían.',
+        )
+        parser.add_argument(
+            '--tope-llamadas',
+            type=int,
+            default=50,
+            help='Se niega a correr si el plan supera este número de llamadas a la API (default 50).',
         )
 
     def handle(self, *args, **opts):
@@ -187,12 +193,27 @@ class Command(BaseCommand):
             self.stderr.write(self.style.ERROR('Sin categorías válidas.'))
             return
 
+        # Cada query pide páginas de 20; con max_q <= 20 es UNA llamada por query.
+        paginas = max(1, -(-max_q // 20))
+        n_queries = len(categorias) * len(comunas)
+        n_llamadas = n_queries * paginas
+        # Text Search (New) con teléfono/web/rating = SKU "Advanced": ~USD 35 por 1.000 llamadas.
+        costo_usd = n_llamadas * 0.035
         self.stdout.write(
-            f'\nBuscando {len(categorias)} categorías × {len(comunas)} comunas '
-            f'= {len(categorias) * len(comunas)} queries (max {max_q} resultados c/u).'
+            f'\nPlan: {len(categorias)} categorías × {len(comunas)} comunas = {n_queries} queries, '
+            f'{paginas} página(s) c/u → {n_llamadas} llamadas a Places API (≈ USD {costo_usd:.2f}).'
         )
+        self.stdout.write('  Comunas    : ' + ', '.join(c.name for c in comunas))
+        self.stdout.write('  Categorías : ' + ', '.join(c.name for c in categorias))
         if dry:
-            self.stdout.write(self.style.WARNING('  [DRY-RUN — no se guardará nada]'))
+            self.stdout.write(self.style.WARNING('  [DRY-RUN] 0 llamadas hechas, 0 filas escritas. Quita --dry-run para correr.'))
+            return
+        if n_llamadas > opts['tope_llamadas']:
+            self.stderr.write(self.style.ERROR(
+                f'Plan de {n_llamadas} llamadas supera el tope de {opts["tope_llamadas"]}. '
+                f'Reduce comunas/categorías o sube --tope-llamadas a propósito.'
+            ))
+            return
 
         total_creados = 0
         total_skipped = 0
@@ -226,10 +247,12 @@ class Command(BaseCommand):
                         slug = f'{slug_base}-{counter}'
                         counter += 1
 
-                    if dry:
-                        creados_query += 1
-                        total_creados += 1
-                        continue
+                    telefono = r['telefono']
+                    digitos = ''.join(ch for ch in telefono if ch.isdigit())
+                    if digitos.startswith('9') and len(digitos) == 9:
+                        digitos = '56' + digitos
+                    # Solo un móvil chileno recibe WhatsApp; un fijo queda solo como teléfono.
+                    whatsapp = digitos if (len(digitos) == 11 and digitos.startswith('569')) else ''
 
                     Provider.objects.create(
                         business_name=nombre,
@@ -243,8 +266,8 @@ class Command(BaseCommand):
                             r['direccion'], r['rating'], r['reviews'],
                         ),
                         short_description=_short_desc(nombre, categoria.name, comuna.name),
-                        phone=r['telefono'],
-                        whatsapp_number=r['telefono'],
+                        phone=telefono,
+                        whatsapp_number=whatsapp,
                         email='',
                         address=r['direccion'][:180] if r['direccion'] else '',
                         service_area=f'{comuna.name} y alrededores',

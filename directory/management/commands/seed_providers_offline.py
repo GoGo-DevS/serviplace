@@ -1,5 +1,6 @@
 """
-Seed offline: genera providers realistas para 10 comunas grandes de Chile.
+SOLO DESARROLLO — NUNCA EN UN BUILD NI EN PRODUCCIÓN.
+Seed offline: genera providers FICTICIOS para 10 comunas grandes de Chile.
 No requiere Google Maps API — usa datos ficticios pero plausibles.
 Uso: python manage.py seed_providers_offline [--clear]
 """
@@ -169,6 +170,18 @@ def telefono_falso():
         return f'+569{random.randint(10000000, 99999999)}'
     return f'+562{random.randint(1000000, 9999999)}'
 
+def _solo_desarrollo(command, options):
+    """Este seed inventa prestadores. JAMÁS en un build ni en producción."""
+    from django.conf import settings
+    import os
+    if os.environ.get('RENDER') or not settings.DEBUG or not options.get('solo_desarrollo'):
+        command.stderr.write(command.style.ERROR(
+            'Este comando crea datos FALSOS. Solo corre en desarrollo (DEBUG=True, sin RENDER) '
+            'y con --solo-desarrollo explícito. No va en build.sh.'
+        ))
+        return False
+    return True
+
 
 class Command(BaseCommand):
     help = 'Seed offline: genera providers realistas sin Google Maps API'
@@ -176,8 +189,11 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('--clear', action='store_true', help='Eliminar providers scrapeados antes de insertar')
         parser.add_argument('--por-comuna', type=int, default=20, help='Providers por comuna (default: 20)')
+        parser.add_argument('--solo-desarrollo', action='store_true', help='Obligatorio: confirma que es una base de desarrollo.')
 
     def handle(self, *args, **options):
+        if not _solo_desarrollo(self, options):
+            return
         if options['clear']:
             deleted, _ = Provider.objects.filter(data_status=Provider.PUBLIC_PROSPECT, owner__isnull=True).exclude(
                 commune__name='Maipú'

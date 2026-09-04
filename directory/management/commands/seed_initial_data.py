@@ -3,10 +3,28 @@ from django.core.management.base import BaseCommand
 from directory.models import Category, Commune, Provider
 
 
+
+def _solo_desarrollo(command, options):
+    """Este seed inventa prestadores. JAMÁS en un build ni en producción."""
+    from django.conf import settings
+    import os
+    if os.environ.get('RENDER') or not settings.DEBUG or not options.get('solo_desarrollo'):
+        command.stderr.write(command.style.ERROR(
+            'Este comando crea datos FALSOS. Solo corre en desarrollo (DEBUG=True, sin RENDER) '
+            'y con --solo-desarrollo explícito. No va en build.sh.'
+        ))
+        return False
+    return True
+
 class Command(BaseCommand):
-    help = 'Carga datos iniciales para SERVIPLACE Maipu.'
+    help = 'SOLO DESARROLLO: categorías + 10 prestadores DEMO de Maipú con teléfono inventado. Usa seed_categorias en producción.'
+
+    def add_arguments(self, parser):
+        parser.add_argument('--solo-desarrollo', action='store_true', help='Obligatorio: confirma que es una base de desarrollo.')
 
     def handle(self, *args, **options):
+        if not _solo_desarrollo(self, options):
+            return
         maipu, _ = Commune.objects.update_or_create(
             slug='maipu',
             defaults={'name': 'Maipu', 'is_active': True},
