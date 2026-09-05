@@ -1,64 +1,52 @@
 from django import forms
+from django.utils.html import strip_tags
 
-from .models import ProviderApplication
+from core.antispam import AntispamFormMixin
+
+from .models import ProviderReport
 
 
-class ProviderApplicationForm(forms.ModelForm):
+def _plano(valor):
+    return ' '.join(strip_tags(valor or '').split()).strip()
+
+
+class ProviderReportForm(AntispamFormMixin, forms.ModelForm):
+    """Reportar / pedir baja / corregir / reclamar un perfil. Lo llena cualquiera."""
+
     class Meta:
-        model = ProviderApplication
-        fields = [
-            'nombre_negocio',
-            'nombre_contacto',
-            'categoria',
-            'telefono',
-            'whatsapp',
-            'instagram',
-            'website',
-            'anos_experiencia',
-            'horario_atencion',
-            'sector',
-            'descripcion_servicio',
-            'acepta_contacto',
-        ]
+        model = ProviderReport
+        fields = ['kind', 'reporter_name', 'reporter_contact', 'message']
         labels = {
-            'nombre_negocio': 'Nombre del negocio o servicio',
-            'nombre_contacto': 'Nombre de contacto',
-            'categoria': 'Categoría principal',
-            'telefono': 'Teléfono',
-            'whatsapp': 'WhatsApp',
-            'instagram': 'Instagram',
-            'website': 'Sitio web',
-            'anos_experiencia': 'Años de experiencia',
-            'horario_atencion': 'Horario de atención',
-            'sector': 'Sector o zona donde atiendes',
-            'descripcion_servicio': 'Describe tu servicio',
-            'acepta_contacto': 'Acepto que SERVIPLACE me contacte para revisar mi información.',
+            'kind': '¿Qué quieres hacer?',
+            'reporter_name': 'Tu nombre',
+            'reporter_contact': 'Cómo te contactamos (WhatsApp o correo)',
+            'message': 'Cuéntanos',
         }
         widgets = {
-            'nombre_negocio': forms.TextInput(attrs={'placeholder': 'Ej: Gasfiter Express'}),
-            'nombre_contacto': forms.TextInput(attrs={'placeholder': 'Tu nombre'}),
-            'telefono': forms.TextInput(attrs={'placeholder': '+56 9 1234 5678'}),
-            'whatsapp': forms.TextInput(attrs={'placeholder': '+56 9 1234 5678'}),
-            'instagram': forms.TextInput(attrs={'placeholder': 'Ej: @miservicio'}),
-            'website': forms.URLInput(attrs={'placeholder': 'https://tusitio.cl'}),
-            'anos_experiencia': forms.NumberInput(attrs={'min': 0, 'placeholder': 'Ej: 5'}),
-            'horario_atencion': forms.TextInput(attrs={'placeholder': 'Ej: Lunes a sábado, 9:00 a 19:00'}),
-            'sector': forms.TextInput(attrs={'placeholder': 'Ej: Centro, Rinconada, zona norte'}),
-            'descripcion_servicio': forms.Textarea(
-                attrs={
-                    'rows': 5,
-                    'placeholder': 'Cuenta que haces, en qué sectores atiendes y qué tipo de trabajos recibes.',
-                }
-            ),
+            'kind': forms.RadioSelect(),
+            'message': forms.Textarea(attrs={'rows': 5}),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        for field_name, field in self.fields.items():
-            if field_name == 'acepta_contacto':
-                field.widget.attrs.update({'class': 'form-check-input'})
-                field.required = True
-            else:
-                field.widget.attrs.update({'class': 'form-control form-control-lg'})
-        self.fields['categoria'].widget.attrs.update({'class': 'form-select form-select-lg'})
-        self.fields['categoria'].queryset = self.fields['categoria'].queryset.filter(is_active=True)
+        self.fields['reporter_name'].required = True
+        self.fields['reporter_contact'].required = True
+        for name, field in self.fields.items():
+            if name.startswith('sitio_web') or name.startswith('sello_') or name == 'kind':
+                continue
+            field.widget.attrs['class'] = 'form-control'
+
+    def clean_reporter_name(self):
+        return _plano(self.cleaned_data['reporter_name'])
+
+    def clean_reporter_contact(self):
+        return _plano(self.cleaned_data['reporter_contact'])
+
+    def clean_message(self):
+        texto = strip_tags(self.cleaned_data['message']).strip()
+        if len(texto) < 10:
+            raise forms.ValidationError('Cuéntanos un poco más (mínimo 10 caracteres).')
+        return texto
+
+    def antispam_textos(self):
+        return [self.data.get('message', ''), self.data.get('reporter_name', ''), self.data.get('reporter_contact', '')]

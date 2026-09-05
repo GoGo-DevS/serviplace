@@ -34,3 +34,26 @@ class UserProfile(models.Model):
     def referral_url(self):
         from django.urls import reverse
         return f"{reverse('core:home')}?ref={self.referral_code}"
+
+
+class LoginAttempt(models.Model):
+    """Un intento FALLIDO de login, por IP.
+
+    05-09-2026 — `LoginThrottledView` ya contaba estos intentos para frenar la
+    fuerza bruta (N fallos por IP en M minutos → 429), pero el modelo nunca se
+    escribió: la sesión autónoma dejó la vista y las settings, no la tabla, y
+    la importación tumbaba el arranque entero.
+
+    Solo se guardan los FALLIDOS: un login correcto no deja rastro acá, así que
+    la tabla no crece con el uso normal. Y solo IP + usuario intentado: nunca
+    la contraseña.
+    """
+    ip = models.GenericIPAddressField(db_index=True)
+    username = models.CharField(max_length=150, blank=True, default='')
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'{self.ip} · {self.username or "?"} · {self.created_at:%d-%m %H:%M}'

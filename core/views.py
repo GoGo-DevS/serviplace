@@ -3,7 +3,6 @@ from django.contrib import messages
 from django.shortcuts import redirect, render
 from django.urls import reverse
 
-from directory.forms import ProviderApplicationForm
 from directory.models import Category, Commune, Provider
 
 
@@ -34,30 +33,46 @@ def home(request):
 
 
 def join(request):
-    message = 'Hola, quiero sumar mi servicio a SERVIPLACE gratis.'
-    whatsapp_url = f'https://wa.me/{settings.DEFAULT_CONTACT_WHATSAPP}?text={message.replace(" ", "%20")}'
+    """`/sumate/` manda al flujo de autoservicio.
 
-    if request.method == 'POST':
-        form = ProviderApplicationForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(
-                request,
-                'Recibimos tu postulación. Te contactaremos para revisar la información antes de publicar tu perfil.',
-            )
-            return redirect('core:join')
-    else:
-        form = ProviderApplicationForm()
+    05-09-2026 — Esta vista todavía usaba `ProviderApplicationForm`, el
+    formulario de "postula y te contactamos para revisar antes de publicar".
+    Ese flujo murió con el pivot Yapo (27-06): hoy cualquiera se registra y
+    publica de inmediato desde `accounts`. El formulario ya no existía y la
+    importación tumbaba el arranque entero del sitio.
 
-    context = {
-        'form': form,
-        'whatsapp_url': whatsapp_url,
-        'page_title': 'Súmate gratis a SERVIPLACE',
-        'meta_description': 'Postula tu servicio local en SERVIPLACE y recibe contactos directos por WhatsApp cuando tu perfil esté aprobado.',
-        'og_title': 'Ofrece tu servicio en SERVIPLACE',
-        'og_description': 'Suma tu negocio local a SERVIPLACE — directorio gratuito de servicios en Chile.',
-    }
-    return render(request, 'core/join.html', context)
+    La URL se conserva porque está en el sitemap y en enlaces compartidos; el
+    `?ref=` del programa de referidos se pasa de largo para no perderlo.
+    """
+    destino = reverse('accounts:provider_create')
+    ref = request.GET.get('ref', '')
+    if ref:
+        destino = f'{destino}?ref={ref}'
+    return redirect(destino)
+
+
+def robots_txt(request):
+    """`/robots.txt`. Permite todo lo público y bloquea lo que no es contenido.
+
+    05-09-2026 — `config/urls.py` ya la enrutaba y la vista no existía: la
+    sesión autónoma paró a mitad de la fase SEO. Sin este archivo el sitio
+    arranca igual, pero Google rastrea el panel de cuenta y el admin, y esas
+    URLs no aportan nada al índice.
+
+    Texto plano y sin plantilla a propósito: un robots.txt con HTML por
+    accidente lo ignora todo rastreador.
+    """
+    lineas = [
+        'User-agent: *',
+        'Disallow: /cuenta/',
+        'Disallow: /admin/',
+        'Allow: /',
+        '',
+        f'Sitemap: {settings.SITE_URL}/sitemap.xml',
+        '',
+    ]
+    from django.http import HttpResponse
+    return HttpResponse('\n'.join(lineas), content_type='text/plain; charset=utf-8')
 
 
 def about(request):
