@@ -221,6 +221,37 @@ ya advierte que media necesita Cloudinary antes de producción.
 [x] Mecanismos de crecimiento: compartir WhatsApp en detail, copiar enlace,
     OG tags completos (og:image/url/description), referral links con ?ref=CODE.
 
+🔵 TAREA PEDIDA POR DIEGO (05-09-2026) — IMPORTADOR MULTI-FUENTE
+[ ] Hoy TODO el contenido viene de una sola fuente: Google Maps (428 de 460
+    prestadores, los 361 activos son todos de ahí). Eso tiene dos problemas:
+    el catálogo se limita a negocios ya registrados en Maps, y depende de una
+    sola API con cuota y costo.
+
+    Diego pide un IMPORTADOR CON VARIAS FUENTES, que busque prestadores donde
+    de verdad se ofrecen: Facebook Marketplace (sección Servicios), Yapo.cl
+    (categoría Servicios), LinkedIn, y las que se descubran (grupos de
+    Facebook por comuna, Instagram por hashtag, Mercado Libre Servicios).
+
+    Antes de escribir código:
+    · Revisar `growth/services/apify_service.py` de GoGoCRM: ya resuelve
+      Facebook (grupos, páginas y marketplace) por URL, e Instagram por
+      hashtag. Es el patrón a reusar, no a reinventar.
+    · Revisar `growth/services/agendapro_service.py`: ahí quedó escrito qué
+      hacer cuando una fuente NO deja entrar. AgendaPro devuelve 403 por
+      Cloudflare y NO se evadió — se dejó el camino de "pegar el HTML a
+      mano". Misma regla acá: si Yapo o LinkedIn bloquean, se respeta el no.
+      LinkedIn además prohíbe el scraping en sus términos: evaluar su API
+      oficial o descartarlo.
+    · CADA prestador importado tiene que quedar con `source_name` y
+      `source_url` reales, como los de Google Maps. Sin eso no se puede
+      responder de dónde salió un dato del sitio de cara al público.
+    · Deduplicar entre fuentes por teléfono normalizado, no por nombre: el
+      mismo gásfiter aparece en Maps y en Yapo escrito distinto.
+    · Nada se publica activo sin revisión: importar deja `is_active=False`
+      y un comando de curación decide. Ya hay `curar_importados.py`.
+    · Dry-run por defecto en todo comando que llame a una API con costo, y
+      que informe cuántas llamadas hará ANTES de hacerlas.
+
 ⏸️ PENDIENTE (próxima sesión):
 [ ] Reemplazar seed offline por datos reales de Google Maps (cuando Diego tenga API key).
     Comando listo: `python manage.py seed_providers_nacional`.
@@ -377,4 +408,52 @@ Próxima tarea:
   - Deploy a Render (requiere confirmación Diego).
   - Cuando haya API key: correr seed_providers_nacional con comunas reales.
   - Subir fotos de portada a algunos providers para ver cards con imágenes.
+---
+
+---
+[05-09-2026] — Modo: colaborativo (arranque + verificación de datos)
+Tarea completada: el sitio VOLVIÓ A ARRANCAR. La sesión autónoma del 04-09
+  commiteó la fase 1 y paró a las 19:16 a mitad de la fase 2, con 448 líneas
+  sin commitear en 6 archivos que referenciaban cosas que nunca alcanzó a
+  escribir. El arranque moría con ImportError, así que el sitio no se podía
+  ni ver. Tres huecos tapados:
+  · `core/views.py` importaba `ProviderApplicationForm` — el formulario de
+    "postula y te contactamos", muerto desde el pivot Yapo del 27-06.
+    `/sumate/` ahora redirige al publicar de autoservicio, conservando el
+    `?ref=` de referidos (está en el sitemap y en enlaces compartidos).
+  · `accounts.LoginAttempt` no existía y `LoginThrottledView` ya lo usaba
+    para frenar la fuerza bruta. Modelo + migración 0003. Solo guarda los
+    intentos FALLIDOS (IP y usuario intentado, nunca la contraseña), así que
+    la tabla no crece con el uso normal.
+  · `robots_txt` estaba enrutada en `config/urls.py` y no existía. Texto
+    plano (con HTML por accidente, ningún rastreador la lee), bloquea
+    `/cuenta/` y `/admin/`, apunta al sitemap.
+VERIFICACIÓN DE DATOS (Diego preguntó si son reales): SÍ.
+  428 de 460 prestadores traen `source_name='Google Maps'` con su
+  `source_url`. Los 361 ACTIVOS son todos de esa fuente. Los 10 sintéticos
+  que quedaban (teléfonos secuenciales 5691111000x) están `is_active=False`:
+  existen en la base pero no se ven en el sitio. La fase 1 del agente hizo
+  lo que prometió.
+  Distribución real: Maipú 122, Las Condes 85, La Florida 79, Puente Alto 76,
+  Santiago 39, Estación Central 11. 26 comunas, 9 categorías.
+Archivos modificados: core/views.py, accounts/models.py,
+  accounts/migrations/0003_login_attempt.py, y el commit del trabajo a medias
+  del agente (accounts/forms, accounts/urls, accounts/views, config/settings,
+  config/urls, directory/forms, core/context_processors.py).
+Bugs encontrados/resueltos: los 3 ImportError de arriba.
+QA: check 0 issues, 8 rutas responden lo que corresponde (200/302/404),
+  0 desbordes a 390 y 1440 px medidos con Chrome real, 0 imágenes rotas.
+LO QUE SE VIO MIRANDO Y QUEDA PENDIENTE (fase 3, diseño):
+  · `/servicios/` mide 162.000 px de alto en el celular: los 361 prestadores
+    en una sola página, SIN PAGINAR. Es lo primero que hay que arreglar.
+  · En la ficha, el botón fijo de WhatsApp tapa el texto al hacer scroll:
+    falta el hueco inferior.
+  · "Maipú, Maipú" duplicado en la ficha (comuna y sector repetidos).
+  · La caja "Sin fotos publicadas aún" sale en perfiles scrapeados que nunca
+    van a tener foto: se lee como que el sitio está a medio hacer.
+🔴 POR QUÉ SE CORTÓ EL AGENTE: sin confirmar. No dejó entrada de bitácora ni
+  commit de la fase 2. Si fue por contexto, la próxima sesión debe arrancar
+  leyendo `git log` para no rehacer la fase 1.
+Próxima tarea: el IMPORTADOR MULTI-FUENTE (ver el bloque 🔵 de PENDIENTES).
+  Después: fase 2 (seguridad) y fase 3 (diseño), que quedaron a medias.
 ---
