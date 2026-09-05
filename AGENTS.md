@@ -3,6 +3,116 @@
 Dos agentes trabajan sobre este repositorio. Este archivo es lo único que
 ambos aceptan como reglas del juego.
 
+> **v2 — 05-09-2026.** Incorpora los cinco ajustes que pidió Codex al revisar
+> la v1, y el hueco que él mismo señaló al final: *el prompt no conecta a los
+> agentes ni ejecuta nada; falta definir cómo nos entregamos los cambios y el
+> reporte*. Está resuelto en "El canal" y en "Alcance de la revisión".
+
+## Alcance de la revisión — se declara, no se supone
+
+**Lo primero de cada ciclo.** Sin esto no arranca nada, y no es burocracia:
+en este equipo ya se trabajó sobre una copia muerta de un repositorio que
+respondía el `git remote` del padre y parecía legítima. Se perdió una tanda
+entera.
+
+Cada `TASK.md` abre declarando:
+
+    REPO      ruta absoluta + URL del remote
+    RAMA      la rama
+    BASE      el commit desde el que se revisa (SHA completo)
+    CABEZA    el commit hasta el que se revisa (lo llena Claude al entregar)
+    ENTORNO   qué base de datos, qué .env, qué servicios externos se tocan
+
+Codex verifica que está parado en ese repositorio y ese commit **antes** de
+mirar una sola línea. Si no coincide, el veredicto es `INCONCLUSO` y no se
+revisa nada más.
+
+⚠️ **Este repositorio (`serviplace`) es git independiente y vive DENTRO de
+GoGoCRM.** `git remote -v` desde una subcarpeta puede contestar el remote del
+padre. Comprobar siempre `git rev-parse --show-toplevel`.
+
+## Tres veredictos, no dos
+
+| Veredicto | Cuándo |
+|---|---|
+| **PASS** | Sin bloqueantes abiertos y los criterios aplicables verificados |
+| **FAIL** | Queda al menos un bloqueante con evidencia |
+| **INCONCLUSO** | No se pudo comprobar lo esencial: falta sesión, credencial, entorno o servicio |
+
+`INCONCLUSO` no es un empate cortés. Es el veredicto correcto cuando el
+entorno impide juzgar, y **no se convierte en PASS por defecto**. Un ciclo
+puede cerrarse INCONCLUSO diciendo exactamente qué hizo falta para poder
+juzgar; eso lo resuelve Diego, no otra vuelta de revisión.
+
+## Gravedad y bloqueo son dos cosas distintas
+
+La v1 metía todos los P2 en "hallazgos bloqueantes" y a la vez decía que un
+P2 solo bloquea si compromete el resultado pedido. Se contradecía. Ahora cada
+hallazgo lleva las dos etiquetas, por separado:
+
+    [P1][BLOQUEA]     defecto grave que impide entregar
+    [P2][BLOQUEA]     calidad seria que compromete lo que TASK.md pidió
+    [P2][NO BLOQUEA]  calidad seria que NO compromete el objetivo del ciclo
+    [P3][NO BLOQUEA]  mejora menor
+
+Todo P0 y P1 bloquea siempre. Un P2 bloquea solo si Codex explica **contra
+qué criterio de `TASK.md`** atenta. Si no puede nombrar el criterio, no
+bloquea — va a la lista de arrastre y se decide en el ciclo siguiente.
+
+## Revisar no puede tener efectos reales
+
+**Regla dura, sin excepciones tácitas.** Verificar no puede:
+
+- mandar un mensaje a un cliente o prospecto real (WhatsApp, Instagram, correo)
+- escribir en una base de producción
+- emitir un cobro, una boleta o un pago
+- publicar en una red social
+- gastar cuota de una API paga
+
+Toda verificación corre contra **base de test o SQLite descartable**, con
+datos de prueba, y con los envíos apagados. Si un criterio SOLO se puede
+comprobar con un efecto real, no se ejecuta a escondidas: se marca
+`INCONCLUSO`, se dice qué haría falta, y **Diego autoriza esa corrida en
+concreto** — no "las corridas de este tipo".
+
+En GoGoCRM esto es literal: el `.env` de la raíz apunta a Neon, que es
+producción con los datos de todos los clientes.
+
+## El canal — cómo nos entregamos las cosas
+
+No hay conexión entre los agentes. **El repositorio es el canal**, y lo que
+no está commiteado no existe para el otro.
+
+    Claude entrega:   implementa → .\verificar.ps1 → escribe STATUS.md
+                      → commit → push
+                      → avisa: "ciclo N entregado, CABEZA <sha>"
+
+    Codex revisa:     git pull → comprueba REPO/RAMA/BASE/CABEZA
+                      → corre .\verificar.ps1 él mismo
+                      → escribe REVIEW.md → commit → push
+                      → avisa: "ciclo N revisado, VEREDICTO"
+
+Nadie escribe el archivo del otro. Si los dos tocan el repositorio a la vez,
+el segundo hace `git pull --rebase` antes de comitear: `STATUS.md` y
+`REVIEW.md` son archivos distintos, así que no chocan.
+
+Diego es quien pasa el aviso entre los dos. Es un paso manual y está bien que
+lo sea: es donde él decide si el ciclo sigue.
+
+## Evidencia archivada, con identificadores estables
+
+Cada revisión deja su rastro en `revisiones/ciclo-<N>.md`, con:
+
+- REPO, RAMA, BASE, CABEZA
+- los comandos que se ejecutaron **de verdad** y su salida
+- cada hallazgo con un identificador estable: `C<ciclo>-<n>`, por ejemplo
+  `C1-3`. Ese identificador **no cambia nunca**: así el ciclo 2 puede decir
+  "C1-3 cerrado, con la prueba `test_x` que falla sin el arreglo" y se puede
+  seguir el hilo sin releer todo.
+
+Un hallazgo cerrado no se vuelve a abrir con otro número. Si reaparece, es el
+mismo `C1-3` reabierto, y eso ya dice algo por sí solo.
+
     CLAUDE IMPLEMENTA
           ↓
     VERIFICACIÓN AUTOMATIZADA   ( .\verificar.ps1 )

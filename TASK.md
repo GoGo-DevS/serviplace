@@ -1,5 +1,25 @@
 # TASK.md — Ciclo 1
 
+## Alcance — verificar esto ANTES de revisar
+
+    REPO      C:\Users\diego\Desktop\backup-gogodevs\Proyectos GoGoDevS\GoGoCRM\serviplace
+              https://github.com/GoGo-DevS/serviplace  (privado)
+    RAMA      main
+    BASE      65e935f8   (el andamiaje del loop; el ciclo 1 arranca acá)
+    CABEZA    — la llena Claude al entregar —
+    ENTORNO   SQLite local (db.sqlite3). Sin Postgres, sin Render, sin dominio.
+              NO se toca Neon: es otro repositorio.
+              NO hay envíos de ningún tipo en este proyecto.
+
+⚠️ Este repositorio es git **independiente** y vive dentro de GoGoCRM.
+`git remote -v` desde una subcarpeta puede contestar el remote del padre.
+Comprobar con `git rev-parse --show-toplevel`; tiene que terminar en
+`/serviplace`.
+
+Si algo de arriba no coincide: veredicto `INCONCLUSO`, y no se revisa nada más.
+
+---
+
 **Objetivo del ciclo:** que lo que la sesión autónoma dejó a medias quede
 **probado**, y que los defectos que se ven al abrir el sitio desaparezcan.
 
