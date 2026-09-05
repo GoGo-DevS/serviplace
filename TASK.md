@@ -5,8 +5,8 @@
     REPO      C:\Users\diego\Desktop\backup-gogodevs\Proyectos GoGoDevS\GoGoCRM\serviplace
               https://github.com/GoGo-DevS/serviplace  (privado)
     RAMA      main
-    BASE      65e935f8   (el andamiaje del loop; el ciclo 1 arranca acá)
-    CABEZA    — la llena Claude al entregar —
+    BASE      ab6721c6a9b98c640ddbbc08b4588ccd361f9f80  (contrato v2)
+    CABEZA    3342203a3bf9ac5a457e616d34fe12dd36defec0  (entrega del ciclo 1)
     ENTORNO   SQLite local (db.sqlite3). Sin Postgres, sin Render, sin dominio.
               NO se toca Neon: es otro repositorio.
               NO hay envíos de ningún tipo en este proyecto.
