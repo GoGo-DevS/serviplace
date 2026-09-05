@@ -59,10 +59,21 @@
           {% endfor %}
         </div>
       </div>
-      {% else %}
+      {% elif provider.owner %}
+      {% comment %}
+      D4 — El hueco de fotos SOLO se muestra si el perfil tiene dueño.
+
+      Un perfil que vino de Google Maps no tiene a nadie que pueda subir una
+      foto, así que anunciar que le faltan no informa nada: se lee como que el
+      sitio está a medio hacer, y son la mayoría de las fichas. Al dueño sí le
+      sirve, porque es una tarea que puede hacer.
+      {% endcomment %}
       <div class="detail-block">
         <h2>Fotos</h2>
-        <div class="placeholder-photo" style="min-height:140px">Sin fotos publicadas aún</div>
+        <div class="placeholder-photo" style="min-height:140px">
+          Todavía no subes fotos.
+          <a href="{% url 'accounts:provider_edit' provider.slug %}">Agregar fotos →</a>
+        </div>
       </div>
       {% endif %}
 

@@ -1,107 +1,153 @@
 # STATUS.md
 
-**Ciclo:** 0 — montaje del loop
+**Ciclo:** 1 — entregado para revisión
 **Escrito por:** Claude
 **Fecha:** 05-09-2026
 
-## Qué se hizo en este ciclo
+    REPO      C:\Users\diego\Desktop\backup-gogodevs\Proyectos GoGoDevS\GoGoCRM\serviplace
+              https://github.com/GoGo-DevS/serviplace  (privado)
+    RAMA      main
+    BASE      ab6721c6a9b98c640ddbbc08b4588ccd361f9f80
+    CABEZA    (el commit de esta entrega — ver `git log -1`)
+    ENTORNO   SQLite local. Sin Postgres, sin Render, sin dominio, sin envíos.
+              No se tocó ninguna base de producción ni ninguna API paga.
 
-No se implementó ningún criterio de `TASK.md`. Se construyó lo que faltaba
-para que el loop pueda funcionar, y se midió la línea de partida.
+Comprobado antes de tocar nada: `git rev-parse --show-toplevel` termina en
+`/serviplace`, remote `GoGo-DevS/serviplace`, rama `main`, árbol limpio.
 
-El diagrama del workflow dice:
+---
 
-    CLAUDE IMPLEMENTA → VERIFICACIÓN AUTOMATIZADA → CODEX REVISA
+## Qué se cambió
 
-**Ese paso del medio no existía.** El repositorio tenía tres archivos de test
-vacíos y ni una sola prueba. Sin verificación automatizada, Codex tendría que
-reproducir a mano cada criterio en cada vuelta, y el límite de 3 ciclos no
-alcanzaría para converger.
+| Criterio | Qué se hizo | Archivo |
+|---|---|---|
+| D1 | El listado pagina de a 24, con controles que conservan los filtros | `directory/views.py`, `templates/directory/provider_list.html` |
+| D4 | El hueco de fotos solo se muestra si el perfil tiene dueño | `templates/directory/provider_detail.html` |
+| E2 | Tamaño táctil mínimo de 44 px en controles, solo con `pointer:coarse` | `static/css/site.css` |
+| B1-B5 | 13 pruebas de seguridad del autoservicio | `accounts/tests.py` (nuevo) |
+| B3, C, D1, D4 | 18 pruebas del directorio público | `directory/tests.py` |
 
-Tampoco existía `TASK.md`, así que no había nada contra qué auditar: una
-revisión sin criterios de aceptación termina siendo un intercambio de
-opiniones sobre gusto.
+**Nada de esto cambia el comportamiento para el usuario salvo D1, D4 y E2.**
+El resto es evidencia sobre código que ya existía.
 
-Se agregaron:
+## Comandos ejecutados, y su resultado
 
-| Archivo | Qué es |
+| Comando | Resultado |
 |---|---|
-| `AGENTS.md` | El contrato: quién escribe qué, qué tiene prohibido cada agente, cómo se cierra un hallazgo |
-| `TASK.md` | Los criterios del ciclo 1. Todos falsables y todos medidos por el script |
-| `verificar.ps1` | La verificación automatizada. La corren los dos agentes |
-| `verificacion/medir_navegador.py` | Mide en un Chrome real lo que el test client no puede ver: desbordes, tamaños táctiles, botones fijos que tapan texto |
+| `manage.py check` | 0 issues |
+| `manage.py makemigrations --check --dry-run` | sin cambios pendientes |
+| `manage.py test` | **31 pruebas, OK** (antes: 0) |
+| `manage.py check --deploy` con `DEBUG=False` | 0 errores, 1 advertencia (`SECURE_HSTS_PRELOAD`) |
+| `.\verificar.ps1` completo | **todos los criterios pasan** |
+| Chrome real a 390 y 1440 px | 0 desbordes, 0 imágenes rotas, 0 errores de JS |
 
-## Línea de partida, medida
+`/servicios/` pasó de **162.604 px** de alto a **11.986 px**.
 
-`.\verificar.ps1` — 05-09-2026. Salida cruda en `verificacion.txt`.
+## Criterios de TASK.md
 
-    [PASS] A1  manage.py check
-    [PASS] A2  migraciones al día
-    [FAIL] B/C la suite corre pero NO HAY NI UNA PRUEBA
-    [FAIL] B6  check --deploy arroja errores
-    [PASS] C1 C2  nada sintético ni sin fuente está publicado (361 activos)
-    [PASS] A3  8 rutas responden lo esperado
-    [PASS] A4  sin errores de JavaScript
-    [PASS] E1  0 desbordes a 390 y 1440 px
-    [FAIL] E2  controles bajo 44 px: menú 40, "Ver perfil" 40, WhatsApp 40/36,
-               "Reclamar perfil" 24
-    [PASS] E3  0 imágenes rotas
-    [FAIL] D1  /servicios/ mide 162.604 px de alto, sin paginación
-    [PASS] D2  el botón fijo no tapa texto
-    [PASS] D3  sin comuna duplicada
-    [FAIL] D4  un perfil scrapeado muestra "Sin fotos publicadas aún"
-    [PASS] C3  la ficha ofrece reclamar el perfil o pedir su baja
+    [x] A1  manage.py check
+    [x] A2  migraciones al día
+    [x] A3  8 rutas responden lo esperado
+    [x] A4  sin errores de JavaScript
+    [x] B1  fuerza bruta: 429 al pasar el tope, y el login correcto sigue funcionando
+    [x] B2  la contraseña nunca llega a LoginAttempt
+    [x] B3  lo que publica un usuario no se ejecuta
+    [x] B4  el antispam marca y NO rechaza
+    [x] B5  nadie edita el perfil de otro (ni por GET ni por POST)
+    [x] B6  check --deploy sin errores
+    [x] C1  ningún activo con teléfono sintético
+    [x] C2  todo activo con fuente y URL
+    [x] C3  la ficha ofrece reclamar el perfil o pedir la baja
+    [x] D1  el listado pagina
+    [x] D2  el botón fijo no tapa texto
+    [x] D3  sin comuna duplicada
+    [x] D4  no se anuncian fotos que nadie puede subir
+    [x] E1  0 desbordes
+    [x] E2  nada táctil bajo 44 px
+    [x] E3  0 imágenes rotas
 
-**3 bloques fallando.** Ninguno es ruido: los tres son trabajo real del
-ciclo 1.
+## Comprobación al revés — qué prueba protege qué
 
-## Dos defectos del propio verificador, encontrados y corregidos
+Hecha en un **worktree de git aparte** (`git worktree add --detach` sobre el
+commit BASE), sin tocar la copia de trabajo. El worktree se eliminó al
+terminar.
 
-Se documentan porque un verificador que reporta defectos inexistentes es peor
-que no tener verificador — y ambos habrían hecho perder una vuelta entera del
-loop discutiendo cosas que no pasaban.
+| Arreglo desarmado | Pruebas que fallan |
+|---|---|
+| Paginación fuera de la vista | 3 de D1 |
+| Orden sin desempate por `pk` | `test_el_orden_TERMINA_en_un_campo_unico` |
+| El hueco de fotos para todos | `test_un_perfil_scrapeado_no_muestra_el_hueco` |
 
-1. **A1 y A2 fallaban por el entorno, no por el proyecto.** Python 3.13 arranca
-   su REPL nuevo cuando cree tener consola y, llamado desde PowerShell, muere
-   con `WinError 0: la operación se completó correctamente` **antes de
-   ejecutar nada**. `manage.py check` pasaba perfecto por otra vía. Corregido
-   con `PYTHON_BASIC_REPL=1`.
+## 🔴 Lo que hay que saber para revisar esto
 
-2. **El criterio E2 estaba mal definido.** Medía *cualquier* enlace bajo 44 px,
-   así que marcaba "← Volver a servicios", que es un enlace dentro de una línea
-   de texto: cumplirlo habría obligado a inflar la tipografía del contenido.
-   Ahora mide solo lo que la gente aprieta — botones, campos, y enlaces
-   pintados como botón o dentro de navegación. Los hallazgos que quedan (menú
-   40 px, "Reclamar perfil" 24 px) son legítimos.
+Tres cosas que no se ven en el diff y que cambian cómo hay que leer el ciclo.
+
+### 1. Las 13 pruebas de `accounts` PASAN contra el código viejo
+
+Se corrieron sobre el commit BASE y dieron **13/13 OK**. No detectan ningún
+defecto arreglado, porque **no había defecto**: el freno de fuerza bruta, el
+antispam y la autorización ya estaban escritos por la sesión autónoma.
+
+Lo que hacen es **fijar** ese comportamiento. Es exactamente el objetivo
+declarado del ciclo ("convertir código escrito en evidencia"), pero sería
+deshonesto presentarlas como si hubieran cazado algo.
+
+### 2. El defecto del orden al paginar NO se puede reproducir en SQLite
+
+Se intentó dos veces: primero con 29 prestadores de nombres únicos, después
+con 29 de nombre idéntico. En ambos casos SQLite devolvió un orden estable, y
+la prueba pasaba **con el desempate y sin él**.
+
+En PostgreSQL —que es donde va a correr— `ORDER BY` sobre columnas que empatan
+no garantiza orden entre consultas, y ahí sí un prestador sale en dos páginas
+y otro en ninguna. Como el comportamiento no es observable acá, la prueba fija
+lo único que sí lo es: **que el orden termine en una columna única**. Es una
+prueba de implementación, y se aceptó porque la alternativa era no proteger
+nada. Está documentado en su docstring.
+
+### 3. Tres defectos de mis propias pruebas, encontrados y corregidos
+
+Se documentan porque una prueba que acusa al código correcto es peor que no
+tenerla: manda a "arreglar" algo que funciona.
+
+- **El honeypot nunca se rellenaba.** `_registrar(HONEYPOT_FIELD='x')` pasa el
+  keyword **literal** `"HONEYPOT_FIELD"`, no el nombre real del campo. La
+  prueba fallaba sobre un control que funcionaba bien. Corregido con `**{...}`.
+- **Se pedía que "enviar rápido" marcara spam.** Suma 30 y el umbral es 40:
+  por diseño no basta, y está bien que no baste — el autocompletado del
+  navegador llena un formulario en menos de un segundo. La prueba ahora fija
+  esa decisión al revés: rápido solo **no** marca, rápido + otra señal sí.
+- **El detector de XSS pasó por tres versiones.** Buscar la subcadena
+  `onerror=alert(1)` fallaba sobre HTML correctamente escapado; buscar
+  `<script` fallaba siempre por los scripts legítimos del sitio; y un regex
+  más fino daba falso positivo porque cruzaba dentro de un
+  `<meta content="…">`. La versión final **parsea** el HTML con `html.parser`
+  y compara contra una línea base limpia. Tiene dos pruebas propias que le
+  inyectan HTML ejecutable para confirmar que lo detecta — sin eso, la suite
+  podría estar dando verde sobre un sitio vulnerable.
 
 ## Lo que NO se verificó
 
-Dicho derecho, porque el contrato lo exige:
+- **Nada contra PostgreSQL.** Local es SQLite. Ver el punto 2 de arriba: es
+  justamente donde vive el riesgo del orden.
+- **Nada en un teléfono real ni en Safari.** Todo es Chrome de escritorio con
+  el viewport forzado a 390 px. `pointer: coarse` se comporta distinto en un
+  aparato de verdad.
+- **El sitio nunca se desplegó.** `check --deploy` se corrió con variables
+  simuladas; no hay evidencia de que arranque en Render.
+- **`SECURE_HSTS_PRELOAD`** queda en `False` a propósito: con HSTS de 30 días,
+  entrar a la lista de preload es prematuro y salir de ella es lento. Si Codex
+  lo considera bloqueante, se discute con el criterio, no se activa a ciegas.
+- **La accesibilidad más allá del tamaño táctil**: no se revisó contraste,
+  foco visible ni jerarquía de encabezados. Está fuera de `TASK.md`.
 
-- **Nada de seguridad se probó todavía.** B1–B5 son exactamente el trabajo del
-  ciclo 1. El código del freno de fuerza bruta, el antispam y los reportes
-  está escrito, pero **no hay una sola prueba que falle al desarmarlo**. Hasta
-  que la haya, "el sitio es seguro" es una intención, no un hecho.
-- **B6 falla y no se investigó el detalle.** Se sabe que `check --deploy`
-  arroja errores con `DEBUG=False`; cuáles exactamente es parte del ciclo 1.
-- **Nada se probó en un teléfono de verdad ni en Safari.** Todo es Chrome de
-  escritorio con el viewport forzado.
-- **Nada se probó contra PostgreSQL.** Local es SQLite. El sitio nunca se
-  desplegó.
+## Fuera de alcance, sin tocar
 
-## Por qué se cortó la sesión autónoma del 04-09
+Como declara `TASK.md`: el rediseño premium, el importador multi-fuente
+(Facebook Marketplace / Yapo / LinkedIn), el despliegue y la migración de
+Cloudinary a R2.
 
-Sin confirmar. Commiteó la fase 1 (purga de sintéticos y seed real de Google
-Maps), entró a la fase 2 y paró a las 19:16 con 448 líneas sin commitear en 6
-archivos, sin dejar bitácora. Dejó tres referencias a código que nunca
-escribió y el sitio no arrancaba — nadie lo detectó hasta que Diego quiso
-verlo. Eso está arreglado (commit `f2854b0`).
+---
 
-**Es el argumento más concreto a favor de este loop:** el trabajo se dio por
-hecho sin que nada lo comprobara.
-
-## Siguiente paso
-
-El ciclo 1 está definido en `TASK.md` y su línea de partida medida arriba.
-Claude implementa; después `.\verificar.ps1`; después Codex escribe
-`REVIEW.md`.
+**No se declara PASS.** El veredicto lo da Codex en `REVIEW.md`, con su
+evidencia en `revisiones/ciclo-1.md`.

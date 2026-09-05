@@ -67,6 +67,34 @@
     {% endfor %}
   </div>
 
+  {% comment %}
+  D1 — Paginación. Los enlaces arrastran los filtros activos (`querystring`
+  quita `page` y conserva el resto): sin eso, pasar a la página 2 perdería la
+  comuna y la categoría que el visitante eligió, y volvería a "todo Chile".
+  {% endcomment %}
+  {% if pagina.paginator.num_pages > 1 %}
+  <nav class="sp-paginacion" aria-label="Páginas de resultados">
+    {% if pagina.has_previous %}
+      <a class="sp-pag-btn" href="?{% querystring page=pagina.previous_page_number %}"
+         rel="prev">← Anterior</a>
+    {% else %}
+      <span class="sp-pag-btn sp-pag-off" aria-hidden="true">← Anterior</span>
+    {% endif %}
+
+    <span class="sp-pag-estado" aria-live="polite">
+      Página <strong>{{ pagina.number }}</strong> de {{ pagina.paginator.num_pages }}
+      <span class="sp-pag-total">· {{ total_resultados }} prestador{{ total_resultados|pluralize:"es" }}</span>
+    </span>
+
+    {% if pagina.has_next %}
+      <a class="sp-pag-btn" href="?{% querystring page=pagina.next_page_number %}"
+         rel="next">Siguiente →</a>
+    {% else %}
+      <span class="sp-pag-btn sp-pag-off" aria-hidden="true">Siguiente →</span>
+    {% endif %}
+  </nav>
+  {% endif %}
+
   <!-- CTA publicar -->
   {% if providers %}
   <div class="text-center mt-5 py-4" style="border-top:1px solid var(--sp-line-soft)">

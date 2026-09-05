@@ -84,7 +84,14 @@ Write-Host "         ($([int]((Get-Date) - $antes).TotalSeconds)s)" -ForegroundC
 Bloque 'B6 · Configuración de producción'
 $env:DEBUG = 'False'
 $env:ALLOWED_HOSTS = 'serviplace.cl'
-$env:SECRET_KEY = 'solo-para-verificar-no-es-la-real-000000000000'
+# La clave tiene que ser larga y variada o `check --deploy` la marca (W009) y
+# el fallo sería del verificador, no del proyecto. No es una clave real: nunca
+# sale de este proceso.
+$env:SECRET_KEY = 'verificacion-J7xQ2m-Kp9vLw4Tz-Rb8Nc3Hd6Yf1Sg5Aj0Ue-no-es-la-real'
+# Y un DATABASE_URL de mentira: settings aborta a propósito si arranca en
+# producción con SQLite (en Render se borra en cada deploy). Esa guarda está
+# BIEN; sin esta línea el verificador la interpretaba como un defecto.
+$env:DATABASE_URL = 'postgres://verificacion:x@localhost:5432/verificacion'
 $salida = & $py manage.py check --deploy --fail-level ERROR 2>&1
 $salida | Add-Content $log -Encoding utf8
 if ($LASTEXITCODE -eq 0) {
@@ -95,7 +102,7 @@ if ($LASTEXITCODE -eq 0) {
   ($salida | Select-String -Pattern '^\?:' | Select-Object -First 6) | ForEach-Object { Write-Host "         $_" -ForegroundColor DarkGray }
   $fallos += 'B6 (check --deploy)'
 }
-Remove-Item Env:DEBUG, Env:ALLOWED_HOSTS, Env:SECRET_KEY -ErrorAction SilentlyContinue
+Remove-Item Env:DEBUG, Env:ALLOWED_HOSTS, Env:SECRET_KEY, Env:DATABASE_URL -ErrorAction SilentlyContinue
 
 # ── C1/C2: nada falso publicado ────────────────────────────────────────────
 # Va acá y no en las pruebas porque mira la base REAL, no una de test: es la

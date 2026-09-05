@@ -1266,3 +1266,53 @@ a:hover { color: var(--sp-blue-dark); }
 /* Bootstrap overrides */
 .text-bg-success { background-color: var(--sp-green) !important; }
 .text-bg-primary { background-color: var(--sp-blue) !important; }
+
+/* ── E2 · TAMAÑO TÁCTIL MÍNIMO ───────────────────────────────────────────
+   Medido el 05-09 en Chrome real a 390 px: el botón de menú 40, "Ver perfil"
+   40, WhatsApp 40 y 36, y "Reclamar perfil" 24. Apple pide 44 de mínimo y
+   Google 48.
+
+   Esto NO es un detalle de estilo: el sitio se usa de pie, con una mano,
+   buscando un gásfiter. El botón de WhatsApp es la única acción que genera
+   valor para el prestador, y "Reclamar perfil" de 24 px es el que convierte
+   una ficha scrapeada en un usuario registrado.
+
+   Va al FINAL del archivo a propósito: con la misma especificidad gana la
+   última regla, y escrita más arriba la pisarían las de Bootstrap sin dar
+   ningún error. Ese bug ya costó una vuelta en otro proyecto del equipo.
+
+   `pointer: coarse` lo decide el APARATO. Un notebook con trackpad no
+   necesita botones más grandes, y agrandarlos ahí solo haría el sitio más
+   tosco en escritorio. */
+@media (pointer: coarse) {
+  .btn,
+  .navbar-toggler,
+  .provider-card .btn,
+  .share-row a,
+  .share-row button,
+  a.badge[href] {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* La insignia que además es un enlace ("Reclamar perfil", 24 px medidos):
+     se mantiene el aspecto de insignia, pero con área para el dedo. */
+  a.badge[href] {
+    padding-top: .55rem;
+    padding-bottom: .55rem;
+  }
+
+  /* Los campos también: un select de 36 px se falla al tocarlo y el
+     visitante cree que el filtro no funciona. */
+  .form-control,
+  .form-select,
+  input[type="text"],
+  input[type="search"],
+  input[type="email"],
+  input[type="tel"],
+  select {
+    min-height: 44px;
+  }
+}

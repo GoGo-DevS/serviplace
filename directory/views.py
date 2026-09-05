@@ -1,11 +1,17 @@
 from urllib.parse import quote
 
+from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db.models import F, Prefetch, Q
 from django.shortcuts import get_object_or_404, redirect, render
 
 from leads.models import LeadEvent
 
 from .models import Category, Commune, Provider, Region
+
+# Cuántos prestadores por página. 24 entra en 3 columnas en escritorio y en 2
+# en tablet sin dejar una fila coja, y en el teléfono son ~6 pantallas de
+# scroll en vez de 190.
+PROVEEDORES_POR_PAGINA = 24
 
 
 def provider_list(request):
@@ -31,7 +37,27 @@ def provider_list(request):
     if commune_slug:
         providers = providers.filter(commune__slug=commune_slug)
 
-    providers = providers.order_by('-is_featured', '-is_verified', 'business_name')
+    # `pk` al final del orden a propósito: sin un criterio único de desempate,
+    # dos prestadores con el mismo destacado/verificado/nombre pueden salir en
+    # orden distinto en cada consulta, y al paginar eso hace que uno se repita
+    # en la página 2 y otro no aparezca nunca. Es el defecto clásico de
+    # paginar sobre un orden no determinista.
+    providers = providers.order_by('-is_featured', '-is_verified', 'business_name', 'pk')
+
+    # D1 — El listado se pagina. Medido el 05-09: los 361 prestadores en una
+    # sola página daban 162.604 px de alto en un teléfono, o sea unas 190
+    # pantallas de scroll, y el navegador pedía las 361 fotos de una.
+    paginador = Paginator(providers, PROVEEDORES_POR_PAGINA)
+    numero = request.GET.get('page')
+    try:
+        pagina = paginador.page(numero)
+    except PageNotAnInteger:
+        pagina = paginador.page(1)
+    except EmptyPage:
+        # Pedir la página 999 devuelve la última, no un 404: la URL puede
+        # venir de un enlace viejo o de Google, y un error ahí se lee como
+        # sitio roto.
+        pagina = paginador.page(paginador.num_pages)
 
     categories = Category.objects.filter(is_active=True)
     active_communes_qs = Commune.objects.filter(is_active=True).order_by('name')
@@ -45,7 +71,13 @@ def provider_list(request):
     commune_name = selected_commune.name if selected_commune else 'Chile'
 
     context = {
-        'providers': providers,
+        # `providers` es la PÁGINA, no el queryset entero: la plantilla itera
+        # sobre esto y si acá fuera el queryset completo la paginación sería
+        # decorativa — se dibujarían los controles y se seguirían pintando los
+        # 361. `pagina` va aparte para los controles.
+        'providers': pagina.object_list,
+        'pagina': pagina,
+        'total_resultados': paginador.count,
         'categories': categories,
         'regions_with_communes': regions_with_communes,
         'query': query,
