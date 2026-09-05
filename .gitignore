@@ -39,3 +39,6 @@ Thumbs.db
 
 # Render
 .render/
+
+# La verificacion deja su salida cruda aca; es un artefacto, no fuente.
+verificacion.txt
