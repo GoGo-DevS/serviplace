@@ -388,3 +388,15 @@ class AdminDeProduccion(TestCase):
     def test_sin_contrasena_no_crea_nada(self):
         self._correr(DJANGO_SUPERUSER_USERNAME='diego', DJANGO_SUPERUSER_PASSWORD='')
         self.assertFalse(User.objects.filter(username='diego').exists())
+
+
+class LaPortadaNoPrometeLoQueNoHace(Base):
+    """La portada decía "verificados manualmente" con 349 de 361 prestadores
+    sacados de Google Maps sin revisión. Una promesa de verificación que no
+    se cumple es justo lo que la ficha del prestador sí aclara ("pendiente de
+    revisión"): la portada no puede contradecirla."""
+
+    def test_no_dice_que_todos_estan_verificados(self):
+        self._prestador()
+        html = self.client.get(reverse('core:home')).content.decode().lower()
+        self.assertNotIn('verificados manualmente', html)
