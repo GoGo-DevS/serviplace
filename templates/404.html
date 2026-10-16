@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block extra_head %}<meta name="robots" content="noindex">{% endblock %}
+
+{% block content %}
+<section class="container py-5 text-center">
+  <span class="eyebrow">Error 404</span>
+  <h1 class="display-6 fw-bold mt-2">Esta página no existe</h1>
+  <p class="lead text-muted">Puede que el perfil se haya dado de baja o que el enlace venga cortado.</p>
+  <a class="btn btn-primary btn-lg mt-3" href="{% url 'directory:provider_list' %}">Buscar servicios</a>
+</section>
+{% endblock %}

@@ -305,3 +305,86 @@ class CNadaSePublicaSinDecirDeDondeSalio(Base):
         p = self._prestador(nombre='Retenido', is_active=False)
         r = self.client.get(p.get_absolute_url())
         self.assertNotEqual(r.status_code, 200)
+
+
+# ─────────────────────────────────────────────────────────────────────────
+# Despliegue · el directorio inicial que carga build.sh
+# ─────────────────────────────────────────────────────────────────────────
+class CargaInicialDelDirectorio(TestCase):
+    """build.sh corre `cargar_directorio_inicial` en CADA deploy. Lo que se
+    protege: que la primera vez cargue los prestadores reales, y que las
+    siguientes no pise nada de lo que se publicó en producción."""
+
+    def _cargar(self):
+        from io import StringIO
+        from django.core.management import call_command
+        out = StringIO()
+        call_command('cargar_directorio_inicial', stdout=out)
+        return out.getvalue()
+
+    def test_en_base_vacia_carga_los_prestadores_reales(self):
+        self._cargar()
+        self.assertEqual(Provider.objects.count(), 361)
+        self.assertEqual(Region.objects.count(), 16)
+        self.assertEqual(Commune.objects.count(), 346)
+
+    def test_lo_cargado_es_publicable_y_no_trae_trafico_falso(self):
+        """C1/C2 sobre el fixture: todo activo, con fuente y URL, sin el
+        teléfono secuencial de los sintéticos, sin dueño y con contadores en
+        cero (los locales eran ruido de pruebas, no visitas de verdad)."""
+        self._cargar()
+        qs = Provider.objects.all()
+        self.assertFalse(qs.filter(is_active=False).exists())
+        self.assertFalse(qs.filter(source_url='').exists())
+        self.assertFalse(qs.filter(whatsapp_number__startswith='5691111000').exists())
+        self.assertFalse(qs.exclude(owner=None).exists())
+        self.assertFalse(qs.exclude(views_count=0).exists())
+        self.assertFalse(qs.exclude(whatsapp_clicks_count=0).exists())
+
+    def test_seed_de_regiones_despues_no_duplica_nada(self):
+        """build.sh corre `seed_regiones_chile` justo después: si no
+        reconociera las comunas del fixture, crearía 346 más."""
+        from django.core.management import call_command
+        self._cargar()
+        call_command('seed_regiones_chile', stdout=__import__('io').StringIO())
+        self.assertEqual(Region.objects.count(), 16)
+        self.assertEqual(Commune.objects.count(), 346)
+
+    def test_si_ya_hay_prestadores_no_toca_nada(self):
+        region = Region.objects.create(name='RM', slug='rm', is_active=True)
+        comuna = Commune.objects.create(region=region, name='Maipú', slug='maipu', is_active=True)
+        cat = Category.objects.create(name='Gasfitería', slug='gasfiteria', is_active=True)
+        Provider.objects.create(business_name='Publicado en producción', category=cat,
+                                commune=comuna, whatsapp_number='56922223333', is_active=True)
+        salida = self._cargar()
+        self.assertEqual(Provider.objects.count(), 1)
+        self.assertIn('no se toca nada', salida)
+
+
+class AdminDeProduccion(TestCase):
+    """Render Free no tiene consola: el admin nace en el build."""
+
+    def _correr(self, **env):
+        import os
+        from io import StringIO
+        from unittest import mock
+        from django.core.management import call_command
+        out = StringIO()
+        with mock.patch.dict(os.environ, env, clear=False):
+            call_command('asegurar_admin', stdout=out)
+        return out.getvalue()
+
+    def test_crea_el_admin_si_no_existe(self):
+        self._correr(DJANGO_SUPERUSER_USERNAME='diego', DJANGO_SUPERUSER_PASSWORD='x-Prueba-123',
+                     DJANGO_SUPERUSER_EMAIL='a@b.cl')
+        u = User.objects.get(username='diego')
+        self.assertTrue(u.is_superuser and u.check_password('x-Prueba-123'))
+
+    def test_un_deploy_no_le_cambia_la_contrasena(self):
+        User.objects.create_superuser('diego', 'a@b.cl', 'la-que-puso-en-el-admin')
+        self._correr(DJANGO_SUPERUSER_USERNAME='diego', DJANGO_SUPERUSER_PASSWORD='otra')
+        self.assertTrue(User.objects.get(username='diego').check_password('la-que-puso-en-el-admin'))
+
+    def test_sin_contrasena_no_crea_nada(self):
+        self._correr(DJANGO_SUPERUSER_USERNAME='diego', DJANGO_SUPERUSER_PASSWORD='')
+        self.assertFalse(User.objects.filter(username='diego').exists())
