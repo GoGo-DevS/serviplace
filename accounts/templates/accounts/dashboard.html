@@ -66,8 +66,8 @@
             <div class="flex-grow-1 min-w-0">
               <div class="d-flex flex-wrap gap-2 mb-1">
                 <span class="badge badge-category">{{ provider.category.name }}</span>
-                {% if provider.is_verified %}<span class="badge badge-verified">✓ Verificado</span>{% endif %}
-                {% if provider.is_featured %}<span class="badge badge-featured">⭐ Destacado</span>{% endif %}
+                {% if provider.is_verified %}<span class="badge badge-verified">Verificado</span>{% endif %}
+                {% if provider.is_featured %}<span class="badge badge-featured">Destacado</span>{% endif %}
               </div>
               <h3 class="h6 mb-0">{{ provider.business_name }}</h3>
               <p class="text-muted mb-2" style="font-size:.85rem">{{ provider.sector }}, {{ provider.commune.name }}</p>
@@ -110,7 +110,7 @@
 
       <!-- Hazte verificado -->
       <div class="benefit-box">
-        <h4 class="h6 mb-2">⭐ Hazte Verificado</h4>
+        <h4 class="h6 mb-2">Hazte verificado</h4>
         <p style="font-size:.85rem;color:var(--sp-muted);margin-bottom:.75rem">Destaca sobre la competencia con el badge de negocio verificado. Más vistas, más confianza.</p>
         <a class="btn btn-sm btn-primary w-100" href="{% url 'accounts:hazte_verificado' %}">Saber más →</a>
       </div>

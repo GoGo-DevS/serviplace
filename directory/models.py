@@ -220,9 +220,9 @@ class Provider(models.Model):
     def modalities(self):
         return [
             etiqueta for activa, etiqueta in (
-                (self.attends_home, '🏠 A domicilio'),
-                (self.attends_office, '🏢 En consulta o local'),
-                (self.attends_online, '💻 Online'),
+                (self.attends_home, 'A domicilio'),
+                (self.attends_office, 'En consulta o local'),
+                (self.attends_online, 'Online'),
             ) if activa
         ]
 

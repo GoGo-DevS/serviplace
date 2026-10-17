@@ -1,76 +1,59 @@
 {% extends "base.html" %}
 
 {% block content %}
-<!-- HERO -->
-<section class="hero-section">
-  <div class="container py-5">
-    <div class="row align-items-center g-5">
-      <div class="col-lg-7">
-        <span class="hero-eyebrow">Maestros y profesionales en Chile</span>
-        <h1 class="mt-3 mb-3">Encuentra el profesional que necesitas, <span style="color:var(--sp-blue-mid)">cerca de ti</span></h1>
-        <p class="lead mb-3">Gásfiter, electricista, kinesióloga, psicólogo, profe particular y más. Contacto directo por WhatsApp, sin intermediarios.</p>
-        <span class="hero-trust-badge mb-4 d-inline-block">Sin comisión para el profesional ni para ti</span>
-
-        <!-- Buscador -->
-        <form class="search-panel mt-4" action="{% url 'directory:provider_list' %}" method="get">
-          <div class="row g-2">
-            <div class="col-md-6">
-              <label class="form-label" for="q">¿Qué necesitas?</label>
-              <input class="form-control form-control-lg" id="q" name="q" type="search" placeholder="Ej: gásfiter, kinesiólogo, clases de inglés…">
+{% comment %}
+Portada "Cuadra" (18-10-2026). Dos recorridos, con distinto peso:
+  1. Buscar (principal): qué necesitas + en qué comuna.
+  2. Publicar (permanente, sin competir): la franja oscura bajo el buscador
+     y el botón fijo del menú.
+El mapa es ilustrativo y lo dice; los pines son las comunas con más perfiles,
+con su cifra real.
+{% endcomment %}
+<section class="cuadra-hero">
+  <div class="cuadra-mapa" aria-hidden="true"></div>
+  <div class="cuadra-avenida" aria-hidden="true"></div>
+  <div class="container">
+    <div class="cuadra-grid">
+      <div>
+        <div class="buscador-card">
+          <span class="eyebrow">Maestros y profesionales en tu comuna</span>
+          <h1>Encuentra a quien necesitas, <u>en tu comuna</u></h1>
+          <p class="lede">Gásfiter, electricista, kinesióloga, psicólogo, profe particular y más. Le escribes directo por WhatsApp, sin intermediarios.</p>
+          <form class="buscador-campos" action="{% url 'directory:provider_list' %}" method="get" role="search">
+            <div>
+              <label for="q">¿Qué necesitas?</label>
+              <input class="form-control form-control-lg" id="q" name="q" type="search" placeholder="Ej: gásfiter, kinesiólogo, clases de inglés">
             </div>
-            <div class="col-md-4">
-              <label class="form-label" for="categoria">Categoría</label>
-              <select class="form-select form-select-lg" id="categoria" name="categoria">
-                <option value="">Todas</option>
-                {% for grupo in grupos %}
-                  <optgroup label="{{ grupo.nombre }}">
-                    {% for category in grupo.categorias %}
-                      <option value="{{ category.slug }}">{{ category.icon }} {{ category.name }}</option>
-                    {% endfor %}
+            <div>
+              <label for="comuna">¿En qué comuna?</label>
+              <select class="form-select form-select-lg" id="comuna" name="comuna">
+                <option value="">Todas las comunas</option>
+                {% for region in regions_with_communes %}
+                  <optgroup label="{{ region.name }}">
+                    {% for commune in region.active_communes %}<option value="{{ commune.slug }}">{{ commune.name }}</option>{% endfor %}
                   </optgroup>
                 {% endfor %}
               </select>
             </div>
-            <div class="col-md-2 d-grid align-self-end">
-              <button class="btn btn-primary btn-lg" type="submit">Buscar</button>
-            </div>
-          </div>
-        </form>
+            <button class="btn btn-primary btn-lg" type="submit">Buscar</button>
+          </form>
+          <p class="buscador-nota">{{ total_providers }} perfiles en {{ communes_count }} comunas · {{ categories|length }} especialidades · sin comisión</p>
+        </div>
 
-        <div class="group-chips mt-3" aria-label="Explorar por tipo de servicio">
-          {% for grupo in grupos %}
-            <a class="group-chip" href="{% url 'directory:provider_list' %}?grupo={{ grupo.clave }}">{{ grupo.nombre }}</a>
-          {% endfor %}
+        <div class="publica-card">
+          <div>
+            <strong>¿Ofreces un servicio?</strong>
+            <span>Crea tu perfil gratis y compártelo con tus clientes.</span>
+          </div>
+          <a href="{% url 'core:para_profesionales' %}">Quiero publicar mis servicios →</a>
         </div>
       </div>
 
-      <!-- Stats card -->
-      <div class="col-lg-5">
-        <div class="stats-card">
-          <span class="eyebrow">Red en crecimiento</span>
-          <p class="mt-2 mb-0" style="font-size:.95rem;color:var(--sp-muted)">Profesionales y maestros de tu comuna, contacto directo por WhatsApp, sin intermediarios.</p>
-          <div class="stats-grid">
-            <div class="stat-item">
-              <strong>{{ categories|length }}</strong>
-              <span>especialidades</span>
-            </div>
-            <div class="stat-item">
-              <strong>{{ total_providers }}</strong>
-              <span>perfiles</span>
-            </div>
-            <div class="stat-item">
-              <strong>{{ communes_count }}</strong>
-              <span>comunas</span>
-            </div>
-            <div class="stat-item">
-              <strong>$0</strong>
-              <span>comisión</span>
-            </div>
-          </div>
-          <div class="mt-3 pt-3" style="border-top:1px solid var(--sp-line-soft)">
-            <p style="font-size:.85rem;color:var(--sp-muted);margin:0">¿Atiendes por tu cuenta? <a href="{% url 'core:para_profesionales' %}">Crea tu perfil gratis →</a></p>
-          </div>
-        </div>
+      <div class="pines" aria-label="Comunas con más perfiles">
+        {% for comuna in top_comunas %}
+          <a class="pin" href="{% url 'directory:provider_list' %}?comuna={{ comuna.slug }}"><i>{{ comuna.n }}</i>{{ comuna.name }} <small>perfiles</small></a>
+        {% endfor %}
+        <p class="mapa-nota">Mapa ilustrativo. Las cifras de cada comuna son reales.</p>
       </div>
     </div>
   </div>
@@ -87,7 +70,7 @@
   <div class="group-block">
     <div class="group-block-head">
       <div>
-        <h3>{{ grupo.nombre }}</h3>
+        <h3>{% include "_icono_grupo.html" with grupo=grupo.clave %}{{ grupo.nombre }}</h3>
         <p>{{ grupo.descripcion }}</p>
       </div>
       <a href="{% url 'directory:provider_list' %}?grupo={{ grupo.clave }}">Ver {{ grupo.nombre|lower }} →</a>
@@ -95,8 +78,7 @@
     <div class="category-grid">
       {% for category in grupo.categorias %}
         <a class="category-tile{% if not category.n_activos %} is-empty{% endif %}" href="{% url 'directory:provider_list' %}?categoria={{ category.slug }}">
-          <span class="category-icon">{{ category.icon|default:"🔧" }}</span>
-          <span style="font-weight:700;font-size:.95rem">{{ category.name }}</span>
+          <span class="tile-name">{{ category.name }}</span>
           {% if category.description %}<small>{{ category.description }}</small>{% endif %}
           {% if category.n_activos %}
             <span class="tile-count">{{ category.n_activos }} perfil{{ category.n_activos|pluralize:"es" }}</span>
@@ -110,26 +92,6 @@
   {% endfor %}
 </section>
 
-<!-- PARA PROFESIONALES -->
-<section class="container py-4">
-  <div class="pro-band">
-    <div class="pro-band-copy">
-      <span class="pro-band-eyebrow">Para profesionales independientes</span>
-      <h2>¿Te titulaste hace poco? No necesitas otro portal de empleos: necesitas clientes.</h2>
-      <p>Crea tu perfil gratis, muestra tu título, tu institución y tu registro, y recibe consultas de tu comuna directo en tu WhatsApp.</p>
-      <ul class="pro-band-list">
-        <li>Te encuentran cuando buscan tu especialidad en tu comuna</li>
-        <li>Tu formación se ve aunque todavía no tengas reseñas</li>
-        <li>El precio y la agenda los pones tú: sin comisión</li>
-      </ul>
-    </div>
-    <div class="pro-band-actions">
-      <a class="btn btn-light btn-lg" href="{% url 'core:para_profesionales' %}">Ver cómo funciona →</a>
-      <a class="pro-band-link" href="{% url 'accounts:register' %}">Crear mi perfil ahora</a>
-    </div>
-  </div>
-</section>
-
 <!-- CÓMO FUNCIONA -->
 <section class="container py-4">
   <div class="section-heading">
@@ -137,24 +99,24 @@
   </div>
   <div class="row g-3 mt-1">
     <div class="col-md-4">
-      <div class="step-card">
+      <div class="step-card h-100">
         <span class="step-num">1</span>
-        <h3 class="h5 mb-1">Busca lo que necesitas</h3>
-        <p class="text-muted mb-0" style="font-size:.9rem">Filtra por especialidad, comuna o palabra clave.</p>
+        <h3 class="h5 mb-1">Busca en tu comuna</h3>
+        <p class="text-muted mb-0" style="font-size:.95rem">Escribe lo que necesitas y elige tu comuna, o explora por especialidad.</p>
       </div>
     </div>
     <div class="col-md-4">
-      <div class="step-card">
+      <div class="step-card h-100">
         <span class="step-num">2</span>
-        <h3 class="h5 mb-1">Revisa el perfil</h3>
-        <p class="text-muted mb-0" style="font-size:.9rem">Lee qué hace, cómo atiende, su formación y su zona de atención.</p>
+        <h3 class="h5 mb-1">Revisa su ficha</h3>
+        <p class="text-muted mb-0" style="font-size:.95rem">Qué hace, cómo atiende, su formación y su zona de atención.</p>
       </div>
     </div>
     <div class="col-md-4">
-      <div class="step-card">
+      <div class="step-card h-100">
         <span class="step-num">3</span>
         <h3 class="h5 mb-1">Escríbele por WhatsApp</h3>
-        <p class="text-muted mb-0" style="font-size:.9rem">Directo, sin intermediarios ni comisiones.</p>
+        <p class="text-muted mb-0" style="font-size:.95rem">Directo, sin intermediarios ni comisiones. El precio lo acuerdan ustedes.</p>
       </div>
     </div>
   </div>
@@ -175,18 +137,23 @@
 </section>
 {% endif %}
 
-<!-- JOIN CTA -->
+<!-- PARA PROFESIONALES -->
 <section class="container py-5">
-  <div class="confidence-block mb-4">
-    <h2 class="h4">¿Por qué SERVIPLACE?</h2>
-    <p>Sin comisión y sin aprobación previa. Publicas tu perfil en minutos y te contactan directo por WhatsApp. <a href="{% url 'accounts:hazte_verificado' %}">Obtén el badge de verificado</a> para destacar.</p>
-  </div>
-  <div class="join-band">
-    <div style="position:relative;z-index:1">
-      <h2>¿Ofreces un servicio o atiendes por tu cuenta?</h2>
-      <p>Publica tu perfil gratis en minutos. Sin trámites, sin comisión.</p>
+  <div class="pro-band">
+    <div class="pro-band-copy">
+      <span class="pro-band-eyebrow">Para profesionales independientes</span>
+      <h2>¿Te titulaste hace poco? No necesitas otro portal de empleos: necesitas clientes.</h2>
+      <p>Crea tu perfil gratis, muestra tu título, tu institución y tu registro, y compártelo con un link propio. Las consultas te llegan directo a tu WhatsApp.</p>
+      <ul class="pro-band-list">
+        <li>Un link profesional para tu Instagram y tu WhatsApp</li>
+        <li>Tu formación a la vista, aunque todavía no tengas reseñas</li>
+        <li>El precio y la agenda los pones tú: sin comisión</li>
+      </ul>
     </div>
-    <a class="btn btn-light btn-lg" href="{% url 'accounts:register' %}" style="position:relative;z-index:1;flex-shrink:0">Publicar gratis →</a>
+    <div class="pro-band-actions">
+      <a class="btn btn-light btn-lg" href="{% url 'core:para_profesionales' %}">Ver cómo funciona →</a>
+      <a class="pro-band-link" href="{% url 'accounts:register' %}?desde=portada">Crear mi perfil ahora</a>
+    </div>
   </div>
 </section>
 {% endblock %}

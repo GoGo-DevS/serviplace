@@ -12,17 +12,17 @@
       <div class="provider-detail-avatar">{{ provider.business_name|first|upper }}</div>
       <div class="provider-detail-info">
         <div class="d-flex flex-wrap gap-2 mb-2 align-items-center">
-          <span class="badge badge-category">{{ provider.category.icon|default:"🔧" }} {{ provider.category.name }}</span>
-          {% if provider.is_verified %}<span class="badge badge-verified">✓ Verificado</span>{% endif %}
-          {% if provider.is_featured %}<span class="badge badge-featured">⭐ Destacado</span>{% endif %}
+          <span class="badge badge-category">{{ provider.category.name }}</span>
+          {% if provider.is_verified %}<span class="badge badge-verified">Verificado</span>{% endif %}
+          {% if provider.is_featured %}<span class="badge badge-featured">Destacado</span>{% endif %}
           {% if not provider.owner %}
-            <a class="badge badge-new" href="{% url 'accounts:claim_profile' provider.slug %}" style="cursor:pointer">🔑 Reclamar perfil</a>
+            <a class="badge badge-new" href="{% url 'accounts:claim_profile' provider.slug %}">¿Es tuyo? Reclámalo</a>
           {% endif %}
         </div>
         <h1 class="mb-1" style="font-size:clamp(1.65rem,4vw,2.75rem);letter-spacing:-.025em">{{ provider.business_name }}</h1>
-        {% if provider.profession_title %}<p class="detail-profession mb-1">🎓 {{ provider.profession_title }}{% if provider.graduation_year %} · {% if provider.is_student %}se titula en {{ provider.graduation_year }}{% else %}titulado/a en {{ provider.graduation_year }}{% endif %}{% endif %}</p>{% endif %}
+        {% if provider.profession_title %}<p class="detail-profession mb-1">{{ provider.profession_title }}{% if provider.graduation_year %} · {% if provider.is_student %}se titula en {{ provider.graduation_year }}{% else %}titulado/a en {{ provider.graduation_year }}{% endif %}{% endif %}</p>{% endif %}
         <p class="lead mb-0">{{ provider.short_description }}</p>
-        <p class="text-muted mt-1" style="font-size:.9rem">📍 {{ provider.sector }}, {{ provider.commune.name }}</p>
+        <p class="text-muted mt-1 mb-0" style="font-size:.95rem">{{ provider.sector }} · {{ provider.commune.name }}</p>
         {% if provider.modalities %}
         <div class="d-flex gap-2 flex-wrap mt-2">
           {% for modalidad in provider.modalities %}<span class="mini-pill">{{ modalidad }}</span>{% endfor %}
@@ -43,7 +43,7 @@
       </div>
 
       {% if provider.has_professional_info %}
-      <div class="detail-block">
+      <div class="detail-block credencial-block">
         <h2>Formación</h2>
         <dl class="info-list mb-0">
           {% if provider.profession_title %}<dt>Título o profesión</dt><dd>{{ provider.profession_title }}</dd>{% endif %}
@@ -60,7 +60,7 @@
 
       <div class="detail-block">
         <h2>Zona de atención</h2>
-        <p class="mb-0">📍 {% if provider.service_area %}{{ provider.service_area }}{% else %}{{ provider.commune.name }} y sectores cercanos{% endif %}</p>
+        <p class="mb-0">{% if provider.service_area %}{{ provider.service_area }}{% else %}{{ provider.commune.name }} y sectores cercanos{% endif %}</p>
       </div>
 
       <div class="detail-block">
@@ -110,9 +110,7 @@
           <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.555 4.117 1.528 5.845L0 24l6.335-1.652A11.95 11.95 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.943 0-3.771-.52-5.344-1.424l-.383-.226-3.963 1.033 1.055-3.857-.248-.396A9.928 9.928 0 012 12c0-5.514 4.486-10 10-10s10 4.486 10 10-4.486 10-10 10z"/></svg>
           WhatsApp
         </a>
-        <button class="share-btn" onclick="navigator.clipboard.writeText(window.location.href).then(()=>alert('Enlace copiado'))">
-          🔗 Copiar enlace
-        </button>
+        <button class="share-btn" type="button" data-copiar>Copiar enlace</button>
       </div>
 
     </div>
@@ -149,7 +147,7 @@
 
           {% if not provider.is_verified and user.is_authenticated and provider.owner_id == user.id %}
           <div class="mt-2" style="padding:.7rem .85rem;border:1px solid rgba(245,158,11,.20);border-radius:10px;background:#fef3c7;font-size:.83rem;color:#92400e">
-            ⭐ <a href="{% url 'accounts:hazte_verificado' %}" style="color:#92400e;font-weight:700">Obtener badge verificado →</a>
+            <a href="{% url 'accounts:hazte_verificado' %}" style="color:var(--sp-amber);font-weight:700">Obtener la insignia de verificado →</a>
           </div>
           {% endif %}
         </div>
@@ -166,4 +164,14 @@
     Contactar por WhatsApp
   </a>
 </div>
+<script>
+  // Copiar sin alert(): el botón confirma con su propio texto.
+  document.querySelectorAll('[data-copiar]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var aviso = function (t) { b.textContent = t; setTimeout(function () { b.textContent = 'Copiar enlace'; }, 2400); };
+      if (!navigator.clipboard) { aviso('Copia el enlace de la barra'); return; }
+      navigator.clipboard.writeText(window.location.href).then(function () { aviso('Enlace copiado'); }, function () { aviso('Copia el enlace de la barra'); });
+    });
+  });
+</script>
 {% endblock %}

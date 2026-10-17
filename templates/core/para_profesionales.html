@@ -8,9 +8,9 @@
       <div class="col-lg-7">
         <span class="hero-eyebrow">Para profesionales independientes</span>
         <h1 class="mt-3 mb-3">Te titulaste. Ahora te faltan <span style="color:var(--sp-blue-mid)">clientes</span>, no otro portal de empleos.</h1>
-        <p class="lead mb-3">LinkedIn y las bolsas de trabajo te ponen a competir por un contrato. Si atiendes por tu cuenta, lo que necesitas es que te encuentren las personas de tu comuna. Crea tu perfil gratis y recibe consultas directo en tu WhatsApp.</p>
+        <p class="lead mb-3">LinkedIn y las bolsas de trabajo te ponen a competir por un contrato. Si atiendes por tu cuenta, lo que necesitas es una página profesional que puedas compartir y que te encuentren en tu comuna. Crea tu perfil gratis y recibe consultas directo en tu WhatsApp.</p>
         <div class="d-flex flex-wrap gap-2 mt-4">
-          <a class="btn btn-primary btn-lg" href="{% url 'accounts:register' %}">Crear mi perfil gratis</a>
+          <a class="btn btn-primary btn-lg" href="{% url 'accounts:register' %}?desde=landing">Crear mi perfil gratis</a>
           <a class="btn btn-outline-primary btn-lg" href="#ejemplo">Ver un perfil de ejemplo</a>
         </div>
         <p class="mt-3 mb-0" style="font-size:.88rem;color:var(--sp-muted)">Sin comisión · Sin aprobación previa · Listo en 5 minutos</p>
@@ -20,32 +20,22 @@
       <div class="col-lg-5" id="ejemplo">
         <div class="ejemplo-wrap">
           <span class="ejemplo-label">Perfil de ejemplo</span>
-          <article class="provider-card is-verified h-100" aria-label="Perfil de ejemplo de una kinesióloga">
-            <div class="provider-card-accent"></div>
-            <div class="provider-card-body">
-              <div class="provider-card-header">
-                <div class="provider-card-avatar">C</div>
-                <div class="provider-card-meta">
-                  <h3>Camila R. · Kinesiología</h3>
-                  <span class="location">Lomas de San Andrés, Concepción</span>
-                </div>
-              </div>
-              <div class="provider-card-tags">
-                <span class="badge badge-category">💪 Kinesiología</span>
-              </div>
-              <p class="provider-card-desc">Rehabilitación musculoesquelética y adulto mayor. Evaluación a domicilio y seguimiento online.</p>
-              <div class="pro-credential">
-                🎓 Kinesióloga · Titulada en {{ anio_actual|add:"-1" }}<br>
-                <span>Universidad de Concepción · Registro SIS N° 000000</span>
-              </div>
-              <div class="d-flex gap-2 flex-wrap mt-2">
-                <span class="mini-pill">🏠 A domicilio</span>
-                <span class="mini-pill">💻 Online</span>
-              </div>
-              <div class="provider-card-actions mt-3">
-                <span class="btn btn-outline-primary disabled" aria-disabled="true">Ver perfil</span>
-                <span class="btn btn-success disabled" aria-disabled="true">WhatsApp</span>
-              </div>
+          <article class="ficha" aria-label="Perfil de ejemplo de una kinesióloga">
+            <div class="ficha-top"><b>Kinesiología</b><span>Concepción</span></div>
+            <div class="ficha-who">
+              <div class="ficha-avatar" aria-hidden="true">C</div>
+              <div><h3>Camila R. Kinesiología</h3><p>Lomas de San Andrés</p></div>
+            </div>
+            <p class="ficha-desc">Rehabilitación musculoesquelética y adulto mayor. Evaluación a domicilio y seguimiento online.</p>
+            <dl class="ficha-cred">
+              <dt>Título</dt><dd>Kinesióloga · titulada en {{ anio_actual|add:"-1" }}</dd>
+              <dt>Estudió en</dt><dd>Universidad de Concepción</dd>
+              <dt>Registro</dt><dd>N° 000000</dd>
+            </dl>
+            <div class="ficha-tags"><span class="mini-pill">A domicilio</span><span class="mini-pill">Online</span></div>
+            <div class="ficha-acciones">
+              <span class="ficha-ver" aria-disabled="true">Ver ficha →</span>
+              <span class="btn btn-success disabled" aria-disabled="true">WhatsApp</span>
             </div>
           </article>
         </div>
@@ -62,23 +52,23 @@
   <div class="row g-3">
     <div class="col-md-4">
       <div class="step-card h-100">
-        <span class="step-num">📍</span>
-        <h3 class="h5 mb-1">Te encuentran en tu comuna</h3>
-        <p class="text-muted mb-0" style="font-size:.92rem">Cada especialidad tiene su página por comuna, pensada para aparecer cuando alguien busca "kinesiólogo en Concepción" o "profe de inglés en Maipú".</p>
+        <span class="step-num"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 10a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg></span>
+        <h3 class="h5 mb-1">Tu página profesional, gratis</h3>
+        <p class="text-muted mb-0" style="font-size:.92rem">Un link propio para tu bio de Instagram, tu estado de WhatsApp y tus tarjetas. Te sirve desde el primer día, aunque nadie te haya buscado todavía.</p>
       </div>
     </div>
     <div class="col-md-4">
       <div class="step-card h-100">
-        <span class="step-num">🎓</span>
+        <span class="step-num"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c3 2 9 2 12 0v-5"/></svg></span>
         <h3 class="h5 mb-1">Muestras tu formación</h3>
         <p class="text-muted mb-0" style="font-size:.92rem">Título, institución, año y registro de salud a la vista. Cuando todavía no tienes reseñas, eso es lo que genera confianza.</p>
       </div>
     </div>
     <div class="col-md-4">
       <div class="step-card h-100">
-        <span class="step-num">💬</span>
-        <h3 class="h5 mb-1">Te escriben directo</h3>
-        <p class="text-muted mb-0" style="font-size:.92rem">Las consultas llegan a tu WhatsApp. Tú pones el precio, la agenda y cómo atiendes. ServiPlace no cobra comisión ni se mete en el pago.</p>
+        <span class="step-num"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-5.2-7-11a7 7 0 0 1 14 0c0 5.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></span>
+        <h3 class="h5 mb-1">Apareces en tu comuna</h3>
+        <p class="text-muted mb-0" style="font-size:.92rem">Además figuras cuando alguien busca tu especialidad en tu comuna. Te escriben directo a tu WhatsApp; el precio y la agenda los pones tú, sin comisión.</p>
       </div>
     </div>
   </div>
@@ -93,12 +83,12 @@
   <div class="group-block">
     <div class="group-block-head">
       <div>
-        <h3>{{ grupo.nombre }}</h3>
+        <h3>{% include "_icono_grupo.html" with grupo=grupo.clave %}{{ grupo.nombre }}</h3>
       </div>
     </div>
     <div class="spec-chips">
       {% for category in grupo.categorias %}
-        <a class="spec-chip" href="{% url 'directory:provider_list' %}?categoria={{ category.slug }}">{{ category.icon }} {{ category.name }}</a>
+        <a class="spec-chip" href="{% url 'directory:provider_list' %}?categoria={{ category.slug }}">{{ category.name }}</a>
       {% endfor %}
     </div>
   </div>
@@ -169,10 +159,10 @@
 <section class="container pb-5">
   <div class="join-band">
     <div style="position:relative;z-index:1">
-      <h2>Tu primer cliente puede estar a una búsqueda de distancia</h2>
-      <p>Crea tu perfil gratis y compártelo hoy.</p>
+      <h2>Tu perfil queda listo para compartir hoy</h2>
+      <p>Gratis, sin comisión y en cinco minutos.</p>
     </div>
-    <a class="btn btn-light btn-lg" href="{% url 'accounts:register' %}" style="position:relative;z-index:1;flex-shrink:0">Crear mi perfil gratis →</a>
+    <a class="btn btn-light btn-lg" href="{% url 'accounts:register' %}?desde=landing" style="position:relative;z-index:1;flex-shrink:0">Crear mi perfil gratis →</a>
   </div>
 </section>
 {% endblock %}

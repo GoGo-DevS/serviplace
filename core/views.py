@@ -1,11 +1,12 @@
 from django.conf import settings
 from django.contrib import messages
 from django.shortcuts import redirect, render
+from django.db.models import Count, Prefetch, Q
 from django.urls import reverse
 from django.utils import timezone
 
 from directory.catalogo import categorias_por_grupo
-from directory.models import Category, Commune, Provider
+from directory.models import Category, Commune, Provider, Region
 from leads.models import LeadEvent
 from leads.registro import registrar
 
@@ -21,6 +22,16 @@ def home(request):
     )
     total_providers = Provider.objects.filter(is_active=True).count()
     communes_count = Commune.objects.filter(is_active=True, providers__is_active=True).distinct().count()
+    # Los pines del mapa son datos reales: las comunas con más perfiles hoy.
+    # El mapa es ilustrativo y lo dice; las cifras no.
+    top_comunas = list(
+        Commune.objects.filter(is_active=True, providers__is_active=True)
+        .annotate(n=Count('providers', filter=Q(providers__is_active=True)))
+        .order_by('-n', 'name')[:4]
+    )
+    regions_with_communes = Region.objects.filter(is_active=True).prefetch_related(
+        Prefetch('communes', queryset=Commune.objects.filter(is_active=True).order_by('name'), to_attr='active_communes')
+    ).order_by('name')
 
     context = {
         'categories': categories,
@@ -28,6 +39,8 @@ def home(request):
         'featured_providers': featured_providers,
         'total_providers': total_providers,
         'communes_count': communes_count,
+        'top_comunas': top_comunas,
+        'regions_with_communes': regions_with_communes,
         'ref_code': ref_code,
         'page_title': 'SERVIPLACE | Maestros y profesionales en tu comuna — Contacto directo',
         'meta_description': 'Gásfiter, electricista, kinesiólogo, psicólogo, profe particular y más en tu comuna. Contacto directo por WhatsApp, sin comisión.',

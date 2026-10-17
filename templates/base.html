@@ -15,22 +15,23 @@
   <meta name="twitter:card" content="summary">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'css/site.css' %}">
+  <link rel="stylesheet" href="{% static 'css/cuadra.css' %}">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 2C9.4 2 4 7.2 4 13.6 4 22 16 30 16 30s12-8 12-16.4C28 7.2 22.6 2 16 2z' fill='%23d6552c'/%3E%3Ccircle cx='16' cy='13.5' r='4.6' fill='%23fff'/%3E%3C/svg%3E">
+  <meta name="theme-color" content="#1b1f24">
   {% block extra_head %}{% endblock %}
 </head>
 <body>
+  <a class="skip-link" href="#contenido">Saltar al contenido</a>
 
   <!-- NAV -->
   <nav class="navbar navbar-expand-lg site-navbar sticky-top">
     <div class="container">
       <a class="navbar-brand site-brand" href="{% url 'core:home' %}">
-        <span class="brand-mark">S</span>
-        <span class="brand-copy">
-          <strong>SERVIPLACE</strong>
-          <small>Directorio local</small>
-        </span>
+        <span class="brand-pin" aria-hidden="true"></span>
+        <span>serviplace</span>
       </a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Abrir menú">
         <span class="navbar-toggler-icon"></span>
@@ -39,9 +40,10 @@
         <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
           <li class="nav-item"><a class="nav-link" href="{% url 'directory:provider_list' %}">Buscar</a></li>
           <li class="nav-item"><a class="nav-link" href="{% url 'core:para_profesionales' %}">Para profesionales</a></li>
+          {% if user.is_staff %}<li class="nav-item"><a class="nav-link" href="{% url 'core:metricas' %}">Métricas</a></li>{% endif %}
           {% if user.is_authenticated %}
             <li class="nav-item"><a class="nav-link" href="{% url 'accounts:dashboard' %}">Mi cuenta</a></li>
-            <li class="nav-item"><a class="nav-link" href="{% url 'accounts:provider_create' %}">Publicar</a></li>
+            <li class="nav-item ms-lg-1"><a class="btn btn-publicar nav-cta" href="{% url 'accounts:provider_create' %}">Publicar mis servicios</a></li>
             <li class="nav-item ms-lg-1">
               <form method="post" action="{% url 'accounts:logout' %}" style="margin:0">
                 {% csrf_token %}
@@ -50,7 +52,7 @@
             </li>
           {% else %}
             <li class="nav-item"><a class="nav-link" href="{% url 'accounts:login' %}">Iniciar sesión</a></li>
-            <li class="nav-item ms-lg-1"><a class="btn btn-primary nav-cta" href="{% url 'accounts:register' %}">Publicar gratis</a></li>
+            <li class="nav-item ms-lg-1"><a class="btn btn-publicar nav-cta" href="{% url 'core:para_profesionales' %}">Publicar mis servicios</a></li>
           {% endif %}
         </ul>
       </div>
@@ -74,7 +76,7 @@
   </script>
   {% endif %}
 
-  <main>
+  <main id="contenido">
     {% block content %}{% endblock %}
   </main>
 
@@ -82,7 +84,7 @@
     <div class="container py-5">
       <div class="footer-grid">
         <div class="footer-brand">
-          <span>SERVIPLACE</span>
+          <span>serviplace</span>
           <p class="text-muted mb-2" style="font-size:.9rem">Maestros y profesionales independientes en tu comuna.</p>
           <a class="btn btn-primary btn-sm" href="{% url 'accounts:provider_create' %}">Publicar mi servicio gratis</a>
         </div>

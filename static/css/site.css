@@ -1,39 +1,51 @@
 /* ===================================================
-   SERVIPLACE — Design System v3
-   Paleta: Azul índigo profundo + Verde esmeralda
-   Fuente: Space Grotesk (headings) + Plus Jakarta Sans (body)
+   SERVIPLACE — Design System v4 "Cuadra" (18-10-2026)
+   Identidad: la comuna. Asfalto claro + tinta + un acento naranja de obra.
+   Fichas profesionales con estilo de credencial.
+   Fuentes: Bricolage Grotesque (títulos), Atkinson Hyperlegible (texto,
+   pensada para leer fácil: muchos clientes son adultos mayores) e IBM Plex
+   Mono (datos de credencial). Se cargan desde base.html, no con @import:
+   el @import bloqueaba el render y cargaba las fuentes dos veces.
    =================================================== */
-
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
 /* ---- TOKENS ---- */
 :root {
-  --sp-blue:        #1a4fd6;
-  --sp-blue-dark:   #1039a8;
-  --sp-blue-light:  #ebf1ff;
-  --sp-blue-mid:    #2563eb;
-  --sp-green:       #059669;
-  --sp-green-dark:  #047857;
-  --sp-green-light: #d1fae5;
-  --sp-amber:       #b45309;
-  --sp-amber-light: #fef3c7;
-  --sp-ink:         #0f172a;
-  --sp-slate:       #334155;
-  --sp-muted:       #64748b;
-  --sp-line:        #e2e8f0;
-  --sp-line-soft:   #f1f5f9;
-  --sp-bg:          #f8fafc;
+  /* 18-10-2026 — Identidad "Cuadra": la comuna es la protagonista. Asfalto
+     claro de fondo, fichas blancas, tinta casi negra y UN acento: naranja de
+     cono de obra. Los nombres --sp-blue* se conservan porque los usa todo el
+     CSS; ahora apuntan al acento. Contrastes medidos (WCAG): acento sobre
+     blanco 5,1:1, texto atenuado 6,3:1, verde WhatsApp con texto blanco 5,4:1. */
+  --sp-accent:      #bf461e;
+  --sp-accent-deco: #d6552c;   /* solo decoración: pines y mapa, nunca texto */
+  --sp-blue:        var(--sp-accent);
+  --sp-blue-dark:   #973513;
+  --sp-blue-light:  #fbeae3;
+  --sp-blue-mid:    var(--sp-accent);
+  --sp-green:       #0f7a40;   /* WhatsApp y "hay perfiles": semántico, no acento */
+  --sp-green-dark:  #0b6233;
+  --sp-green-light: #dcefe2;
+  --sp-amber:       #8a5a00;
+  --sp-amber-light: #fbf0d6;
+  --sp-ink:         #1b1f24;
+  --sp-slate:       #3a4047;
+  --sp-muted:       #5a6068;
+  --sp-line:        #d9dddb;
+  --sp-line-soft:   #e7eae8;
+  --sp-bg:          #eef0ef;   /* asfalto claro */
   --sp-white:       #ffffff;
-  --sp-r-sm:        8px;
+  --sp-street:      #ffffff;
+  --sp-park:        #d3e4cb;
+  --sp-r-sm:        10px;
   --sp-r-md:        14px;
   --sp-r-lg:        20px;
-  --sp-r-xl:        28px;
-  --sp-sh-sm:       0 1px 3px rgba(15,23,42,.06), 0 4px 12px rgba(15,23,42,.05);
-  --sp-sh-md:       0 4px 16px rgba(15,23,42,.08), 0 12px 36px rgba(15,23,42,.06);
-  --sp-sh-lg:       0 8px 24px rgba(15,23,42,.10), 0 24px 56px rgba(15,23,42,.08);
-  --sp-focus:       0 0 0 3px rgba(26,79,214,.22);
-  --font-head:      'Space Grotesk', system-ui, sans-serif;
-  --font-body:      'Plus Jakarta Sans', system-ui, sans-serif;
+  --sp-r-xl:        26px;
+  --sp-sh-sm:       0 1px 2px rgba(27,31,36,.06), 0 6px 16px -10px rgba(27,31,36,.18);
+  --sp-sh-md:       0 2px 6px rgba(27,31,36,.06), 0 18px 36px -22px rgba(27,31,36,.35);
+  --sp-sh-lg:       0 4px 10px rgba(27,31,36,.06), 0 30px 54px -30px rgba(27,31,36,.5);
+  --sp-focus:       0 0 0 3px rgba(191,70,30,.28);
+  --font-head:      'Bricolage Grotesque', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-body:      'Atkinson Hyperlegible', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono:      'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
 }
 
 /* ---- RESET & BASE ---- */

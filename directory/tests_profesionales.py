@@ -120,12 +120,25 @@ class PortadaYLanding(Base):
     def test_la_portada_no_hace_una_consulta_por_categoria(self):
         """G-04: 27 categorías no pueden ser 27 consultas."""
         self.client.get(reverse('core:home'))
-        with self.assertNumQueries(5) as con_27:
+        with self.assertNumQueries(8) as con_27:
             self.client.get(reverse('core:home'))
         for i in range(10):
             Category.objects.create(name=f'Extra {i}', slug=f'extra-{i}', group=Category.PROFESIONAL)
         with self.assertNumQueries(len(con_27.captured_queries)):
             self.client.get(reverse('core:home'))
+
+    def test_los_pines_del_mapa_son_comunas_reales_con_su_cifra(self):
+        """El mapa es ilustrativo; las cifras no pueden serlo."""
+        for i in range(3):
+            self._perfil(self.gasfiter, f'Gásfiter {i}')
+        html = self.client.get(reverse('core:home')).content.decode()
+        self.assertIn('?comuna=concepcion"><i>3</i>Concepción', html)
+        self.assertIn('Mapa ilustrativo', html)
+
+    def test_publicar_esta_a_la_vista_sin_competir_con_buscar(self):
+        html = self.client.get(reverse('core:home')).content.decode()
+        self.assertIn('Quiero publicar mis servicios', html)
+        self.assertIn('name="comuna"', html, 'el buscador de la portada pide la comuna')
 
     def test_la_landing_de_profesionales_responde_y_lleva_al_registro(self):
         r = self.client.get(reverse('core:para_profesionales'))

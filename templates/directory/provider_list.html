@@ -30,7 +30,7 @@
           {% for grupo in grupos %}
             <optgroup label="{{ grupo.nombre }}">
               {% for category in grupo.categorias %}
-                <option value="{{ category.slug }}" {% if selected_category.slug == category.slug %}selected{% endif %}>{{ category.icon|default:"" }} {{ category.name }}</option>
+                <option value="{{ category.slug }}" {% if selected_category.slug == category.slug %}selected{% endif %}>{{ category.name }}</option>
               {% endfor %}
             </optgroup>
           {% endfor %}
@@ -70,7 +70,6 @@
       {% include "directory/_provider_card.html" %}
     {% empty %}
       <div class="empty-state">
-        <p style="font-size:2.5rem;margin-bottom:.5rem">{% if selected_category %}{{ selected_category.icon|default:"🔍" }}{% else %}🔍{% endif %}</p>
         {% if selected_category and not query %}
           <h2 class="h5">Todavía no hay perfiles de {{ selected_category.name }}{% if selected_commune %} en {{ selected_commune.name }}{% endif %}</h2>
           <p class="text-muted mb-3">¿Te dedicas a esto? Publica tu perfil gratis y aparece primero cuando alguien lo busque.</p>
