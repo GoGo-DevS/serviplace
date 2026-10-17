@@ -1316,3 +1316,241 @@ a:hover { color: var(--sp-blue-dark); }
     min-height: 44px;
   }
 }
+
+/* ==========================================================================
+   17-10-2026 — Profesionales independientes: grupos, credenciales, landing
+   ========================================================================== */
+
+/* Honeypot del antispam: fuera de pantalla, nunca display:none (algunos bots
+   saltan los campos ocultos con CSS). */
+.hp-wrap {
+  position: absolute;
+  left: -10000px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+/* Chips de grupo (portada y listado) */
+.group-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+}
+.group-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: .45rem .9rem;
+  border: 1.5px solid var(--sp-line);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--sp-slate);
+  font-size: .86rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: border-color .15s ease, color .15s ease, background .15s ease;
+}
+.group-chip:hover { border-color: rgba(26,79,214,.35); color: var(--sp-blue-dark); }
+.group-chip.is-active { background: var(--sp-blue); border-color: var(--sp-blue); color: #fff; }
+
+/* Bloques de categorías por grupo */
+.group-block + .group-block { margin-top: 2rem; }
+.group-block-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: .9rem;
+}
+.group-block-head h3 {
+  margin: 0;
+  font-size: 1.15rem;
+  letter-spacing: -.01em;
+}
+.group-block-head p {
+  margin: .15rem 0 0;
+  color: var(--sp-muted);
+  font-size: .9rem;
+}
+.group-block-head a { font-size: .88rem; white-space: nowrap; }
+
+.tile-count {
+  margin-top: auto;
+  font-size: .8rem;
+  font-weight: 700;
+  color: var(--sp-green-dark);
+}
+.tile-count.is-first { color: var(--sp-blue); }
+.category-tile.is-empty { border-style: dashed; box-shadow: none; }
+
+/* Banda para profesionales en la portada */
+.pro-band {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 1.5rem 2rem;
+  align-items: center;
+  padding: clamp(1.5rem, 3.5vw, 2.5rem);
+  border-radius: var(--sp-r-xl);
+  background: linear-gradient(135deg, #0b3b2e 0%, var(--sp-green-dark) 55%, var(--sp-green) 100%);
+  color: #fff;
+  box-shadow: var(--sp-sh-lg);
+}
+.pro-band-eyebrow {
+  display: inline-block;
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: var(--sp-green-light);
+}
+.pro-band h2 {
+  margin: .5rem 0 .6rem;
+  color: #fff;
+  font-size: clamp(1.35rem, 2.6vw, 1.95rem);
+  letter-spacing: -.02em;
+  max-width: 34ch;
+}
+.pro-band p { margin: 0; color: rgba(255,255,255,.85); max-width: 60ch; }
+.pro-band-list {
+  margin: 1rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: .4rem;
+}
+.pro-band-list li { position: relative; padding-left: 1.5rem; color: rgba(255,255,255,.92); font-size: .93rem; }
+.pro-band-list li::before { content: '✓'; position: absolute; left: 0; font-weight: 800; color: var(--sp-green-light); }
+.pro-band-actions { display: flex; flex-direction: column; align-items: stretch; gap: .75rem; text-align: center; }
+.pro-band-link { color: #fff; font-weight: 600; font-size: .92rem; text-decoration: underline; text-underline-offset: 3px; }
+.pro-band-link:hover { color: var(--sp-green-light); }
+
+/* Credenciales en tarjeta y ficha */
+.pro-credential {
+  margin-top: .5rem;
+  padding: .55rem .7rem;
+  border-radius: var(--sp-r-sm);
+  background: var(--sp-green-light);
+  color: #065f46;
+  font-size: .82rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+.pro-credential span { font-weight: 500; color: #047857; }
+.detail-profession { font-weight: 700; color: var(--sp-green-dark); font-size: 1rem; }
+
+/* Landing: perfil de ejemplo */
+.ejemplo-wrap { position: relative; max-width: 420px; margin-inline: auto; }
+.ejemplo-label {
+  position: absolute;
+  top: -.75rem;
+  right: 1rem;
+  z-index: 2;
+  padding: .25rem .7rem;
+  border-radius: 999px;
+  background: var(--sp-amber-light);
+  color: var(--sp-amber);
+  font-size: .75rem;
+  font-weight: 800;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+/* Landing: especialidades */
+.spec-chips { display: flex; flex-wrap: wrap; gap: .5rem; }
+.spec-chip {
+  padding: .5rem .85rem;
+  border: 1.5px solid var(--sp-line);
+  border-radius: var(--sp-r-md);
+  background: #fff;
+  color: var(--sp-ink);
+  font-size: .9rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+.spec-chip:hover { border-color: rgba(26,79,214,.35); color: var(--sp-blue-dark); }
+
+/* Landing: preguntas frecuentes */
+.faq-list { display: grid; gap: .75rem; max-width: 820px; }
+.faq-list details {
+  border: 1.5px solid var(--sp-line);
+  border-radius: var(--sp-r-md);
+  background: #fff;
+  padding: .9rem 1.1rem;
+}
+.faq-list summary {
+  cursor: pointer;
+  font-weight: 700;
+  color: var(--sp-ink);
+  list-style-position: outside;
+}
+.faq-list details[open] summary { margin-bottom: .5rem; }
+.faq-list p { margin: 0; color: var(--sp-slate); line-height: 1.6; }
+
+/* Formulario de publicación */
+.form-section-title {
+  margin: 0 0 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--sp-line-soft);
+  font-size: 1.1rem;
+  letter-spacing: -.01em;
+}
+.form-section-title:first-of-type { border-top: 0; padding-top: 0; }
+.form-section-title small { font-size: .8rem; font-weight: 500; color: var(--sp-muted); }
+.modality-options { display: flex; flex-wrap: wrap; gap: .6rem; }
+.modality-option {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .6rem .9rem;
+  border: 1.5px solid var(--sp-line);
+  border-radius: var(--sp-r-md);
+  background: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+.modality-option .form-check-input { margin: 0; }
+.modality-option:has(input:checked) { border-color: var(--sp-blue); background: var(--sp-blue-light); }
+
+@media (max-width: 767px) {
+  .pro-band { grid-template-columns: 1fr; }
+  .group-block-head { flex-direction: column; align-items: flex-start; gap: .35rem; }
+}
+
+/* E2 para los controles nuevos: los chips son botones de filtro y se tocan
+   con el dedo (39-42 px medidos en un teléfono). */
+@media (pointer: coarse) {
+  .group-chip,
+  .spec-chip,
+  .modality-option,
+  .faq-list summary {
+    min-height: 44px;
+  }
+  .group-chip,
+  .spec-chip { display: inline-flex; align-items: center; }
+  .faq-list summary { display: flex; align-items: center; }
+}
+
+/* En el teléfono, 27 categorías con descripción eran 12.500 px de portada.
+   La descripción se ve en escritorio; acá basta el ícono, el nombre y el
+   conteo, que es lo que decide el toque. */
+@media (max-width: 767px) {
+  .group-block .category-tile small { display: none; }
+  .group-block .category-tile { padding: .85rem; gap: .35rem; scroll-snap-align: start; }
+  .group-block .category-icon { width: 38px; height: 38px; font-size: 1.15rem; }
+  .group-block + .group-block { margin-top: 1.5rem; }
+  /* Cada grupo, una fila que se desliza: asoma la tarjeta siguiente para
+     que se note que hay más. El desborde queda DENTRO de la fila. */
+  .group-block .category-grid {
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: 42%;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding: .25rem .1rem .75rem;
+    margin-inline: -.1rem;
+    scrollbar-width: thin;
+  }
+  /* Tres destacados bastan en el teléfono; seis eran 2.500 px de scroll. */
+  .featured-row > div:nth-child(n+4) { display: none; }
+}

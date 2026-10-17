@@ -20,8 +20,14 @@
           {% endif %}
         </div>
         <h1 class="mb-1" style="font-size:clamp(1.65rem,4vw,2.75rem);letter-spacing:-.025em">{{ provider.business_name }}</h1>
+        {% if provider.profession_title %}<p class="detail-profession mb-1">🎓 {{ provider.profession_title }}{% if provider.graduation_year %} · {% if provider.is_student %}se titula en {{ provider.graduation_year }}{% else %}titulado/a en {{ provider.graduation_year }}{% endif %}{% endif %}</p>{% endif %}
         <p class="lead mb-0">{{ provider.short_description }}</p>
         <p class="text-muted mt-1" style="font-size:.9rem">📍 {{ provider.sector }}, {{ provider.commune.name }}</p>
+        {% if provider.modalities %}
+        <div class="d-flex gap-2 flex-wrap mt-2">
+          {% for modalidad in provider.modalities %}<span class="mini-pill">{{ modalidad }}</span>{% endfor %}
+        </div>
+        {% endif %}
       </div>
     </div>
   </div>
@@ -36,6 +42,22 @@
         <p class="mb-0">{{ provider.description|linebreaksbr }}</p>
       </div>
 
+      {% if provider.has_professional_info %}
+      <div class="detail-block">
+        <h2>Formación</h2>
+        <dl class="info-list mb-0">
+          {% if provider.profession_title %}<dt>Título o profesión</dt><dd>{{ provider.profession_title }}</dd>{% endif %}
+          {% if provider.institution %}<dt>Institución</dt><dd>{{ provider.institution }}</dd>{% endif %}
+          {% if provider.graduation_year %}<dt>{% if provider.is_student %}Se titula en{% else %}Año de titulación{% endif %}</dt><dd>{{ provider.graduation_year }}</dd>{% endif %}
+          {% if provider.health_registry %}
+            <dt>Registro Superintendencia de Salud</dt>
+            <dd>N° {{ provider.health_registry }} · <a href="https://rnpi.superdesalud.gob.cl/" target="_blank" rel="noopener">compruébalo en el registro público →</a></dd>
+          {% endif %}
+        </dl>
+        <p class="safety-note mt-3 mb-0">Estos datos los declara el profesional. {% if provider.health_registry %}El registro de salud lo puedes comprobar tú mismo en el sitio de la Superintendencia.{% else %}Si es un servicio de salud, pídele su número de registro antes de atenderte.{% endif %}</p>
+      </div>
+      {% endif %}
+
       <div class="detail-block">
         <h2>Zona de atención</h2>
         <p class="mb-0">📍 {% if provider.service_area %}{{ provider.service_area }}{% else %}{{ provider.commune.name }} y sectores cercanos{% endif %}</p>
@@ -43,8 +65,12 @@
 
       <div class="detail-block">
         <h2>Antes de contratar</h2>
-        <p>Confirma precio, disponibilidad, materiales y alcance antes de iniciar cualquier trabajo.</p>
-        <p class="safety-note mb-0">SERVIPLACE conecta vecinos con prestadores. La coordinación, precio y ejecución se acuerdan directamente entre las partes. <a href="{% url 'core:trust_and_safety' %}">Ver recomendaciones →</a></p>
+        {% if provider.category.pide_registro_salud %}
+        <p>Confirma el valor de la sesión, la disponibilidad y si entrega boleta. Antes de atenderte, comprueba que esté inscrito en el registro de prestadores de la Superintendencia de Salud.</p>
+        {% else %}
+        <p>Confirma precio, disponibilidad y alcance del trabajo antes de empezar.</p>
+        {% endif %}
+        <p class="safety-note mb-0">SERVIPLACE conecta personas con profesionales y prestadores. La coordinación, el precio y el servicio se acuerdan directamente entre las partes. <a href="{% url 'core:trust_and_safety' %}">Ver recomendaciones →</a></p>
       </div>
 
       <!-- Fotos -->
@@ -96,7 +122,7 @@
       <div class="contact-card">
         <div class="contact-card-header">
           <h2>Contactar</h2>
-          <p style="color:rgba(255,255,255,.8);font-size:.85rem;margin:.25rem 0 0">Habla directo con el prestador</p>
+          <p style="color:rgba(255,255,255,.8);font-size:.85rem;margin:.25rem 0 0">Habla directo, sin intermediarios</p>
         </div>
         <div class="contact-card-body">
           <dl class="info-list">
@@ -113,7 +139,7 @@
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.555 4.117 1.528 5.845L0 24l6.335-1.652A11.95 11.95 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.943 0-3.771-.52-5.344-1.424l-.383-.226-3.963 1.033 1.055-3.857-.248-.396A9.928 9.928 0 012 12c0-5.514 4.486-10 10-10s10 4.486 10 10-4.486 10-10 10z"/></svg>
             Contactar por WhatsApp
           </a>
-          <p class="text-muted mt-2 mb-3" style="font-size:.8rem">Mensaje sugerido: "Hola, vi tu perfil en SERVIPLACE {{ provider.commune.name }} y necesito una cotización."</p>
+          <p class="text-muted mt-2 mb-3" style="font-size:.8rem">Mensaje sugerido: "Hola, vi tu perfil en SERVIPLACE y quiero hacerte una consulta."</p>
 
           {% if not provider.owner %}
           <div style="padding:.7rem .85rem;border:1px solid rgba(26,79,214,.18);border-radius:10px;background:var(--sp-blue-light);font-size:.83rem">
@@ -121,7 +147,7 @@
           </div>
           {% endif %}
 
-          {% if not provider.is_verified %}
+          {% if not provider.is_verified and user.is_authenticated and provider.owner_id == user.id %}
           <div class="mt-2" style="padding:.7rem .85rem;border:1px solid rgba(245,158,11,.20);border-radius:10px;background:#fef3c7;font-size:.83rem;color:#92400e">
             ⭐ <a href="{% url 'accounts:hazte_verificado' %}" style="color:#92400e;font-weight:700">Obtener badge verificado →</a>
           </div>

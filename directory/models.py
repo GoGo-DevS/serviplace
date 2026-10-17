@@ -34,10 +34,36 @@ class Commune(models.Model):
 
 
 class Category(models.Model):
+    # 17-10-2026 — ServiPlace deja de ser solo de oficios del hogar: también es
+    # la vitrina de profesionales independientes (kinesiólogos, psicólogos,
+    # profes particulares…), sobre todo de los recién titulados, que no
+    # necesitan un empleador sino clientes. Los grupos ordenan el catálogo
+    # para que las dos audiencias se encuentren sin mezclarse.
+    HOGAR = 'hogar'
+    SALUD = 'salud'
+    EDUCACION = 'educacion'
+    BELLEZA = 'belleza'
+    PROFESIONAL = 'profesional'
+
+    GRUPOS = [
+        (HOGAR, 'Hogar y oficios', 'Maestros y técnicos para tu casa.'),
+        (SALUD, 'Salud y bienestar', 'Kinesiólogos, psicólogos, nutricionistas y más.'),
+        (EDUCACION, 'Clases y educación', 'Profes particulares, idiomas, música y apoyo escolar.'),
+        (BELLEZA, 'Belleza y cuidado personal', 'Peluquería, manicure y estética, también a domicilio.'),
+        (PROFESIONAL, 'Servicios profesionales', 'Contabilidad, diseño, fotografía e informática.'),
+    ]
+    GROUP_CHOICES = [(clave, nombre) for clave, nombre, _ in GRUPOS]
+
     name = models.CharField(max_length=80, unique=True)
     slug = models.SlugField(max_length=90, unique=True)
     description = models.TextField(blank=True)
     icon = models.CharField(max_length=40, blank=True, help_text='Nombre corto o emoji visible.')
+    group = models.CharField('grupo', max_length=20, choices=GROUP_CHOICES, default=HOGAR)
+    pide_registro_salud = models.BooleanField(
+        'es una profesión de salud',
+        default=False,
+        help_text='Muestra el campo de registro en la Superintendencia de Salud y exige estar titulado/a para publicar.',
+    )
     is_active = models.BooleanField(default=True)
     display_order = models.PositiveSmallIntegerField(default=0)
 
@@ -93,6 +119,22 @@ class Provider(models.Model):
     email = models.EmailField(blank=True)
     address = models.CharField(max_length=180, blank=True)
     service_area = models.CharField(max_length=180, blank=True)
+    # Perfil profesional (17-10-2026). Todo opcional: un gásfiter no tiene
+    # título universitario y no debe parecer incompleto por eso. A quien recién
+    # se titula, en cambio, es lo único que puede mostrar mientras no tiene
+    # reseñas, así que se ve arriba en su ficha.
+    profession_title = models.CharField('título o profesión', max_length=120, blank=True)
+    institution = models.CharField('institución', max_length=140, blank=True)
+    graduation_year = models.PositiveSmallIntegerField('año de titulación', null=True, blank=True)
+    health_registry = models.CharField(
+        'registro en la Superintendencia de Salud',
+        max_length=12,
+        blank=True,
+        help_text='Número del Registro Nacional de Prestadores Individuales. Público y comprobable.',
+    )
+    attends_home = models.BooleanField('atiende a domicilio', default=False)
+    attends_office = models.BooleanField('atiende en consulta o local', default=False)
+    attends_online = models.BooleanField('atiende online', default=False)
     is_verified = models.BooleanField(default=False)
     is_featured = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
@@ -164,6 +206,26 @@ class Provider(models.Model):
     def is_synthetic(self):
         return self.source_name == 'seed_offline'
 
+    @property
+    def has_professional_info(self):
+        return bool(self.profession_title or self.institution or self.graduation_year or self.health_registry)
+
+    @property
+    def is_student(self):
+        """Todavía no se titula: declaró un año de titulación futuro."""
+        from django.utils import timezone
+        return bool(self.graduation_year and self.graduation_year > timezone.localdate().year)
+
+    @property
+    def modalities(self):
+        return [
+            etiqueta for activa, etiqueta in (
+                (self.attends_home, '🏠 A domicilio'),
+                (self.attends_office, '🏢 En consulta o local'),
+                (self.attends_online, '💻 Online'),
+            ) if activa
+        ]
+
 
 class ProviderImage(models.Model):
     provider = models.ForeignKey(Provider, on_delete=models.CASCADE, related_name='images')
@@ -223,13 +285,26 @@ class ProviderReport(models.Model):
     REPORT = 'reporte'
     REMOVAL = 'baja'
     CORRECTION = 'correccion'
+    # 17-10-2026 — Las vistas de "Reclamar perfil" y el panel de cuenta ya
+    # usaban CLAIM y `claimant` desde la sesión autónoma del 04-09, pero el
+    # modelo nunca los tuvo: el panel daba 500 a todo usuario con sesión.
+    CLAIM = 'reclamo'
     KIND_CHOICES = [
         (REPORT, 'Reportar perfil'),
         (REMOVAL, 'Solicitar baja (soy el titular)'),
         (CORRECTION, 'Corregir datos'),
+        (CLAIM, 'Reclamar perfil (es mío)'),
     ]
 
     provider = models.ForeignKey(Provider, on_delete=models.CASCADE, related_name='reports')
+    claimant = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='claims',
+        help_text='Quién reclama el perfil. Al aprobar, pasa a ser su dueño.',
+    )
     kind = models.CharField(max_length=20, choices=KIND_CHOICES, default=REPORT)
     reporter_name = models.CharField(max_length=120, blank=True)
     reporter_contact = models.CharField(max_length=160, blank=True)

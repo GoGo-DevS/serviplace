@@ -1,0 +1,9 @@
+{% comment %}
+Un campo con su etiqueta, su ayuda y SUS errores. Antes solo el nombre
+mostraba errores: si el WhatsApp venía mal escrito, el formulario volvía sin
+decir por qué y la persona se iba.
+{% endcomment %}
+<label class="form-label" for="{{ campo.id_for_label }}">{{ campo.label }}</label>
+{{ campo }}
+{% if campo.help_text %}<div class="form-text">{{ campo.help_text }}</div>{% endif %}
+{% for error in campo.errors %}<div class="text-danger mt-1" style="font-size:.85rem;font-weight:600">{{ error }}</div>{% endfor %}

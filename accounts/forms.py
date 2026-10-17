@@ -3,6 +3,7 @@ import re
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
+from django.utils import timezone
 from django.utils.html import strip_tags
 
 from core.antispam import AntispamFormMixin
@@ -102,9 +103,16 @@ class ProviderForm(AntispamFormMixin, forms.ModelForm):
             'email',
             'address',
             'service_area',
+            'attends_home',
+            'attends_office',
+            'attends_online',
+            'profession_title',
+            'institution',
+            'graduation_year',
+            'health_registry',
         ]
         labels = {
-            'business_name': 'Nombre del negocio o cómo te conocen',
+            'business_name': 'Nombre con el que te presentas',
             'contact_name': 'Tu nombre',
             'category': 'Rubro',
             'commune': 'Comuna base',
@@ -116,15 +124,31 @@ class ProviderForm(AntispamFormMixin, forms.ModelForm):
             'email': 'Correo (opcional)',
             'address': 'Dirección (opcional)',
             'service_area': 'Dónde atiendes (opcional)',
+            'attends_home': 'A domicilio',
+            'attends_office': 'En consulta o local',
+            'attends_online': 'Online',
+            'profession_title': 'Título o profesión',
+            'institution': 'Dónde estudiaste',
+            'graduation_year': 'Año de titulación',
+            'health_registry': 'N° de registro en la Superintendencia de Salud',
         }
         help_texts = {
             'short_description': 'Máximo 220 caracteres. Es lo que se ve en la tarjeta.',
             'whatsapp_number': 'Celular chileno. Es el botón principal de tu perfil.',
             'service_area': 'Ej: Maipú, Cerrillos y Pudahuel',
+            'profession_title': 'Ej: Kinesióloga, Psicólogo, Profesora de inglés.',
+            'business_name': 'Tu negocio o tu nombre profesional. Ej: Camila Rojas Kinesiología, Gasfitería Pérez.',
+            'institution': 'Ej: Universidad de Concepción, INACAP, Duoc UC.',
+            'graduation_year': 'Si todavía estudias, el año en que te titulas.',
+            'health_registry': 'Solo si eres profesional de la salud. Tus pacientes pueden comprobarlo en el registro público.',
         }
         widgets = {
-            'short_description': forms.TextInput(attrs={'maxlength': 220, 'placeholder': 'Ej: Gásfiter con 10 años de experiencia, urgencias 24/7'}),
-            'description': forms.Textarea(attrs={'rows': 6, 'placeholder': 'Qué trabajos haces, en qué sectores, horarios, si entregas boleta o garantía…'}),
+            'short_description': forms.TextInput(attrs={'maxlength': 220, 'placeholder': 'Ej: Kinesióloga a domicilio, rehabilitación y adulto mayor'}),
+            'description': forms.Textarea(attrs={'rows': 6, 'placeholder': 'Qué haces, cómo trabajas, horarios, valores de referencia, si entregas boleta…'}),
+            'profession_title': forms.TextInput(attrs={'placeholder': 'Ej: Kinesióloga'}),
+            'institution': forms.TextInput(attrs={'placeholder': 'Ej: Universidad de Concepción'}),
+            'graduation_year': forms.NumberInput(attrs={'placeholder': 'Ej: 2025', 'inputmode': 'numeric'}),
+            'health_registry': forms.TextInput(attrs={'placeholder': 'Ej: 654321', 'inputmode': 'numeric'}),
             'sector': forms.TextInput(attrs={'placeholder': 'Ej: Ciudad Satélite'}),
             'phone': forms.TextInput(attrs={'placeholder': '+56 9 1234 5678', 'inputmode': 'tel'}),
             'whatsapp_number': forms.TextInput(attrs={'placeholder': '+56 9 1234 5678', 'inputmode': 'tel'}),
@@ -136,11 +160,23 @@ class ProviderForm(AntispamFormMixin, forms.ModelForm):
         self.fields['commune'].queryset = Commune.objects.filter(is_active=True).select_related('region').order_by('name')
         self.fields['category'].empty_label = 'Elige un rubro'
         self.fields['commune'].empty_label = 'Elige tu comuna'
+        # 27 rubros en una lista plana no se leen: se agrupan como en la
+        # portada. La validación sigue siendo la del queryset (por pk).
+        categorias = list(self.fields['category'].queryset)
+        nombres = dict(Category.GROUP_CHOICES)
+        self.fields['category'].choices = [('', 'Elige un rubro')] + [
+            (nombres[clave], [(c.pk, f'{c.icon} {c.name}'.strip()) for c in categorias if c.group == clave])
+            for clave, _, _ in Category.GRUPOS
+            if any(c.group == clave for c in categorias)
+        ]
+        self.fields['category'].label = 'Rubro o especialidad'
         for name, field in self.fields.items():
             if name.startswith('sitio_web') or name.startswith('sello_'):
                 continue
             css = field.widget.attrs.get('class', '')
-            if isinstance(field.widget, forms.Select):
+            if isinstance(field.widget, forms.CheckboxInput):
+                field.widget.attrs['class'] = f'{css} form-check-input'.strip()
+            elif isinstance(field.widget, forms.Select):
                 field.widget.attrs['class'] = f'{css} form-select'.strip()
             else:
                 field.widget.attrs['class'] = f'{css} form-control'.strip()
@@ -179,5 +215,42 @@ class ProviderForm(AntispamFormMixin, forms.ModelForm):
             raise forms.ValidationError('El WhatsApp debe ser un celular chileno: +56 9 XXXX XXXX.')
         return digitos
 
+    def clean_profession_title(self):
+        return limpiar_texto(self.cleaned_data.get('profession_title', ''))
+
+    def clean_institution(self):
+        return limpiar_texto(self.cleaned_data.get('institution', ''))
+
+    def clean_graduation_year(self):
+        anio = self.cleaned_data.get('graduation_year')
+        if anio is None:
+            return None
+        hoy = timezone.localdate().year
+        if not 1950 <= anio <= hoy + 7:
+            raise forms.ValidationError(f'Escribe un año entre 1950 y {hoy + 7}.')
+        return anio
+
+    def clean_health_registry(self):
+        valor = ''.join(ch for ch in (self.cleaned_data.get('health_registry') or '') if not ch.isspace())
+        if valor and not re.fullmatch(r'\d{3,10}', valor):
+            raise forms.ValidationError('El registro de la Superintendencia de Salud es solo números.')
+        return valor
+
+    def clean(self):
+        datos = super().clean()
+        categoria = datos.get('category')
+        anio = datos.get('graduation_year')
+        # Ofrecer atención de salud sin título es ejercicio ilegal de la
+        # profesión. Quien está en práctica puede publicar igual, pero en lo
+        # que ya puede hacer (clases, apoyo), no como kinesiólogo.
+        if categoria and categoria.pide_registro_salud and anio and anio > timezone.localdate().year:
+            self.add_error(
+                'category',
+                'La atención de salud solo puede ofrecerla quien ya está titulado/a. '
+                'Mientras terminas, puedes publicar en otra categoría, como clases particulares.',
+            )
+        return datos
+
     def antispam_textos(self):
-        return [self.data.get(k, '') for k in ('business_name', 'short_description', 'description', 'sector', 'service_area')]
+        return [self.data.get(k, '') for k in ('business_name', 'short_description', 'description', 'sector',
+                                                 'service_area', 'profession_title', 'institution')]

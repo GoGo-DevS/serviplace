@@ -22,8 +22,18 @@
 
       <p class="provider-card-desc">{{ provider.short_description }}</p>
 
+      {% if provider.profession_title %}
+      <div class="pro-credential">
+        🎓 {{ provider.profession_title }}{% if provider.graduation_year %} · {% if provider.is_student %}se titula en {{ provider.graduation_year }}{% else %}titulado/a en {{ provider.graduation_year }}{% endif %}{% endif %}
+        {% if provider.institution %}<br><span>{{ provider.institution }}</span>{% endif %}
+      </div>
+      {% endif %}
+
       <div class="d-flex gap-2 flex-wrap mb-2">
         <span class="mini-pill">📍 {{ provider.commune.name }}</span>
+        {% for modalidad in provider.modalities %}
+          <span class="mini-pill">{{ modalidad }}</span>
+        {% endfor %}
         {% if provider.service_area %}
           <span class="mini-pill">{{ provider.service_area }}</span>
         {% endif %}

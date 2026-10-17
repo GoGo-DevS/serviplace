@@ -13,30 +13,42 @@
     <div class="col-sm-6 col-lg-3">
       <div class="dashboard-stat">
         <strong>{{ my_providers|length }}</strong>
-        <span>perfil{{ my_providers|length|pluralize }} publicado{{ my_providers|length|pluralize }}</span>
+        <span>perfil{{ my_providers|length|pluralize:"es" }} publicado{{ my_providers|length|pluralize }}</span>
       </div>
     </div>
     <div class="col-sm-6 col-lg-3">
       <div class="dashboard-stat">
-        {% with total_views=my_providers|length %}
-        <strong>—</strong>
-        {% endwith %}
-        <span>vistas este mes</span>
+        <strong>{{ total_views }}</strong>
+        <span>visita{{ total_views|pluralize }} a tu{{ my_providers|length|pluralize }} perfil{{ my_providers|length|pluralize:"es" }}</span>
       </div>
     </div>
     <div class="col-sm-6 col-lg-3">
       <div class="dashboard-stat">
-        <strong>—</strong>
-        <span>clicks WhatsApp</span>
+        <strong>{{ total_clicks }}</strong>
+        <span>clic{{ total_clicks|pluralize:"s" }} en WhatsApp</span>
       </div>
     </div>
     <div class="col-sm-6 col-lg-3">
       <div class="dashboard-stat" style="border-color:rgba(245,158,11,.25);background:linear-gradient(135deg,#fff,#fef3c7)">
-        <strong style="color:#b45309">{{ my_providers|length|yesno:"activo,—" }}</strong>
-        <span>estado verificado</span>
+        {% if tiene_verificado %}
+          <strong style="color:#047857">Sí</strong>
+          <span>perfil verificado</span>
+        {% else %}
+          <strong style="color:#b45309">No</strong>
+          <span>verificado · <a href="{% url 'accounts:hazte_verificado' %}">cómo obtenerlo</a></span>
+        {% endif %}
       </div>
     </div>
   </div>
+
+  {% if claims %}
+  <div class="confidence-block">
+    <h2 class="h5">Tus reclamos de perfil</h2>
+    {% for claim in claims %}
+      <p class="mb-1">{{ claim.provider.business_name }} — {% if claim.resolved_at %}resuelto el {{ claim.resolved_at|date:"d-m-Y" }}{% else %}en revisión desde el {{ claim.created_at|date:"d-m-Y" }}{% endif %}</p>
+    {% endfor %}
+  </div>
+  {% endif %}
 
   <div class="row g-4">
     <!-- Mis perfiles -->

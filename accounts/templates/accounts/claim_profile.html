@@ -23,11 +23,26 @@
       Al reclamar este perfil confirmas que eres el dueño o representante autorizado de este negocio. La información pasa a ser tu responsabilidad desde este momento.
     </div>
 
-    {% if user.is_authenticated %}
-      <form method="post">
+    {% if pendiente %}
+      <div class="alert alert-info mb-0">Ya enviaste una solicitud para este perfil el {{ pendiente.created_at|date:"d-m-Y" }}. Te avisamos apenas la revisemos.</div>
+    {% elif user.is_authenticated %}
+      <form method="post" novalidate>
         {% csrf_token %}
-        <p class="mb-3">El perfil quedará asociado a tu cuenta <strong>{{ user.username }}</strong> y podrás editarlo de inmediato.</p>
-        <div class="d-flex gap-2">
+        {% comment %}
+        Hasta el 17-10-2026 este formulario mandaba SOLO el token: ningún
+        campo. El formulario exige nombre, contacto y mensaje, salía inválido
+        y la página se recargaba sin decir nada. Nadie podía reclamar su perfil.
+        {% endcomment %}
+        {% include "_antispam.html" %}
+        {{ form.kind.as_hidden }}
+        {% if form.non_field_errors %}<div class="alert alert-danger">{% for e in form.non_field_errors %}{{ e }}{% endfor %}</div>{% endif %}
+        <p class="mb-3">Cuando lo aprobemos, el perfil quedará asociado a tu cuenta <strong>{{ user.username }}</strong> y podrás editarlo.</p>
+        <div class="row g-3 mb-3">
+          <div class="col-md-6">{% include "accounts/_campo.html" with campo=form.reporter_name %}</div>
+          <div class="col-md-6">{% include "accounts/_campo.html" with campo=form.reporter_contact %}</div>
+          <div class="col-12">{% include "accounts/_campo.html" with campo=form.message %}</div>
+        </div>
+        <div class="d-flex gap-2 flex-wrap">
           <button type="submit" class="btn btn-primary btn-lg">Sí, reclamar este perfil</button>
           <a class="btn btn-outline-primary btn-lg" href="{{ provider.get_absolute_url }}">Cancelar</a>
         </div>

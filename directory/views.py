@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 
 from leads.models import LeadEvent
 
+from .catalogo import categorias_por_grupo
 from .models import Category, Commune, Provider, Region
 
 # Cuántos prestadores por página. 24 entra en 3 columnas en escritorio y en 2
@@ -18,6 +19,10 @@ def provider_list(request):
     query = request.GET.get('q', '').strip()
     category_slug = request.GET.get('categoria', '').strip()
     commune_slug = request.GET.get('comuna', '').strip()
+    group_slug = request.GET.get('grupo', '').strip()
+    grupos_validos = dict(Category.GROUP_CHOICES)
+    if group_slug not in grupos_validos:
+        group_slug = ''
 
     providers = Provider.objects.filter(is_active=True).select_related('category', 'commune')
 
@@ -29,10 +34,14 @@ def provider_list(request):
             | Q(description__icontains=query)
             | Q(sector__icontains=query)
             | Q(category__name__icontains=query)
+            | Q(profession_title__icontains=query)
+            | Q(institution__icontains=query)
         )
 
     if category_slug:
         providers = providers.filter(category__slug=category_slug)
+    elif group_slug:
+        providers = providers.filter(category__group=group_slug)
 
     if commune_slug:
         providers = providers.filter(commune__slug=commune_slug)
@@ -67,7 +76,12 @@ def provider_list(request):
     selected_category = categories.filter(slug=category_slug).first() if category_slug else None
     selected_commune = active_communes_qs.filter(slug=commune_slug).first() if commune_slug else None
 
-    title_tail = selected_category.name if selected_category else 'Servicios'
+    if selected_category:
+        title_tail = selected_category.name
+    elif group_slug:
+        title_tail = grupos_validos[group_slug]
+    else:
+        title_tail = 'Servicios y profesionales'
     commune_name = selected_commune.name if selected_commune else 'Chile'
 
     context = {
@@ -79,13 +93,17 @@ def provider_list(request):
         'pagina': pagina,
         'total_resultados': paginador.count,
         'categories': categories,
+        'grupos': categorias_por_grupo(),
+        'selected_group': group_slug,
+        'selected_group_name': grupos_validos.get(group_slug, ''),
+        'title_tail': title_tail,
         'regions_with_communes': regions_with_communes,
         'query': query,
         'selected_category': selected_category,
         'selected_commune': selected_commune,
         'commune_name': commune_name,
         'page_title': f'{title_tail} en {commune_name} | SERVIPLACE',
-        'meta_description': f'Busca {title_tail.lower()} y prestadores confiables en {commune_name}.',
+        'meta_description': f'{title_tail} en {commune_name}: perfiles con contacto directo por WhatsApp, sin comisión.',
     }
     return render(request, 'directory/provider_list.html', context)
 
@@ -116,7 +134,6 @@ def whatsapp_redirect(request, slug):
     Provider.objects.filter(pk=provider.pk).update(whatsapp_clicks_count=F('whatsapp_clicks_count') + 1)
     LeadEvent.objects.create(provider=provider, source_page='provider_detail', event_type=LeadEvent.WHATSAPP_CLICK)
 
-    message = f'Hola, vi tu perfil en SERVIPLACE {provider.commune.name} y necesito una cotización.'
+    message = 'Hola, vi tu perfil en SERVIPLACE y quiero hacerte una consulta.'
     return redirect(f'https://wa.me/{provider.clean_whatsapp_number}?text={quote(message)}')
 
-# Create your views here.

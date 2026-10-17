@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
+from django.utils.http import url_has_allowed_host_and_scheme
 
 from core.antispam import excede_limite_ip, ip_cliente
 from directory.forms import ProviderReportForm
@@ -76,7 +77,12 @@ def register(request):
             login(request, user)
             messages.success(request, f'Bienvenido/a a ServiPlace, {user.username}. Ya puedes publicar tu servicio.')
             next_url = request.GET.get('next') or request.POST.get('next')
-            if next_url and next_url.startswith('/'):
+            # `startswith('/')` dejaba pasar `//sitio-ajeno.com`, que el
+            # navegador lee como otro dominio: una redirección abierta justo
+            # después de crear la cuenta, el momento en que más se confía.
+            if next_url and url_has_allowed_host_and_scheme(
+                next_url, allowed_hosts={request.get_host()}, require_https=request.is_secure()
+            ):
                 return redirect(next_url)
             return redirect('accounts:provider_create')
     else:
@@ -99,6 +105,7 @@ def dashboard(request):
     claims = ProviderReport.objects.filter(claimant=request.user, kind=ProviderReport.CLAIM).select_related('provider')
     total_views = sum(p.views_count for p in my_providers)
     total_clicks = sum(p.whatsapp_clicks_count for p in my_providers)
+    tiene_verificado = any(p.is_verified for p in my_providers)
 
     return render(request, 'accounts/dashboard.html', {
         'my_providers': my_providers,
@@ -106,6 +113,7 @@ def dashboard(request):
         'claims': claims,
         'total_views': total_views,
         'total_clicks': total_clicks,
+        'tiene_verificado': tiene_verificado,
         'page_title': 'Mi cuenta | ServiPlace',
         'robots': 'noindex',
     })
@@ -212,6 +220,7 @@ def claim_profile(request, slug):
             'kind': ProviderReport.CLAIM,
             'reporter_name': request.user.get_full_name() or request.user.username,
             'reporter_contact': request.user.email,
+            'message': f'Soy el dueño o representante de {provider.business_name}. Pueden confirmarlo escribiéndome al WhatsApp del perfil.',
         })
 
     return render(request, 'accounts/claim_profile.html', {

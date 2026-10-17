@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- HERO -->
+<section class="hero-section">
+  <div class="container py-5">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-7">
+        <span class="hero-eyebrow">Para profesionales independientes</span>
+        <h1 class="mt-3 mb-3">Te titulaste. Ahora te faltan <span style="color:var(--sp-blue-mid)">clientes</span>, no otro portal de empleos.</h1>
+        <p class="lead mb-3">LinkedIn y las bolsas de trabajo te ponen a competir por un contrato. Si atiendes por tu cuenta, lo que necesitas es que te encuentren las personas de tu comuna. Crea tu perfil gratis y recibe consultas directo en tu WhatsApp.</p>
+        <div class="d-flex flex-wrap gap-2 mt-4">
+          <a class="btn btn-primary btn-lg" href="{% url 'accounts:register' %}">Crear mi perfil gratis</a>
+          <a class="btn btn-outline-primary btn-lg" href="#ejemplo">Ver un perfil de ejemplo</a>
+        </div>
+        <p class="mt-3 mb-0" style="font-size:.88rem;color:var(--sp-muted)">Sin comisión · Sin aprobación previa · Listo en 5 minutos</p>
+      </div>
+
+      <!-- Perfil de ejemplo -->
+      <div class="col-lg-5" id="ejemplo">
+        <div class="ejemplo-wrap">
+          <span class="ejemplo-label">Perfil de ejemplo</span>
+          <article class="provider-card is-verified h-100" aria-label="Perfil de ejemplo de una kinesióloga">
+            <div class="provider-card-accent"></div>
+            <div class="provider-card-body">
+              <div class="provider-card-header">
+                <div class="provider-card-avatar">C</div>
+                <div class="provider-card-meta">
+                  <h3>Camila R. · Kinesiología</h3>
+                  <span class="location">Lomas de San Andrés, Concepción</span>
+                </div>
+              </div>
+              <div class="provider-card-tags">
+                <span class="badge badge-category">💪 Kinesiología</span>
+              </div>
+              <p class="provider-card-desc">Rehabilitación musculoesquelética y adulto mayor. Evaluación a domicilio y seguimiento online.</p>
+              <div class="pro-credential">
+                🎓 Kinesióloga · Titulada en {{ anio_actual|add:"-1" }}<br>
+                <span>Universidad de Concepción · Registro SIS N° 000000</span>
+              </div>
+              <div class="d-flex gap-2 flex-wrap mt-2">
+                <span class="mini-pill">🏠 A domicilio</span>
+                <span class="mini-pill">💻 Online</span>
+              </div>
+              <div class="provider-card-actions mt-3">
+                <span class="btn btn-outline-primary disabled" aria-disabled="true">Ver perfil</span>
+                <span class="btn btn-success disabled" aria-disabled="true">WhatsApp</span>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BENEFICIOS -->
+<section class="container py-5">
+  <div class="section-heading">
+    <h2>Lo que un perfil hace por ti</h2>
+  </div>
+  <div class="row g-3">
+    <div class="col-md-4">
+      <div class="step-card h-100">
+        <span class="step-num">📍</span>
+        <h3 class="h5 mb-1">Te encuentran en tu comuna</h3>
+        <p class="text-muted mb-0" style="font-size:.92rem">Cada especialidad tiene su página por comuna, pensada para aparecer cuando alguien busca "kinesiólogo en Concepción" o "profe de inglés en Maipú".</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="step-card h-100">
+        <span class="step-num">🎓</span>
+        <h3 class="h5 mb-1">Muestras tu formación</h3>
+        <p class="text-muted mb-0" style="font-size:.92rem">Título, institución, año y registro de salud a la vista. Cuando todavía no tienes reseñas, eso es lo que genera confianza.</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="step-card h-100">
+        <span class="step-num">💬</span>
+        <h3 class="h5 mb-1">Te escriben directo</h3>
+        <p class="text-muted mb-0" style="font-size:.92rem">Las consultas llegan a tu WhatsApp. Tú pones el precio, la agenda y cómo atiendes. ServiPlace no cobra comisión ni se mete en el pago.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PARA QUIÉN -->
+<section class="container py-4">
+  <div class="section-heading">
+    <h2>¿Para quién es?</h2>
+  </div>
+  {% for grupo in grupos %}
+  <div class="group-block">
+    <div class="group-block-head">
+      <div>
+        <h3>{{ grupo.nombre }}</h3>
+      </div>
+    </div>
+    <div class="spec-chips">
+      {% for category in grupo.categorias %}
+        <a class="spec-chip" href="{% url 'directory:provider_list' %}?categoria={{ category.slug }}">{{ category.icon }} {{ category.name }}</a>
+      {% endfor %}
+    </div>
+  </div>
+  {% endfor %}
+  <p class="text-muted" style="font-size:.9rem">¿No ves tu especialidad? Publica en la más cercana y escríbenos: la agregamos.</p>
+</section>
+
+<!-- PASOS -->
+<section class="container py-4">
+  <div class="section-heading">
+    <h2>Tres pasos</h2>
+  </div>
+  <div class="row g-3">
+    <div class="col-md-4">
+      <div class="step-card h-100">
+        <span class="step-num">1</span>
+        <h3 class="h5 mb-1">Crea tu cuenta</h3>
+        <p class="text-muted mb-0" style="font-size:.92rem">Un usuario, tu correo y una contraseña. Un minuto.</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="step-card h-100">
+        <span class="step-num">2</span>
+        <h3 class="h5 mb-1">Completa tu perfil</h3>
+        <p class="text-muted mb-0" style="font-size:.92rem">Especialidad, comuna, cómo atiendes (a domicilio, en consulta u online) y tu formación.</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="step-card h-100">
+        <span class="step-num">3</span>
+        <h3 class="h5 mb-1">Compártelo</h3>
+        <p class="text-muted mb-0" style="font-size:.92rem">Ponlo en tu bio de Instagram, en tu estado de WhatsApp y mándalo a tus conocidos. Cada visita cuenta.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PREGUNTAS -->
+<section class="container py-5">
+  <div class="section-heading">
+    <h2>Preguntas frecuentes</h2>
+  </div>
+  <div class="faq-list">
+    <details>
+      <summary>¿Cuánto cuesta?</summary>
+      <p>Publicar es gratis y no cobramos comisión por los trabajos. Más adelante habrá un perfil destacado opcional, pagado, para quien quiera aparecer primero.</p>
+    </details>
+    <details>
+      <summary>¿Es una bolsa de trabajo?</summary>
+      <p>No. Aquí no se publican ofertas de empleo: es una vitrina para que las personas que necesitan tu servicio te encuentren y te escriban directo.</p>
+    </details>
+    <details>
+      <summary>Todavía estoy en práctica. ¿Puedo publicar?</summary>
+      <p>Puedes publicar lo que ya puedes ofrecer, como clases particulares o apoyo escolar. La atención de salud solo puede ofrecerla quien está titulado/a, así que el formulario no deja publicar en una especialidad de salud con un año de titulación futuro.</p>
+    </details>
+    <details>
+      <summary>¿Cómo van a confiar en mí si no tengo reseñas?</summary>
+      <p>Tu título, tu institución y tu año de titulación quedan a la vista. Si eres profesional de la salud, agrega tu número de registro: tus pacientes pueden comprobarlo en el registro público de la Superintendencia de Salud.</p>
+    </details>
+    <details>
+      <summary>¿Necesito emitir boleta?</summary>
+      <p>Para atender de forma independiente en Chile normalmente se emite boleta de honorarios, que se hace gratis en el sitio del SII. ServiPlace no cobra ni intermedia el pago: lo acuerdas directamente con tu cliente.</p>
+    </details>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="container pb-5">
+  <div class="join-band">
+    <div style="position:relative;z-index:1">
+      <h2>Tu primer cliente puede estar a una búsqueda de distancia</h2>
+      <p>Crea tu perfil gratis y compártelo hoy.</p>
+    </div>
+    <a class="btn btn-light btn-lg" href="{% url 'accounts:register' %}" style="position:relative;z-index:1;flex-shrink:0">Crear mi perfil gratis →</a>
+  </div>
+</section>
+{% endblock %}

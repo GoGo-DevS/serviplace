@@ -15,7 +15,8 @@
     <form method="post" novalidate>
       {% csrf_token %}
       {% if ref_code %}<input type="hidden" name="ref" value="{{ ref_code }}">{% endif %}
-      {% for field in form %}
+      {% include "_antispam.html" %}
+      {% for field in form.visible_fields %}{% if field.name != "sitio_web_confirmacion" %}
         <div class="mb-3">
           <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
           {{ field }}
@@ -24,7 +25,7 @@
             {% for error in field.errors %}<div class="text-danger mt-1" style="font-size:.85rem;font-weight:600">{{ error }}</div>{% endfor %}
           {% endif %}
         </div>
-      {% endfor %}
+      {% endif %}{% endfor %}
       <button type="submit" class="btn btn-primary w-100 btn-lg mt-2">Crear cuenta gratis</button>
     </form>
     <p class="text-center text-muted mt-3" style="font-size:.88rem">

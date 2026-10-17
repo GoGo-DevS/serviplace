@@ -1,0 +1,11 @@
+{% comment %}
+Campos del antispam (core/antispam.py). Van FUERA del bucle de campos visibles:
+- el sello firmado, oculto: sin él toda persona real suma 20 puntos ("sin_sello")
+  y con dos enlaces en su descripción su perfil quedaba oculto como spam;
+- el honeypot, fuera de pantalla: un humano no lo ve, un bot lo llena. Antes
+  se mostraba con su etiqueta "Deja este campo vacío", a la vista de todos.
+{% endcomment %}
+{% for campo in form.hidden_fields %}{{ campo }}{% endfor %}
+{% for campo in form.visible_fields %}{% if campo.name == "sitio_web_confirmacion" %}
+<div class="hp-wrap" aria-hidden="true"><label for="{{ campo.id_for_label }}">No llenar</label>{{ campo }}</div>
+{% endif %}{% endfor %}

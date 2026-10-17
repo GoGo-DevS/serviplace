@@ -6,24 +6,28 @@
   <div class="container py-5">
     <div class="row align-items-center g-5">
       <div class="col-lg-7">
-        <span class="hero-eyebrow">Servicios locales en Chile</span>
+        <span class="hero-eyebrow">Maestros y profesionales en Chile</span>
         <h1 class="mt-3 mb-3">Encuentra el profesional que necesitas, <span style="color:var(--sp-blue-mid)">cerca de ti</span></h1>
-        <p class="lead mb-3">Gasfitería, cerrajería, electricidad, limpieza, climatización y más — sin intermediarios, contacto directo por WhatsApp.</p>
-        <span class="hero-trust-badge mb-4 d-inline-block">Sin comisión para el prestador ni para ti</span>
+        <p class="lead mb-3">Gásfiter, electricista, kinesióloga, psicólogo, profe particular y más. Contacto directo por WhatsApp, sin intermediarios.</p>
+        <span class="hero-trust-badge mb-4 d-inline-block">Sin comisión para el profesional ni para ti</span>
 
         <!-- Buscador -->
         <form class="search-panel mt-4" action="{% url 'directory:provider_list' %}" method="get">
           <div class="row g-2">
             <div class="col-md-6">
               <label class="form-label" for="q">¿Qué necesitas?</label>
-              <input class="form-control form-control-lg" id="q" name="q" type="search" placeholder="Ej: gasfitero, electricista…">
+              <input class="form-control form-control-lg" id="q" name="q" type="search" placeholder="Ej: gásfiter, kinesiólogo, clases de inglés…">
             </div>
             <div class="col-md-4">
               <label class="form-label" for="categoria">Categoría</label>
               <select class="form-select form-select-lg" id="categoria" name="categoria">
                 <option value="">Todas</option>
-                {% for category in categories %}
-                  <option value="{{ category.slug }}">{{ category.icon }} {{ category.name }}</option>
+                {% for grupo in grupos %}
+                  <optgroup label="{{ grupo.nombre }}">
+                    {% for category in grupo.categorias %}
+                      <option value="{{ category.slug }}">{{ category.icon }} {{ category.name }}</option>
+                    {% endfor %}
+                  </optgroup>
                 {% endfor %}
               </select>
             </div>
@@ -33,9 +37,10 @@
           </div>
         </form>
 
-        <div class="d-flex flex-wrap gap-2 mt-4">
-          <a class="btn btn-outline-primary" href="{% url 'accounts:provider_create' %}">Publicar mi servicio gratis</a>
-          <a class="btn btn-outline-primary" href="{% url 'directory:provider_list' %}">Ver todos los servicios</a>
+        <div class="group-chips mt-3" aria-label="Explorar por tipo de servicio">
+          {% for grupo in grupos %}
+            <a class="group-chip" href="{% url 'directory:provider_list' %}?grupo={{ grupo.clave }}">{{ grupo.nombre }}</a>
+          {% endfor %}
         </div>
       </div>
 
@@ -43,15 +48,15 @@
       <div class="col-lg-5">
         <div class="stats-card">
           <span class="eyebrow">Red en crecimiento</span>
-          <p class="mt-2 mb-0" style="font-size:.95rem;color:var(--sp-muted)">Prestadores locales de tu comuna, contacto directo por WhatsApp, sin intermediarios.</p>
+          <p class="mt-2 mb-0" style="font-size:.95rem;color:var(--sp-muted)">Profesionales y maestros de tu comuna, contacto directo por WhatsApp, sin intermediarios.</p>
           <div class="stats-grid">
             <div class="stat-item">
               <strong>{{ categories|length }}</strong>
-              <span>categorías</span>
+              <span>especialidades</span>
             </div>
             <div class="stat-item">
               <strong>{{ total_providers }}</strong>
-              <span>prestadores</span>
+              <span>perfiles</span>
             </div>
             <div class="stat-item">
               <strong>{{ communes_count }}</strong>
@@ -63,7 +68,7 @@
             </div>
           </div>
           <div class="mt-3 pt-3" style="border-top:1px solid var(--sp-line-soft)">
-            <p style="font-size:.85rem;color:var(--sp-muted);margin:0">¿Ofreces un servicio? <a href="{% url 'accounts:provider_create' %}">Publícalo gratis →</a></p>
+            <p style="font-size:.85rem;color:var(--sp-muted);margin:0">¿Atiendes por tu cuenta? <a href="{% url 'core:para_profesionales' %}">Crea tu perfil gratis →</a></p>
           </div>
         </div>
       </div>
@@ -71,20 +76,57 @@
   </div>
 </section>
 
-<!-- CATEGORÍAS -->
+<!-- CATEGORÍAS POR GRUPO -->
 <section class="container py-5">
   <div class="section-heading">
-    <h2>Servicios más buscados</h2>
+    <h2>¿Qué estás buscando?</h2>
     <a href="{% url 'directory:provider_list' %}">Ver todos →</a>
   </div>
-  <div class="category-grid">
-    {% for category in popular_categories %}
-      <a class="category-tile" href="{% url 'directory:provider_list' %}?categoria={{ category.slug }}">
-        <span class="category-icon">{{ category.icon|default:"🔧" }}</span>
-        <span style="font-weight:700;font-size:.95rem">{{ category.name }}</span>
-        {% if category.description %}<small>{{ category.description }}</small>{% endif %}
-      </a>
-    {% endfor %}
+
+  {% for grupo in grupos %}
+  <div class="group-block">
+    <div class="group-block-head">
+      <div>
+        <h3>{{ grupo.nombre }}</h3>
+        <p>{{ grupo.descripcion }}</p>
+      </div>
+      <a href="{% url 'directory:provider_list' %}?grupo={{ grupo.clave }}">Ver {{ grupo.nombre|lower }} →</a>
+    </div>
+    <div class="category-grid">
+      {% for category in grupo.categorias %}
+        <a class="category-tile{% if not category.n_activos %} is-empty{% endif %}" href="{% url 'directory:provider_list' %}?categoria={{ category.slug }}">
+          <span class="category-icon">{{ category.icon|default:"🔧" }}</span>
+          <span style="font-weight:700;font-size:.95rem">{{ category.name }}</span>
+          {% if category.description %}<small>{{ category.description }}</small>{% endif %}
+          {% if category.n_activos %}
+            <span class="tile-count">{{ category.n_activos }} perfil{{ category.n_activos|pluralize:"es" }}</span>
+          {% else %}
+            <span class="tile-count is-first">Sé el primero en publicar</span>
+          {% endif %}
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+  {% endfor %}
+</section>
+
+<!-- PARA PROFESIONALES -->
+<section class="container py-4">
+  <div class="pro-band">
+    <div class="pro-band-copy">
+      <span class="pro-band-eyebrow">Para profesionales independientes</span>
+      <h2>¿Te titulaste hace poco? No necesitas otro portal de empleos: necesitas clientes.</h2>
+      <p>Crea tu perfil gratis, muestra tu título, tu institución y tu registro, y recibe consultas de tu comuna directo en tu WhatsApp.</p>
+      <ul class="pro-band-list">
+        <li>Te encuentran cuando buscan tu especialidad en tu comuna</li>
+        <li>Tu formación se ve aunque todavía no tengas reseñas</li>
+        <li>El precio y la agenda los pones tú: sin comisión</li>
+      </ul>
+    </div>
+    <div class="pro-band-actions">
+      <a class="btn btn-light btn-lg" href="{% url 'core:para_profesionales' %}">Ver cómo funciona →</a>
+      <a class="pro-band-link" href="{% url 'accounts:register' %}">Crear mi perfil ahora</a>
+    </div>
   </div>
 </section>
 
@@ -97,35 +139,35 @@
     <div class="col-md-4">
       <div class="step-card">
         <span class="step-num">1</span>
-        <h3 class="h5 mb-1">Busca el servicio</h3>
-        <p class="text-muted mb-0" style="font-size:.9rem">Filtra por categoría, comuna o palabra clave.</p>
+        <h3 class="h5 mb-1">Busca lo que necesitas</h3>
+        <p class="text-muted mb-0" style="font-size:.9rem">Filtra por especialidad, comuna o palabra clave.</p>
       </div>
     </div>
     <div class="col-md-4">
       <div class="step-card">
         <span class="step-num">2</span>
         <h3 class="h5 mb-1">Revisa el perfil</h3>
-        <p class="text-muted mb-0" style="font-size:.9rem">Lee la descripción, zona de atención y badge de verificación.</p>
+        <p class="text-muted mb-0" style="font-size:.9rem">Lee qué hace, cómo atiende, su formación y su zona de atención.</p>
       </div>
     </div>
     <div class="col-md-4">
       <div class="step-card">
         <span class="step-num">3</span>
-        <h3 class="h5 mb-1">Contacta por WhatsApp</h3>
-        <p class="text-muted mb-0" style="font-size:.9rem">Directo al prestador. Sin intermediarios ni comisiones.</p>
+        <h3 class="h5 mb-1">Escríbele por WhatsApp</h3>
+        <p class="text-muted mb-0" style="font-size:.9rem">Directo, sin intermediarios ni comisiones.</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- PRESTADORES DESTACADOS -->
+<!-- DESTACADOS -->
 {% if featured_providers %}
 <section class="container py-4">
   <div class="section-heading">
-    <h2>Prestadores destacados</h2>
+    <h2>Perfiles destacados</h2>
     <a href="{% url 'directory:provider_list' %}">Explorar todos →</a>
   </div>
-  <div class="row g-3 mt-1">
+  <div class="row g-3 mt-1 featured-row">
     {% for provider in featured_providers %}
       {% include "directory/_provider_card.html" %}
     {% endfor %}
@@ -137,14 +179,14 @@
 <section class="container py-5">
   <div class="confidence-block mb-4">
     <h2 class="h4">¿Por qué SERVIPLACE?</h2>
-    <p>Sin comisión. Sin aprobación previa. Publicas tu perfil en minutos y los clientes te contactan directo por WhatsApp. <a href="{% url 'accounts:hazte_verificado' %}">Obtén el badge de verificado</a> para destacar sobre la competencia.</p>
+    <p>Sin comisión y sin aprobación previa. Publicas tu perfil en minutos y te contactan directo por WhatsApp. <a href="{% url 'accounts:hazte_verificado' %}">Obtén el badge de verificado</a> para destacar.</p>
   </div>
   <div class="join-band">
     <div style="position:relative;z-index:1">
-      <h2>¿Ofreces un servicio local?</h2>
-      <p>Publica tu perfil gratis en segundos. Sin trámites, sin comisión.</p>
+      <h2>¿Ofreces un servicio o atiendes por tu cuenta?</h2>
+      <p>Publica tu perfil gratis en minutos. Sin trámites, sin comisión.</p>
     </div>
-    <a class="btn btn-light btn-lg" href="{% url 'accounts:provider_create' %}" style="position:relative;z-index:1;flex-shrink:0">Publicar gratis →</a>
+    <a class="btn btn-light btn-lg" href="{% url 'accounts:register' %}" style="position:relative;z-index:1;flex-shrink:0">Publicar gratis →</a>
   </div>
 </section>
 {% endblock %}

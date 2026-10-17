@@ -247,7 +247,7 @@ if not DEBUG:
 
 # ── Sitio ────────────────────────────────────────────────────────────────────
 SITE_NAME = 'ServiPlace'
-SITE_DESCRIPTION = 'Encuentra gásfiter, cerrajero, electricista y otros servicios en tu comuna. Contacto directo por WhatsApp, sin comisión.'
+SITE_DESCRIPTION = 'Maestros y profesionales independientes en tu comuna: gásfiter, kinesiólogo, psicólogo, profe particular y más. Contacto directo por WhatsApp, sin comisión.'
 DEFAULT_CONTACT_WHATSAPP = os.environ.get('DEFAULT_CONTACT_WHATSAPP', '')
 CONTACT_EMAIL = os.environ.get('CONTACT_EMAIL', 'contacto@serviplace.cl')
 GOOGLE_MAPS_API_KEY = os.environ.get('GOOGLE_MAPS_API_KEY', '')

@@ -37,7 +37,8 @@
       </button>
       <div class="collapse navbar-collapse" id="mainNav">
         <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
-          <li class="nav-item"><a class="nav-link" href="{% url 'directory:provider_list' %}">Servicios</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'directory:provider_list' %}">Buscar</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'core:para_profesionales' %}">Para profesionales</a></li>
           {% if user.is_authenticated %}
             <li class="nav-item"><a class="nav-link" href="{% url 'accounts:dashboard' %}">Mi cuenta</a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'accounts:provider_create' %}">Publicar</a></li>
@@ -82,17 +83,20 @@
       <div class="footer-grid">
         <div class="footer-brand">
           <span>SERVIPLACE</span>
-          <p class="text-muted mb-2" style="font-size:.9rem">Directorio de servicios locales en Chile.</p>
+          <p class="text-muted mb-2" style="font-size:.9rem">Maestros y profesionales independientes en tu comuna.</p>
           <a class="btn btn-primary btn-sm" href="{% url 'accounts:provider_create' %}">Publicar mi servicio gratis</a>
         </div>
         <nav class="footer-column" aria-label="Para vecinos">
           <strong>Para vecinos</strong>
           <a href="{% url 'directory:provider_list' %}">Buscar servicios</a>
+          <a href="{% url 'directory:provider_list' %}?grupo=salud">Salud y bienestar</a>
+          <a href="{% url 'directory:provider_list' %}?grupo=educacion">Clases particulares</a>
           <a href="{% url 'core:trust_and_safety' %}">Seguridad y confianza</a>
         </nav>
-        <nav class="footer-column" aria-label="Para prestadores">
-          <strong>Para prestadores</strong>
-          <a href="{% url 'accounts:provider_create' %}">Publicar gratis</a>
+        <nav class="footer-column" aria-label="Para profesionales">
+          <strong>Para profesionales</strong>
+          <a href="{% url 'core:para_profesionales' %}">Cómo funciona</a>
+          <a href="{% url 'accounts:register' %}">Publicar gratis</a>
           <a href="{% url 'accounts:hazte_verificado' %}">Hazte Verificado</a>
           <a href="{% url 'core:contact' %}">Contacto</a>
         </nav>

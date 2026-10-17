@@ -2,7 +2,9 @@ from django.conf import settings
 from django.contrib import messages
 from django.shortcuts import redirect, render
 from django.urls import reverse
+from django.utils import timezone
 
+from directory.catalogo import categorias_por_grupo
 from directory.models import Category, Commune, Provider
 
 
@@ -19,14 +21,14 @@ def home(request):
 
     context = {
         'categories': categories,
-        'popular_categories': categories[:9],
+        'grupos': categorias_por_grupo(),
         'featured_providers': featured_providers,
         'total_providers': total_providers,
         'communes_count': communes_count,
         'ref_code': ref_code,
-        'page_title': 'SERVIPLACE | Encuentra servicios locales en Chile — Contacto directo',
-        'meta_description': 'Encuentra gasfitería, cerrajería, electricidad, limpieza, climatización y otros servicios locales en tu comuna. Contacto directo por WhatsApp.',
-        'og_title': 'SERVIPLACE — Servicios locales en Chile',
+        'page_title': 'SERVIPLACE | Maestros y profesionales en tu comuna — Contacto directo',
+        'meta_description': 'Gásfiter, electricista, kinesiólogo, psicólogo, profe particular y más en tu comuna. Contacto directo por WhatsApp, sin comisión.',
+        'og_title': 'SERVIPLACE — Maestros y profesionales en tu comuna',
         'og_description': settings.SITE_DESCRIPTION,
     }
     return render(request, 'core/home.html', context)
@@ -75,6 +77,35 @@ def robots_txt(request):
     return HttpResponse('\n'.join(lineas), content_type='text/plain; charset=utf-8')
 
 
+def para_profesionales(request):
+    """`/profesionales/`: la puerta de entrada de los profesionales independientes.
+
+    17-10-2026 — Nace de una conversación con una kinesióloga de Concepción:
+    a quien recién se titula, LinkedIn y los portales de empleo lo ponen a
+    competir por un contrato, pero si atiende por su cuenta lo que necesita
+    son pacientes, alumnos o clientes que lo encuentren en su comuna. Esta
+    página le habla a esa persona; el producto es el mismo directorio.
+    """
+    grupos = categorias_por_grupo(solo_grupos=[
+        Category.SALUD, Category.EDUCACION, Category.BELLEZA, Category.PROFESIONAL,
+    ])
+    return render(
+        request,
+        'core/para_profesionales.html',
+        {
+            'grupos': grupos,
+            'anio_actual': timezone.localdate().year,
+            'page_title': 'Para profesionales independientes y recién titulados | SERVIPLACE',
+            'meta_description': (
+                'Kinesiólogos, psicólogos, nutricionistas, profes particulares y más: crea tu perfil gratis, '
+                'muestra tu título y recibe consultas de tu comuna directo en tu WhatsApp. Sin comisión.'
+            ),
+            'og_title': 'Tus primeros clientes empiezan con un perfil — SERVIPLACE',
+            'og_description': 'Crea tu perfil profesional gratis y recibe consultas directo en tu WhatsApp.',
+        },
+    )
+
+
 def about(request):
     return render(
         request,
@@ -121,4 +152,3 @@ def trust_and_safety(request):
         },
     )
 
-# Create your views here.
