@@ -93,3 +93,34 @@ NO VERIFICADO: nada se probó en producción (falta el push de Diego). El
 Próxima tarea: push; probar en vivo /profesionales/, publicar un perfil de
   prueba y borrarlo; encuesta de Instagram con la opción nueva.
 ---
+
+---
+[18-10-2026] — Modo: colaborativo (Diego trajo dos análisis de GPT)
+Tarea completada: MEDICIÓN DEL EMBUDO + REDISEÑO "CUADRA".
+  Decisión de diseño: entre tres caminos renderizados (artifact "Rediseño
+  ServiPlace": volante de poste / credencial / cuadra) quedó Cuadra como
+  identidad + Credencial como ficha, y el volante para publicidad.
+  Respuesta a "¿qué lado falla?": ninguno tiene datos. Oferta = 361 perfiles
+  de oficios importados en 4 comunas fuertes (Maipú 82, Las Condes 69,
+  Puente Alto 66, La Florida 61), 0 publicados por su dueño, 0 profesionales.
+  Demanda ≈ 0 (sin difusión, sin Search Console, sin GA4).
+  · Medición (01d00b2): LeadEvent amplía a búsqueda (con conteo de
+    resultados), visita clave, registro iniciado, cuenta creada y perfil
+    publicado. Bots fuera (Google, vista previa de WhatsApp, curl): antes
+    inflaban vistas y clics. Sin IP ni agente: hash diario. Teléfonos
+    escritos en el buscador se borran. Panel /cuenta/metricas/ solo staff,
+    con la lectura automática A-E del plan de 21 días.
+  · Diseño (6c63ca6): tokens nuevos en site.css y la capa static/css/cuadra.css.
+    Portada con mapa ilustrativo (lo dice) y pines = comunas con más
+    perfiles (cifras reales); buscador "qué + comuna"; franja permanente
+    "Quiero publicar mis servicios". Tarjeta-credencial con estado honesto
+    (revisado / de su dueño / fuentes públicas, sin revisar). Landing de
+    profesionales: el valor del día uno es un link profesional propio para
+    compartir (resuelve el incentivo para publicar aunque haya poco tráfico).
+Pruebas: 91. QA en Chrome real a 390 y 1440: sin desbordes, imágenes rotas
+  ni errores de JS. Portada en el teléfono: 12.500 -> 5.800 px.
+NO VERIFICADO EN VIVO: nada de esto (ni 34b299c) está subido. Falta el push.
+Próxima tarea: push; dar de alta Search Console (TXT en Cloudflare); elegir
+  Maipú como mercado inicial (oferta real + Diego vive ahí) y medir 7 días
+  con difusión mínima antes de cualquier campaña.
+---
