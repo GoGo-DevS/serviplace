@@ -52,7 +52,9 @@ def provider_list(request):
     # orden distinto en cada consulta, y al paginar eso hace que uno se repita
     # en la página 2 y otro no aparezca nunca. Es el defecto clásico de
     # paginar sobre un orden no determinista.
-    providers = providers.order_by('-is_featured', '-is_verified', 'business_name', 'pk')
+    # Primero lo publicado por su dueño (tiene a alguien detrás que responde),
+    # después lo importado. `pk` al final sigue siendo el desempate único.
+    providers = providers.order_by(F('owner_id').desc(nulls_last=True), '-is_featured', 'business_name', 'pk')
 
     # D1 — El listado se pagina. Medido el 05-09: los 361 prestadores en una
     # sola página daban 162.604 px de alto en un teléfono, o sea unas 190

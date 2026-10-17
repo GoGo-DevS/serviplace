@@ -13,8 +13,7 @@
       <div class="provider-detail-info">
         <div class="d-flex flex-wrap gap-2 mb-2 align-items-center">
           <span class="badge badge-category">{{ provider.category.name }}</span>
-          {% if provider.is_verified %}<span class="badge badge-verified">Verificado</span>{% endif %}
-          {% if provider.is_featured %}<span class="badge badge-featured">Destacado</span>{% endif %}
+          {% if provider.verificado_publico %}<span class="badge badge-verified">Verificado</span>{% endif %}
           {% if not provider.owner %}
             <a class="badge badge-new" href="{% url 'accounts:claim_profile' provider.slug %}">¿Es tuyo? Reclámalo</a>
           {% endif %}

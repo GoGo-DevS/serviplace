@@ -26,10 +26,9 @@ incompleto. El nombre es el enlace a la ficha; WhatsApp es el botón.
     </dl>
     {% endif %}
 
-    {% if provider.modalities or provider.is_verified or provider.is_featured %}
+    {% if provider.modalities or provider.verificado_publico %}
     <div class="ficha-tags">
-      {% if provider.is_verified %}<span class="badge badge-verified">Verificado</span>{% endif %}
-      {% if provider.is_featured %}<span class="badge badge-featured">Destacado</span>{% endif %}
+      {% if provider.verificado_publico %}<span class="badge badge-verified">Verificado</span>{% endif %}
       {% for modalidad in provider.modalities %}<span class="mini-pill">{{ modalidad }}</span>{% endfor %}
     </div>
     {% endif %}
@@ -41,6 +40,6 @@ incompleto. El nombre es el enlace a la ficha; WhatsApp es el botón.
         WhatsApp
       </a>
     </div>
-    <p class="ficha-estado{% if provider.is_verified %} is-ok{% endif %}">{% if provider.is_verified %}Datos revisados{% elif provider.owner_id %}Publicado por su dueño{% else %}Información de fuentes públicas, sin revisar{% endif %}</p>
+    <p class="ficha-estado{% if provider.verificado_publico %} is-ok{% endif %}">{% if provider.verificado_publico %}Verificado por ServiPlace{% elif provider.owner_id %}Publicado por su dueño{% else %}Información de fuentes públicas, sin revisar{% endif %}</p>
   </article>
 </div>

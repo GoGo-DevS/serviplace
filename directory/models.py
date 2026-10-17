@@ -207,6 +207,18 @@ class Provider(models.Model):
         return self.source_name == 'seed_offline'
 
     @property
+    def verificado_publico(self):
+        """La insignia "Verificado" que ve el público.
+
+        18-10-2026 — 12 perfiles importados de Maipú traían is_verified=True
+        de un seed viejo y se mostraban como "Verificado / Datos revisados"
+        sin que nadie validara sus datos en ServiPlace. Se verifica a una
+        PERSONA que reclamó o publicó su perfil: sin dueño no hay a quién
+        verificar, así que la insignia no se muestra aunque el campo diga True.
+        """
+        return self.is_verified and self.owner_id is not None
+
+    @property
     def has_professional_info(self):
         return bool(self.profession_title or self.institution or self.graduation_year or self.health_registry)
 

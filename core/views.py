@@ -15,10 +15,14 @@ def home(request):
     ref_code = request.GET.get('ref', '')
     registrar(request, LeadEvent.PAGE_VIEW, origen='home')
     categories = Category.objects.filter(is_active=True)
+    # Destacados = lo mejor del directorio, no lo primero que aparezca: solo
+    # perfiles publicados por su dueño Y con foto. Mientras no haya ninguno,
+    # la sección no se muestra (18-10-2026: se veían 12 importados sin logo,
+    # marcados "Verificado" sin estarlo).
     featured_providers = (
-        Provider.objects.filter(is_active=True)
-        .select_related('category', 'commune')
-        .order_by('-is_featured', '-is_verified', 'business_name')[:6]
+        Provider.objects.filter(is_active=True, owner__isnull=False, images__isnull=False)
+        .select_related('category', 'commune').distinct()
+        .order_by('-is_featured', '-is_verified', 'business_name', 'pk')[:6]
     )
     total_providers = Provider.objects.filter(is_active=True).count()
     communes_count = Commune.objects.filter(is_active=True, providers__is_active=True).distinct().count()

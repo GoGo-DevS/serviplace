@@ -464,3 +464,40 @@ class AprobarReclamoEnElAdmin(Base):
         site._registry[ProviderReport].aprobar_reclamo(request, ProviderReport.objects.filter(pk=reporte.pk))
         perfil.refresh_from_db()
         self.assertEqual(perfil.owner, dueno_real)
+
+
+# ─────────────────────────────────────────────────────────────────────────
+# Lo importado no se presenta como validado (18-10-2026)
+# ─────────────────────────────────────────────────────────────────────────
+class LoImportadoNoSePresentaComoValidado(Base):
+    """12 perfiles importados de Maipú traían is_verified=True de un seed
+    viejo y salían en la portada como "Verificado / Datos revisados"."""
+
+    def test_un_importado_con_is_verified_no_dice_verificado(self):
+        p = self._perfil(self.gasfiter, 'Cerrajero de Maps', is_verified=True, owner=None)
+        tarjeta = self.client.get(reverse('directory:provider_list')).content.decode()
+        ficha = self.client.get(p.get_absolute_url()).content.decode()
+        for html in (tarjeta, ficha):
+            self.assertNotIn('>Verificado<', html)
+            self.assertNotIn('Datos revisados', html)
+        self.assertIn('fuentes públicas, sin revisar', tarjeta)
+
+    def test_verificado_si_tiene_duena_y_lo_verificamos(self):
+        duena = User.objects.create_user('duena', password='clave-larga-de-verdad-99')
+        self._perfil(self.kine, 'Camila R.', is_verified=True, owner=duena)
+        html = self.client.get(reverse('directory:provider_list')).content.decode()
+        self.assertIn('>Verificado<', html)
+
+    def test_la_portada_no_destaca_importados(self):
+        self._perfil(self.gasfiter, 'Cerrajero de Maps', is_verified=True, is_featured=True, owner=None)
+        html = self.client.get(reverse('core:home')).content.decode()
+        self.assertNotIn('Perfiles destacados', html)
+        self.assertNotIn('Cerrajero de Maps', html)
+
+    def test_lo_publicado_por_su_dueno_va_primero(self):
+        duena = User.objects.create_user('duena', password='clave-larga-de-verdad-99')
+        self._perfil(self.gasfiter, 'AAA Importado', owner=None)
+        self._perfil(self.gasfiter, 'ZZZ Con dueña', owner=duena)
+        html = self.client.get(reverse('directory:provider_list')).content.decode()
+        self.assertLess(html.index('ZZZ Con dueña'), html.index('AAA Importado'))
+
