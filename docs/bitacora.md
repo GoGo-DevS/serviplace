@@ -151,3 +151,27 @@ EFECTO AL PUBLICAR: el directorio público queda con 0 perfiles hasta que
   con su enlace de reclamo; agregar el bucket `serviplace` al respaldo
   nocturno de R2 (regla 12).
 ---
+
+---
+[18-10-2026, noche] — Modo: colaborativo
+Tarea completada: SEO TÉCNICO CON EL CHECKLIST DE JORGE (memoria checklist-seo-tecnico).
+  Pedido: "SEO profesional al nivel de Jorge" y "vi enlaces con '?', corregir".
+  · URLs limpias: /servicios/<especialidad>/<comuna>/, /servicios/<especialidad>/,
+    /servicios/en/<comuna>/, /servicios/<grupo>/. ?categoria/comuna/grupo -> 301.
+    ?q= queda noindex + canonical /servicios/.
+  · Category.seo_nombre (migraciones 0011 + 0012 de datos): H1/title con la
+    palabra que se busca ("Gásfiter en Maipú").
+  · directory/seo.py: Organization+WebSite solo en portada, CollectionPage +
+    ItemList, BreadcrumbList completa, tipo schema.org por oficio.
+  · Listado vacío = 404 + noindex. Sitemap: solo limpias que dan 200.
+  · static/img/og-serviplace.png (1200x630) y serviplace-logo.png generados
+    con Playwright desde HTML con las fuentes de la marca.
+DEFECTOS EN VIVO ENCONTRADOS: paginación con href="??page=2" (la página 2
+  nunca cargaba, desde el ciclo 1); el meta robots nunca se imprimía (ninguna
+  página tenía noindex); /sumate/ (redirección) estaba en el sitemap; logo del
+  schema con STATIC_URL sin barra.
+Pruebas: 123 (directory/tests_seo.py: el sitemap se prueba pidiendo cada loc,
+  JSON-LD parseado con json.loads). 5 mutaciones detectadas.
+NO HECHO / PENDIENTE: Search Console (Diego); PageSpeed medido en vivo;
+  contenido por keyword (eso es lo de Jorge, no del sitio).
+---
