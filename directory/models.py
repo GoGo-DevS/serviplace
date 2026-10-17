@@ -32,6 +32,9 @@ class Commune(models.Model):
     def __str__(self):
         return self.name
 
+    def get_absolute_url(self):
+        return reverse('directory:listado_comuna', kwargs={'comuna': self.slug})
+
 
 class Category(models.Model):
     # 17-10-2026 — ServiPlace deja de ser solo de oficios del hogar: también es
@@ -53,12 +56,28 @@ class Category(models.Model):
         (PROFESIONAL, 'Servicios profesionales', 'Contabilidad, diseño, fotografía e informática.'),
     ]
     GROUP_CHOICES = [(clave, nombre) for clave, nombre, _ in GRUPOS]
+    # Slug público de cada grupo en la URL (/servicios/salud-y-bienestar/).
+    # La clave interna (salud) es corta y no dice nada en una URL.
+    GROUP_SLUGS = {
+        HOGAR: 'hogar-y-oficios',
+        SALUD: 'salud-y-bienestar',
+        EDUCACION: 'clases-y-educacion',
+        BELLEZA: 'belleza-y-cuidado-personal',
+        PROFESIONAL: 'servicios-profesionales',
+    }
+    GROUP_POR_SLUG = {slug: clave for clave, slug in GROUP_SLUGS.items()}
 
     name = models.CharField(max_length=80, unique=True)
     slug = models.SlugField(max_length=90, unique=True)
     description = models.TextField(blank=True)
     icon = models.CharField(max_length=40, blank=True, help_text='Nombre corto o emoji visible.')
     group = models.CharField('grupo', max_length=20, choices=GROUP_CHOICES, default=HOGAR)
+    # Lo que la gente escribe en Google: "gásfiter en maipú", no "gasfitería
+    # en maipú". Va en el <title> y el H1 de las páginas por comuna.
+    seo_nombre = models.CharField(
+        'nombre en búsquedas', max_length=60, blank=True,
+        help_text='Cómo lo busca la gente, en singular. Ej: Gásfiter, Kinesiólogo, Profesor particular.',
+    )
     pide_registro_salud = models.BooleanField(
         'es una profesión de salud',
         default=False,
@@ -74,6 +93,17 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
+
+    @property
+    def nombre_busqueda(self):
+        return self.seo_nombre or self.name
+
+    @property
+    def group_slug(self):
+        return self.GROUP_SLUGS.get(self.group, '')
+
+    def get_absolute_url(self):
+        return reverse('directory:listado_rubro', kwargs={'rubro': self.slug})
 
 
 class ProviderQuerySet(models.QuerySet):
@@ -196,7 +226,10 @@ class Provider(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            base_slug = slugify(f'{self.business_name}-{self.commune.name}')
+            nombre = slugify(self.business_name)
+            comuna = slugify(self.commune.name)
+            # "Cerrajero Vega Maipú" en Maipú daba cerrajero-vega-maipu-maipu.
+            base_slug = nombre if nombre.endswith(comuna) else f'{nombre}-{comuna}'
             slug = base_slug
             counter = 2
             while Provider.objects.filter(slug=slug).exclude(pk=self.pk).exists():

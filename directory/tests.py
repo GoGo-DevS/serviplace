@@ -241,10 +241,14 @@ class D1ElListadoPagina(Base):
 
     def test_los_filtros_sobreviven_al_cambiar_de_pagina(self):
         """Si al pasar a la página 2 se perdiera la comuna, el visitante
-        volvería a 'todo Chile' sin entender por qué."""
-        html = self.client.get(reverse('directory:provider_list'),
-                               {'comuna': 'maipu'}).content.decode()
-        self.assertIn('comuna=maipu', html)
+        volvería a 'todo Chile' sin entender por qué. Desde el 18-10-2026 la
+        comuna va en la ruta (/servicios/en/maipu/) y el enlace a la página 2
+        es relativo (?page=2), así que la conserva."""
+        url = reverse('directory:listado_comuna', kwargs={'comuna': 'maipu'})
+        r = self.client.get(url)
+        self.assertEqual(r.status_code, 200)
+        self.assertIn('href="?page=2"', r.content.decode())
+        self.assertEqual(self.client.get(url + '?page=2').status_code, 200)
 
     def test_una_pagina_que_no_existe_devuelve_la_ultima_no_un_error(self):
         """La URL puede venir de un enlace viejo o de Google; un error ahí se

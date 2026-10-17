@@ -4,7 +4,9 @@
 {% block content %}
 <section class="page-header">
   <div class="container py-4">
-    <a class="small" href="{% url 'directory:provider_list' %}">← Volver a servicios</a>
+    <nav class="miga" aria-label="Estás en">
+      <ol>{% for nombre, url in pasos %}<li>{% if not forloop.last %}<a href="{{ url }}">{{ nombre }}</a>{% else %}<span aria-current="page">{{ nombre }}</span>{% endif %}</li>{% endfor %}</ol>
+    </nav>
     <div class="provider-detail-top mt-3">
       <div class="provider-detail-avatar{% if provider.foto %} con-foto{% endif %}">{% if provider.foto %}<img src="{{ provider.foto.url }}" alt="Logo o foto de {{ provider.business_name }}">{% else %}{{ provider.business_name|first|upper }}{% endif %}</div>
       <div class="provider-detail-info">

@@ -49,6 +49,7 @@ class LoginThrottledView(LoginView):
         ctx = super().get_context_data(**kwargs)
         ctx.setdefault('bloqueado', False)
         ctx['page_title'] = 'Iniciar sesión | ServiPlace'
+        ctx['robots'] = 'noindex'
         ctx['ventana_minutos'] = settings.LOGIN_VENTANA_MINUTOS
         return ctx
 

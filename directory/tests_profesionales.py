@@ -166,10 +166,12 @@ class ListadoPorGrupo(Base):
     def test_filtra_por_grupo(self):
         self._perfil(self.kine, 'Kine Uno')
         self._perfil(self.gasfiter, 'Gásfiter Uno')
-        html = self.client.get(reverse('directory:provider_list') + '?grupo=salud').content.decode()
+        r = self.client.get(reverse('directory:provider_list') + '?grupo=salud', follow=True)
+        self.assertEqual(r.redirect_chain, [('/servicios/salud-y-bienestar/', 301)])
+        html = r.content.decode()
         self.assertIn('Kine Uno', html)
         self.assertNotIn('Gásfiter Uno', html)
-        self.assertIn('Salud y bienestar en Chile', html)
+        self.assertIn('<h1 class="h2 mt-2 mb-1">Salud y bienestar</h1>', html)
 
     def test_un_grupo_inventado_se_ignora(self):
         self._perfil(self.gasfiter, 'Gásfiter Uno')
@@ -192,8 +194,10 @@ class ListadoPorGrupo(Base):
         self.assertIn('<strong>30</strong> resultados', html)
 
     def test_una_especialidad_vacia_invita_a_publicar(self):
-        html = self.client.get(reverse('directory:provider_list') + '?categoria=kinesiologia').content.decode()
-        self.assertIn('Todavía no hay perfiles de Kinesiología', html)
+        r = self.client.get(reverse('directory:provider_list') + '?categoria=kinesiologia', follow=True)
+        self.assertEqual(r.status_code, 404, 'una especialidad vacía responde 404, no 200')
+        html = r.content.decode()
+        self.assertIn('Todavía no hay perfiles de kinesiólogo', html)
         self.assertIn(reverse('accounts:register'), html)
 
 

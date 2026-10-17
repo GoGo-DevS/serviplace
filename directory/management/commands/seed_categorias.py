@@ -12,6 +12,37 @@ from django.core.management.base import BaseCommand
 
 from directory.models import Category
 
+# Nombre de búsqueda (SEO): lo que la gente escribe en Google.
+SEO_NOMBRES = {
+    'gasfiteria': 'Gásfiter',
+    'electricidad': 'Electricista',
+    'cerrajeria': 'Cerrajero',
+    'climatizacion': 'Técnico en climatización',
+    'construccion': 'Maestro constructor',
+    'limpieza': 'Servicio de aseo',
+    'jardineria': 'Jardinero',
+    'carpinteria': 'Carpintero',
+    'pintura': 'Pintor',
+    'kinesiologia': 'Kinesiólogo',
+    'psicologia': 'Psicólogo',
+    'nutricion': 'Nutricionista',
+    'fonoaudiologia': 'Fonoaudiólogo',
+    'terapia-ocupacional': 'Terapeuta ocupacional',
+    'enfermeria': 'Enfermería a domicilio',
+    'podologia': 'Podólogo',
+    'cuidado-de-personas': 'Cuidadora de adulto mayor',
+    'clases-particulares': 'Profesor particular',
+    'idiomas': 'Clases de inglés e idiomas',
+    'clases-de-musica': 'Profesor de música',
+    'psicopedagogia': 'Psicopedagogo',
+    'peluqueria': 'Peluquería a domicilio',
+    'manicure-y-estetica': 'Manicurista',
+    'contabilidad': 'Contador',
+    'diseno-grafico': 'Diseñador gráfico',
+    'fotografia-y-video': 'Fotógrafo',
+    'soporte-computacional': 'Técnico en computación',
+}
+
 H, S, E, B, P = (Category.HOGAR, Category.SALUD, Category.EDUCACION,
                  Category.BELLEZA, Category.PROFESIONAL)
 
@@ -62,6 +93,7 @@ class Command(BaseCommand):
                 defaults={
                     'name': nombre, 'description': desc, 'icon': icono, 'group': grupo,
                     'pide_registro_salud': salud, 'display_order': orden, 'is_active': True,
+                    'seo_nombre': SEO_NOMBRES.get(slug, ''),
                 },
             )
             creadas += int(created)

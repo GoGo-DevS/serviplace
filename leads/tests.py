@@ -64,12 +64,13 @@ class LosBotsNoCuentan(Base):
 class Busquedas(Base):
 
     def test_una_busqueda_sin_resultados_queda_registrada_con_su_contexto(self):
-        self.client.get(reverse('directory:provider_list') + '?categoria=kinesiologia&comuna=maipu', **HUMANO)
+        self.client.get(reverse('directory:provider_list') + '?categoria=kinesiologia&comuna=maipu',
+                        follow=True, **HUMANO)
         e = LeadEvent.objects.get(event_type=LeadEvent.SEARCH)
         self.assertEqual((e.category_slug, e.commune_slug, e.results_count), ('kinesiologia', 'maipu', 0))
 
     def test_cuenta_los_resultados_reales(self):
-        self.client.get(reverse('directory:provider_list') + '?categoria=gasfiteria', **HUMANO)
+        self.client.get(reverse('directory:provider_list') + '?categoria=gasfiteria', follow=True, **HUMANO)
         self.assertEqual(LeadEvent.objects.get(event_type=LeadEvent.SEARCH).results_count, 1)
 
     def test_no_guarda_un_telefono_escrito_en_el_buscador(self):
@@ -123,7 +124,8 @@ class PanelDeMetricas(Base):
         self.assertEqual(self.client.get(reverse('core:metricas')).status_code, 302)
 
     def test_el_staff_ve_el_embudo_y_las_busquedas_sin_resultados(self):
-        self.client.get(reverse('directory:provider_list') + '?categoria=kinesiologia&comuna=maipu', **HUMANO)
+        self.client.get(reverse('directory:provider_list') + '?categoria=kinesiologia&comuna=maipu',
+                        follow=True, **HUMANO)
         self.client.get(self.perfil.get_absolute_url(), **HUMANO)
         staff = User.objects.create_user('staff', password='clave-larga-de-verdad-99', is_staff=True)
         self.client.force_login(staff)

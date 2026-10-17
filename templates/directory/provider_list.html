@@ -3,20 +3,23 @@
 {% block content %}
 <section class="page-header">
   <div class="container py-4">
-    <span class="eyebrow">Directorio local</span>
-    <h1 class="h2 mt-2 mb-1" style="letter-spacing:-.02em">{{ title_tail }} en {{ commune_name }}</h1>
-    <p class="text-muted mb-0">Busca por especialidad, comuna o palabra clave y escríbele directo por WhatsApp.</p>
+    <nav class="miga" aria-label="Estás en">
+      <ol>{% for nombre, url in pasos %}<li>{% if not forloop.last %}<a href="{{ url }}">{{ nombre }}</a>{% else %}<span aria-current="page">{{ nombre }}</span>{% endif %}</li>{% endfor %}</ol>
+    </nav>
+    <h1 class="h2 mt-2 mb-1">{{ h1 }}</h1>
+    {% if intro %}<p class="text-muted mb-0 listado-intro">{{ intro }}</p>{% endif %}
     <div class="group-chips mt-3" aria-label="Filtrar por tipo de servicio">
-      <a class="group-chip{% if not selected_group and not selected_category %} is-active{% endif %}" href="{% url 'directory:provider_list' %}{% if selected_commune %}?comuna={{ selected_commune.slug }}{% endif %}">Todo</a>
+      <a class="group-chip{% if not selected_group and not selected_category %} is-active{% endif %}" href="{{ url_comuna_todo }}">Todo</a>
       {% for grupo in grupos %}
-        <a class="group-chip{% if selected_group == grupo.clave or selected_category.group == grupo.clave %} is-active{% endif %}" href="?grupo={{ grupo.clave }}{% if selected_commune %}&amp;comuna={{ selected_commune.slug }}{% endif %}">{{ grupo.nombre }}</a>
+        <a class="group-chip{% if selected_group == grupo.clave or selected_category.group == grupo.clave %} is-active{% endif %}" href="{% if selected_commune %}{% url 'directory:listado_rubro_comuna' grupo.slug selected_commune.slug %}{% else %}{% url 'directory:listado_rubro' grupo.slug %}{% endif %}">{{ grupo.nombre }}</a>
       {% endfor %}
     </div>
   </div>
 </section>
 
 <section class="container py-4">
-  <form class="filter-bar" method="get">
+  {% comment %}El formulario va a /servicios/: sin texto, la vista redirige (301) a la URL limpia.{% endcomment %}
+  <form class="filter-bar" method="get" action="{% url 'directory:provider_list' %}">
     <div class="row g-2">
       <div class="col-lg-5">
         <label class="form-label" for="q">Buscar</label>
@@ -24,7 +27,7 @@
         {% if selected_group and not selected_category %}<input type="hidden" name="grupo" value="{{ selected_group }}">{% endif %}
       </div>
       <div class="col-lg-3">
-        <label class="form-label" for="categoria">Categoría</label>
+        <label class="form-label" for="categoria">Especialidad</label>
         <select class="form-select form-select-lg" id="categoria" name="categoria">
           <option value="">Todas</option>
           {% for grupo in grupos %}
@@ -71,9 +74,9 @@
     {% empty %}
       <div class="empty-state">
         {% if selected_category and not query %}
-          <h2 class="h5">Todavía no hay perfiles de {{ selected_category.name }}{% if selected_commune %} en {{ selected_commune.name }}{% endif %}</h2>
+          <h2 class="h5">Todavía no hay perfiles de {{ selected_category.nombre_busqueda|lower }}{% if selected_commune %} en {{ selected_commune.name }}{% endif %}</h2>
           <p class="text-muted mb-3">¿Te dedicas a esto? Publica tu perfil gratis y aparece primero cuando alguien lo busque.</p>
-          <a class="btn btn-primary" href="{% url 'accounts:register' %}">Publicar mi perfil gratis →</a>
+          <a class="btn btn-primary" href="{% url 'accounts:register' %}?desde=vacio-{{ selected_category.slug }}">Publicar mi perfil gratis →</a>
           {% if selected_category.group != 'hogar' %}<p class="mt-3 mb-0" style="font-size:.88rem"><a href="{% url 'core:para_profesionales' %}">Cómo funciona para profesionales →</a></p>{% endif %}
         {% else %}
           <h2 class="h5">No encontramos perfiles con esos filtros</h2>
@@ -92,7 +95,7 @@
   {% if pagina.paginator.num_pages > 1 %}
   <nav class="sp-paginacion" aria-label="Páginas de resultados">
     {% if pagina.has_previous %}
-      <a class="sp-pag-btn" href="?{% querystring page=pagina.previous_page_number %}"
+      <a class="sp-pag-btn" href="{% querystring page=pagina.previous_page_number %}"
          rel="prev">← Anterior</a>
     {% else %}
       <span class="sp-pag-btn sp-pag-off" aria-hidden="true">← Anterior</span>
@@ -104,7 +107,7 @@
     </span>
 
     {% if pagina.has_next %}
-      <a class="sp-pag-btn" href="?{% querystring page=pagina.next_page_number %}"
+      <a class="sp-pag-btn" href="{% querystring page=pagina.next_page_number %}"
          rel="next">Siguiente →</a>
     {% else %}
       <span class="sp-pag-btn sp-pag-off" aria-hidden="true">Siguiente →</span>
@@ -112,11 +115,28 @@
   </nav>
   {% endif %}
 
+  {% if relacionados_comunas or relacionados_categorias %}
+  <div class="relacionados">
+    {% if relacionados_comunas %}
+    <div>
+      <h2 class="h6">{{ selected_category.nombre_busqueda }} en otras comunas</h2>
+      <ul>{% for f in relacionados_comunas %}<li><a href="{{ f.url }}">{{ selected_category.nombre_busqueda }} en {{ f.commune__name }}</a> <span>{{ f.n }}</span></li>{% endfor %}</ul>
+    </div>
+    {% endif %}
+    {% if relacionados_categorias %}
+    <div>
+      <h2 class="h6">Otros servicios en {{ selected_commune.name }}</h2>
+      <ul>{% for f in relacionados_categorias %}<li><a href="{{ f.url }}">{% firstof f.category__seo_nombre f.category__name %} en {{ selected_commune.name }}</a> <span>{{ f.n }}</span></li>{% endfor %}</ul>
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+
   <!-- CTA publicar -->
   {% if providers %}
   <div class="text-center mt-5 py-4" style="border-top:1px solid var(--sp-line-soft)">
     <p class="text-muted mb-2">¿Tu servicio no aparece aquí?</p>
-    <a class="btn btn-primary" href="{% url 'accounts:provider_create' %}">Publicar mi servicio gratis →</a>
+    <a class="btn btn-primary" href="{% url 'accounts:register' %}?desde=listado">Publicar mi servicio gratis →</a>
   </div>
   {% endif %}
 </section>

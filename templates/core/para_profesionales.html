@@ -88,7 +88,7 @@
     </div>
     <div class="spec-chips">
       {% for category in grupo.categorias %}
-        <a class="spec-chip" href="{% url 'directory:provider_list' %}?categoria={{ category.slug }}">{{ category.name }}</a>
+        <a class="spec-chip" href="{% if category.n_activos %}{{ category.get_absolute_url }}{% else %}{% url 'accounts:register' %}?desde=landing-{{ category.slug }}{% endif %}">{{ category.name }}</a>
       {% endfor %}
     </div>
   </div>

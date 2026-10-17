@@ -8,6 +8,7 @@ from django.utils import timezone
 from directory.catalogo import categorias_por_grupo
 from directory.models import Category, Commune, Provider, Region
 from leads.models import LeadEvent
+from directory import seo
 from leads.registro import registrar
 
 
@@ -39,7 +40,10 @@ def home(request):
         'communes_count': communes_count,
         'regions_with_communes': regions_with_communes,
         'ref_code': ref_code,
-        'page_title': 'SERVIPLACE | Maestros y profesionales en tu comuna — Contacto directo',
+        # El schema de la organización va SOLO acá (auditoría de Jorge): el
+        # resto de las páginas la referencia por @id.
+        'jsonld': seo.como_script(seo.organizacion_y_sitio()),
+        'page_title': 'ServiPlace: maestros y profesionales en tu comuna',
         'meta_description': 'Gásfiter, electricista, kinesiólogo, psicólogo, profe particular y más en tu comuna. Contacto directo por WhatsApp, sin comisión.',
         'og_title': 'SERVIPLACE — Maestros y profesionales en tu comuna',
         'og_description': settings.SITE_DESCRIPTION,
@@ -125,8 +129,8 @@ def about(request):
         request,
         'core/about.html',
         {
-            'page_title': 'Sobre SERVIPLACE',
-            'meta_description': 'SERVIPLACE conecta vecinos con prestadores locales en todo Chile de forma simple y directa.',
+            'page_title': 'Qué es ServiPlace | Directorio de maestros y profesionales',
+            'meta_description': 'ServiPlace es un directorio chileno de maestros y profesionales independientes por comuna, hecho por GoGoDevS. Contacto directo por WhatsApp, sin comisión.',
         },
     )
 
@@ -136,8 +140,8 @@ def contact(request):
         request,
         'core/contact.html',
         {
-            'page_title': 'Contacto | SERVIPLACE',
-            'meta_description': 'Contacta al equipo de SERVIPLACE.',
+            'page_title': 'Contacto | ServiPlace',
+            'meta_description': 'Escríbenos para publicar tu perfil, reclamar uno que ya aparece, corregir datos o pedir la baja. Respondemos por WhatsApp o correo.',
             'join_url': reverse('core:join'),
         },
     )
@@ -148,8 +152,8 @@ def terms(request):
         request,
         'core/terms.html',
         {
-            'page_title': 'Términos de Uso | SERVIPLACE',
-            'meta_description': 'Términos de uso de SERVIPLACE — directorio de servicios locales en Chile.',
+            'page_title': 'Términos de uso | ServiPlace',
+            'meta_description': 'Términos de uso de ServiPlace: cómo funciona el directorio, qué es responsabilidad de cada perfil y cómo pedir una corrección o la baja.',
         },
     )
 
@@ -159,8 +163,8 @@ def trust_and_safety(request):
         request,
         'core/trust_and_safety.html',
         {
-            'page_title': 'Seguridad y confianza | SERVIPLACE',
-            'meta_description': 'Recomendaciones para contactar prestadores por SERVIPLACE de forma clara y responsable.',
+            'page_title': 'Seguridad y confianza | ServiPlace',
+            'meta_description': 'Recomendaciones antes de contratar a un maestro o profesional: pide cotización clara, revisa su formación y acuerda precio y alcance por escrito.',
             'og_title': 'Seguridad y confianza en SERVIPLACE',
             'og_description': 'SERVIPLACE es una vitrina local para contactar prestadores directamente por WhatsApp en todo Chile.',
         },

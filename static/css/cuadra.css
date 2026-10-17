@@ -342,3 +342,18 @@ input[type="file"].form-control::file-selector-button { border: 0; border-radius
 .gogodevs-box a { color: #e3c77d; }
 .gogodevs-tag { display: inline-block; font-family: var(--font-mono); font-size: .68rem; letter-spacing: .08em; text-transform: uppercase; color: #c9a84c; margin-bottom: .35rem; }
 .footer-bottom { flex-wrap: wrap; gap: .5rem 1rem; }
+
+/* ---- SEO visible: miga de pan y enlaces relacionados ---- */
+.miga ol { display: flex; flex-wrap: wrap; gap: .2rem .45rem; list-style: none; margin: 0; padding: 0; font-size: .86rem; }
+.miga li { display: inline-flex; align-items: center; gap: .45rem; color: var(--sp-muted); }
+.miga li + li::before { content: "/"; color: var(--sp-line); font-weight: 700; }
+.miga a { color: var(--sp-slate); font-weight: 700; }
+.miga a:hover { color: var(--sp-accent); }
+.miga [aria-current] { color: var(--sp-ink); font-weight: 700; }
+.listado-intro { max-width: 68ch; margin-top: .35rem; }
+.relacionados { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); gap: 1rem; margin-top: 2rem; }
+.relacionados > div { background: #fff; border-radius: 18px; padding: 1rem 1.2rem; }
+.relacionados h2 { margin: 0 0 .6rem; font-size: 1rem; }
+.relacionados ul { list-style: none; margin: 0; padding: 0; display: grid; gap: .35rem; }
+.relacionados li { display: flex; justify-content: space-between; gap: .75rem; font-size: .92rem; }
+.relacionados li span { font-family: var(--font-mono); font-size: .78rem; color: var(--sp-muted); }

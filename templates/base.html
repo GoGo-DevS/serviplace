@@ -1,18 +1,25 @@
 {% load static %}
 <!doctype html>
-<html lang="es">
+<html lang="es-CL">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{{ page_title|default:"SERVIPLACE — Servicios locales en Chile" }}</title>
-  <meta name="description" content="{% firstof meta_description 'Encuentra gasfitero, electricista, cerrajero y más servicios locales en tu comuna. Contacto directo por WhatsApp.' %}">
-  <meta property="og:title" content="{% firstof og_title page_title 'SERVIPLACE' %}">
-  <meta property="og:description" content="{% firstof og_description meta_description 'Directorio de servicios locales en Chile. Contacta directo.' %}">
+  <title>{{ page_title|default:"ServiPlace: maestros y profesionales en tu comuna" }}</title>
+  <meta name="description" content="{% firstof meta_description 'Maestros y profesionales independientes en tu comuna: gásfiter, electricista, kinesiólogo, profe particular y más. Contacto directo por WhatsApp.' %}">
+  {% comment %}
+  robots: antes las vistas lo pasaban y la plantilla nunca lo imprimía, así que
+  ninguna página tenía noindex. canonical: siempre absoluto y sin parámetros.
+  {% endcomment %}
+  {% if robots %}<meta name="robots" content="{{ robots }}">{% endif %}
+  <link rel="canonical" href="{% firstof canonical canonical_por_defecto %}">
+  <meta property="og:title" content="{% firstof og_title page_title 'ServiPlace' %}">
+  <meta property="og:description" content="{% firstof og_description meta_description 'Maestros y profesionales independientes en tu comuna. Contacto directo por WhatsApp.' %}">
   <meta property="og:type" content="{{ og_type|default:'website' }}">
-  <meta property="og:site_name" content="SERVIPLACE">
-  {% if og_image %}<meta property="og:image" content="{{ og_image }}">{% endif %}
-  {% if og_url %}<meta property="og:url" content="{{ og_url }}">{% endif %}
-  <meta name="twitter:card" content="summary">
+  <meta property="og:site_name" content="ServiPlace">
+  <meta property="og:locale" content="es_CL">
+  <meta property="og:url" content="{% firstof canonical canonical_por_defecto %}">
+  <meta property="og:image" content="{% if og_image %}{{ og_image }}{% else %}{{ SITE_URL }}{% static 'img/og-serviplace.png' %}{% endif %}">
+  <meta name="twitter:card" content="summary_large_image">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
@@ -21,6 +28,7 @@
   <link rel="stylesheet" href="{% static 'css/cuadra.css' %}">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 2C9.4 2 4 7.2 4 13.6 4 22 16 30 16 30s12-8 12-16.4C28 7.2 22.6 2 16 2z' fill='%23d6552c'/%3E%3Ccircle cx='16' cy='13.5' r='4.6' fill='%23fff'/%3E%3C/svg%3E">
   <meta name="theme-color" content="#1b1f24">
+  {{ jsonld }}
   {% block extra_head %}{% endblock %}
 </head>
 <body>
@@ -91,8 +99,6 @@
         <nav class="footer-column" aria-label="Para vecinos">
           <strong>Para vecinos</strong>
           <a href="{% url 'directory:provider_list' %}">Buscar servicios</a>
-          <a href="{% url 'directory:provider_list' %}?grupo=salud">Salud y bienestar</a>
-          <a href="{% url 'directory:provider_list' %}?grupo=educacion">Clases particulares</a>
           <a href="{% url 'core:trust_and_safety' %}">Seguridad y confianza</a>
         </nav>
         <nav class="footer-column" aria-label="Para profesionales">

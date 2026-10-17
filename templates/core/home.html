@@ -13,7 +13,7 @@ llevan a cada puerta antes de cualquier scroll.
   <div class="container">
     <div class="puertas-intro">
       <span class="eyebrow">Maestros y profesionales independientes en tu comuna</span>
-      <h1>¿Buscas o ofreces un servicio?</h1>
+      <h1>¿Buscas o ofreces un servicio en tu comuna?</h1>
       <nav class="puertas-atajos" aria-label="Elige qué vienes a hacer">
         <a href="#busco">Busco un servicio</a>
         <a href="#ofrezco">Ofrezco un servicio</a>
@@ -78,11 +78,11 @@ llevan a cada puerta antes de cualquier scroll.
         <h3>{% include "_icono_grupo.html" with grupo=grupo.clave %}{{ grupo.nombre }}</h3>
         <p>{{ grupo.descripcion }}</p>
       </div>
-      <a href="{% url 'directory:provider_list' %}?grupo={{ grupo.clave }}">Ver {{ grupo.nombre|lower }} →</a>
+      {% if grupo.total %}<a href="{% url 'directory:listado_rubro' grupo.slug %}">Ver {{ grupo.nombre|lower }} →</a>{% endif %}
     </div>
     <div class="category-grid">
       {% for category in grupo.categorias %}
-        <a class="category-tile{% if not category.n_activos %} is-empty{% endif %}" href="{% url 'directory:provider_list' %}?categoria={{ category.slug }}">
+        <a class="category-tile{% if not category.n_activos %} is-empty{% endif %}" href="{% if category.n_activos %}{{ category.get_absolute_url }}{% else %}{% url 'accounts:register' %}?desde=especialidad-{{ category.slug }}{% endif %}">
           <span class="tile-name">{{ category.name }}</span>
           {% if category.description %}<small>{{ category.description }}</small>{% endif %}
           {% if category.n_activos %}

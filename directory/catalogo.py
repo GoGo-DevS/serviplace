@@ -24,6 +24,7 @@ def categorias_por_grupo(solo_grupos=None):
         if del_grupo:
             grupos.append({
                 'clave': clave,
+                'slug': Category.GROUP_SLUGS[clave],
                 'nombre': nombre,
                 'descripcion': descripcion,
                 'categorias': del_grupo,
