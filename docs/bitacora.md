@@ -124,3 +124,30 @@ Próxima tarea: push; dar de alta Search Console (TXT en Cloudflare); elegir
   Maipú como mercado inicial (oferta real + Diego vive ahí) y medir 7 días
   con difusión mínima antes de cualquier campaña.
 ---
+
+---
+[18-10-2026, tarde] — Modo: colaborativo
+Tarea completada: PORTADA DE DOS PUERTAS + IMPORTADOS OCULTOS + LOGO/FOTO + QA.
+  Pedidos de Diego en orden: (1) los perfiles destacados eran data no
+  validada y sin logos: "horrible"; (2) la portada tiene que separar altiro
+  al que busca del que ofrece; (3) arreglar problemas visuales tipo cajas de
+  texto que no calzan, con QA de UI/UX; (4) tag de GoGoDevS.
+  · Decisiones (AskUserQuestion): ocultar los 361 importados; sí a logo/foto.
+  · Provider.objects.publicos() = activo + con dueño. Todo lo público parte
+    de ahí. Importados: 404, fuera de sitemap y conteos; reclamables por
+    /prestadores/<slug>/reclamar/ (para invitarlos).
+  · Insignia "Verificado" exige dueño (12 importados traían is_verified=True).
+  · Foto: directory/imagenes.py (WebP <100 KB, sin EXIF, exif_transpose).
+  · QA con la skill ui-ux-pro-max + auditoría automática en Chrome
+    (scratchpad/auditoria_visual.py): 0 problemas reales en 44 revisiones.
+DEFECTOS ENCONTRADOS EN ESTA PASADA: login sin clases (campos del navegador),
+  errores con aria-describedby a ids inexistentes, doble clic en Publicar
+  podía crear dos perfiles, alert() en copiar enlace del panel, texto de
+  botones descentrado, franja bajo el pie, mensaje de Django en español de
+  España para imagen inválida, emojis en el selector de rubro.
+Pruebas: 105.
+EFECTO AL PUBLICAR: el directorio público queda con 0 perfiles hasta que
+  publiquen los primeros. Pendiente: invitar a los 12 autorizados de Maipú
+  con su enlace de reclamo; agregar el bucket `serviplace` al respaldo
+  nocturno de R2 (regla 12).
+---
