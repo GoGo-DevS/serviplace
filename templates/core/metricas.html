@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block extra_head %}<meta name="robots" content="noindex">{% endblock %}
+
+{% block content %}
+<section class="page-header">
+  <div class="container py-4">
+    <span class="eyebrow">Solo para el equipo</span>
+    <div class="metricas-head">
+      <h1 class="h2 mt-2 mb-1">Métricas del directorio</h1>
+      <nav class="metricas-periodos" aria-label="Período">
+        {% for p in periodos %}
+          <a href="?dias={{ p }}" class="{% if p == dias %}is-active{% endif %}">{{ p }} días</a>
+        {% endfor %}
+      </nav>
+    </div>
+    <p class="text-muted mb-0">Dónde se pierde la oportunidad: en la oferta, en la búsqueda, en la ficha o en el registro. Sin bots ni datos personales.</p>
+  </div>
+</section>
+
+<section class="container py-4">
+  <div class="metricas-diagnostico">
+    <span class="metricas-caso">Caso {{ diagnostico.0 }}</span>
+    <p class="mb-0">{{ diagnostico.1 }}</p>
+  </div>
+
+  <div class="metricas-bloques">
+    <article class="metricas-bloque">
+      <h2>Oferta <small>hoy</small></h2>
+      <dl>
+        <div><dt>Perfiles activos</dt><dd>{{ oferta.total }}</dd></div>
+        <div><dt>Publicados por su dueño</dt><dd>{{ oferta.autoservicio }}</dd></div>
+        <div><dt>Importados de fuentes públicas</dt><dd>{{ oferta.importados }}</dd></div>
+        <div><dt>Propios incompletos</dt><dd>{{ incompletos }}</dd></div>
+      </dl>
+      <p class="metricas-nota">{% for g in grupos %}{{ g.nombre }}: {{ g.n }}{% if not forloop.last %} · {% endif %}{% endfor %}</p>
+    </article>
+
+    <article class="metricas-bloque">
+      <h2>Demanda <small>{{ dias }} días</small></h2>
+      <dl>
+        <div><dt>Visitantes (únicos por día)</dt><dd>{{ visitantes }}</dd></div>
+        <div><dt>Visitas a la portada</dt><dd>{{ visitas_portada }}</dd></div>
+        <div><dt>Búsquedas</dt><dd>{{ busquedas }}</dd></div>
+        <div><dt>Sin resultados</dt><dd>{{ sin_resultados }}{% if tasa_sin_resultados is not None %} <span>({{ tasa_sin_resultados }}%)</span>{% endif %}</dd></div>
+      </dl>
+    </article>
+
+    <article class="metricas-bloque">
+      <h2>Conexión <small>{{ dias }} días</small></h2>
+      <dl>
+        <div><dt>Fichas abiertas</dt><dd>{{ vistas }}</dd></div>
+        <div><dt>Clics en WhatsApp</dt><dd>{{ clics }}</dd></div>
+        <div><dt>Clics por ficha abierta</dt><dd>{% if tasa_clic is not None %}{{ tasa_clic }}%{% else %}—{% endif %}</dd></div>
+      </dl>
+      <p class="metricas-nota">Un clic en WhatsApp es intención de contacto, no una conversación ni un trabajo hecho.</p>
+    </article>
+
+    <article class="metricas-bloque">
+      <h2>Captación <small>{{ dias }} días</small></h2>
+      <dl>
+        <div><dt>Visitas a /profesionales/</dt><dd>{{ visitas_landing }}</dd></div>
+        <div><dt>Registros iniciados</dt><dd>{{ registros_iniciados }}</dd></div>
+        <div><dt>Cuentas creadas</dt><dd>{{ cuentas }}{% if tasa_registro is not None %} <span>({{ tasa_registro }}%)</span>{% endif %}</dd></div>
+        <div><dt>Perfiles publicados</dt><dd>{{ publicados }}{% if tasa_publicacion is not None %} <span>({{ tasa_publicacion }}%)</span>{% endif %}</dd></div>
+      </dl>
+    </article>
+  </div>
+
+  <div class="metricas-tablas">
+    <article class="metricas-tabla">
+      <h2>Búsquedas sin resultados</h2>
+      <p class="metricas-nota">Dónde faltan perfiles. Es la lista de captación.</p>
+      {% if sin_resultado_top %}
+      <div class="tabla-scroll"><table>
+        <thead><tr><th>Especialidad</th><th>Comuna</th><th>Texto</th><th class="num">Veces</th></tr></thead>
+        <tbody>{% for f in sin_resultado_top %}<tr><td>{{ f.categoria|default:"—" }}</td><td>{{ f.comuna|default:"—" }}</td><td>{{ f.query|default:"—" }}</td><td class="num">{{ f.n }}</td></tr>{% endfor %}</tbody>
+      </table></div>
+      {% else %}<p class="metricas-vacio">Ninguna en el período.</p>{% endif %}
+    </article>
+
+    <article class="metricas-tabla">
+      <h2>Perfiles con más interés</h2>
+      {% if perfiles_top %}
+      <div class="tabla-scroll"><table>
+        <thead><tr><th>Perfil</th><th>Comuna</th><th class="num">Vistas</th><th class="num">Clics</th></tr></thead>
+        <tbody>{% for f in perfiles_top %}<tr><td><a href="{% url 'directory:provider_detail' f.provider__slug %}">{{ f.provider__business_name }}</a></td><td>{{ f.provider__commune__name }}</td><td class="num">{{ f.vistas }}</td><td class="num">{{ f.clics }}</td></tr>{% endfor %}</tbody>
+      </table></div>
+      {% else %}<p class="metricas-vacio">Nadie ha abierto una ficha en el período.</p>{% endif %}
+    </article>
+
+    <article class="metricas-tabla">
+      <h2>Lo más buscado</h2>
+      {% if buscado_top %}
+      <div class="tabla-scroll"><table>
+        <thead><tr><th>Especialidad</th><th class="num">Búsquedas</th></tr></thead>
+        <tbody>{% for f in buscado_top %}<tr><td>{{ f.categoria|default:f.category_slug }}</td><td class="num">{{ f.n }}</td></tr>{% endfor %}</tbody>
+      </table></div>
+      {% else %}<p class="metricas-vacio">Sin búsquedas por especialidad en el período.</p>{% endif %}
+    </article>
+
+    <article class="metricas-tabla">
+      <h2>Dónde hay oferta</h2>
+      <p class="metricas-nota">Comuna y especialidad con más perfiles activos: los candidatos a mercado inicial.</p>
+      <div class="tabla-scroll"><table>
+        <thead><tr><th>Comuna</th><th>Especialidad</th><th class="num">Perfiles</th></tr></thead>
+        <tbody>{% for f in mercado %}<tr><td>{{ f.commune__name }}</td><td>{{ f.category__name }}</td><td class="num">{{ f.n }}</td></tr>{% endfor %}</tbody>
+      </table></div>
+    </article>
+  </div>
+
+  <article class="metricas-tabla mt-4">
+    <h2>Día a día</h2>
+    {% if serie_dias %}
+    <div class="tabla-scroll"><table>
+      <thead><tr><th>Día</th><th class="num">Visitas</th><th class="num">Búsquedas</th><th class="num">Fichas</th><th class="num">WhatsApp</th><th class="num">Registros</th><th class="num">Publicados</th></tr></thead>
+      <tbody>{% for d in serie_dias %}<tr>
+        <td>{{ d.dia|date:"D d-m" }}</td>
+        <td class="num">{{ d.page_view|default:0 }}</td><td class="num">{{ d.search|default:0 }}</td>
+        <td class="num">{{ d.detail_view|default:0 }}</td><td class="num">{{ d.whatsapp_click|default:0 }}</td>
+        <td class="num">{{ d.signup_done|default:0 }}</td><td class="num">{{ d.profile_published|default:0 }}</td>
+      </tr>{% endfor %}</tbody>
+    </table></div>
+    {% else %}<p class="metricas-vacio">Todavía no hay eventos en el período.</p>{% endif %}
+  </article>
+</section>
+{% endblock %}

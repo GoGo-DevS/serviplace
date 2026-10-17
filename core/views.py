@@ -6,10 +6,13 @@ from django.utils import timezone
 
 from directory.catalogo import categorias_por_grupo
 from directory.models import Category, Commune, Provider
+from leads.models import LeadEvent
+from leads.registro import registrar
 
 
 def home(request):
     ref_code = request.GET.get('ref', '')
+    registrar(request, LeadEvent.PAGE_VIEW, origen='home')
     categories = Category.objects.filter(is_active=True)
     featured_providers = (
         Provider.objects.filter(is_active=True)
@@ -86,6 +89,7 @@ def para_profesionales(request):
     son pacientes, alumnos o clientes que lo encuentren en su comuna. Esta
     página le habla a esa persona; el producto es el mismo directorio.
     """
+    registrar(request, LeadEvent.PAGE_VIEW, origen='profesionales')
     grupos = categorias_por_grupo(solo_grupos=[
         Category.SALUD, Category.EDUCACION, Category.BELLEZA, Category.PROFESIONAL,
     ])

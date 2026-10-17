@@ -10,6 +10,8 @@ from django.utils.http import url_has_allowed_host_and_scheme
 from core.antispam import excede_limite_ip, ip_cliente
 from directory.forms import ProviderReportForm
 from directory.models import Provider, ProviderReport
+from leads.models import LeadEvent
+from leads.registro import registrar
 
 from .forms import ProviderForm, RegisterForm
 from .models import LoginAttempt, UserProfile
@@ -75,6 +77,7 @@ def register(request):
                     profile.referred_by = referrer_profile.user
             profile.save()
             login(request, user)
+            registrar(request, LeadEvent.SIGNUP_DONE, origen='register')
             messages.success(request, f'Bienvenido/a a ServiPlace, {user.username}. Ya puedes publicar tu servicio.')
             next_url = request.GET.get('next') or request.POST.get('next')
             # `startswith('/')` dejaba pasar `//sitio-ajeno.com`, que el
@@ -87,6 +90,7 @@ def register(request):
             return redirect('accounts:provider_create')
     else:
         form = RegisterForm()
+        registrar(request, LeadEvent.SIGNUP_STARTED, origen=request.GET.get('desde', 'register')[:40])
 
     return render(request, 'accounts/register.html', {
         'form': form,
@@ -144,6 +148,10 @@ def provider_create(request):
                 provider.hidden_at = timezone.now()
                 provider.moderation_note = 'Retenido por el filtro antispam al publicar.'
             provider.save()
+            if provider.is_active:
+                registrar(request, LeadEvent.PROFILE_PUBLISHED, origen='provider_create', provider=provider,
+                          category_slug=provider.category.slug, commune_slug=provider.commune.slug,
+                          group=provider.category.group)
             if provider.spam_flag:
                 messages.info(request, 'Recibimos tu perfil. Quedó en revisión y lo publicaremos apenas lo mire una persona.')
             else:

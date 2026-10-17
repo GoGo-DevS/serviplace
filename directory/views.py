@@ -5,6 +5,7 @@ from django.db.models import F, Prefetch, Q
 from django.shortcuts import get_object_or_404, redirect, render
 
 from leads.models import LeadEvent
+from leads.registro import es_bot, registrar, sanear_busqueda
 
 from .catalogo import categorias_por_grupo
 from .models import Category, Commune, Provider, Region
@@ -84,6 +85,16 @@ def provider_list(request):
         title_tail = 'Servicios y profesionales'
     commune_name = selected_commune.name if selected_commune else 'Chile'
 
+    # Embudo: una búsqueda es cualquier filtro aplicado en la primera página
+    # (pasar a la página 2 no es buscar de nuevo). Con el conteo se ven las
+    # búsquedas SIN resultados, que dicen dónde faltan perfiles.
+    if (query or category_slug or commune_slug or group_slug) and not request.GET.get('page'):
+        registrar(
+            request, LeadEvent.SEARCH, origen='provider_list',
+            category_slug=category_slug[:90], commune_slug=commune_slug[:90], group=group_slug,
+            query=sanear_busqueda(query), results_count=paginador.count,
+        )
+
     context = {
         # `providers` es la PÁGINA, no el queryset entero: la plantilla itera
         # sobre esto y si acá fuera el queryset completo la paginación sería
@@ -114,9 +125,14 @@ def provider_detail(request, slug):
         slug=slug,
         is_active=True,
     )
-    Provider.objects.filter(pk=provider.pk).update(views_count=F('views_count') + 1)
-    LeadEvent.objects.create(provider=provider, source_page='provider_detail', event_type=LeadEvent.DETAIL_VIEW)
-    provider.views_count += 1
+    # Un bot (Google, la vista previa de WhatsApp) no es una visita: no suma
+    # al contador que ve el profesional en su panel ni al embudo.
+    if not es_bot(request):
+        Provider.objects.filter(pk=provider.pk).update(views_count=F('views_count') + 1)
+        registrar(request, LeadEvent.DETAIL_VIEW, origen='provider_detail', provider=provider,
+                  category_slug=provider.category.slug, commune_slug=provider.commune.slug,
+                  group=provider.category.group)
+        provider.views_count += 1
 
     context = {
         'provider': provider,
@@ -130,9 +146,12 @@ def provider_detail(request, slug):
 
 
 def whatsapp_redirect(request, slug):
-    provider = get_object_or_404(Provider.objects.select_related('commune'), slug=slug, is_active=True)
-    Provider.objects.filter(pk=provider.pk).update(whatsapp_clicks_count=F('whatsapp_clicks_count') + 1)
-    LeadEvent.objects.create(provider=provider, source_page='provider_detail', event_type=LeadEvent.WHATSAPP_CLICK)
+    provider = get_object_or_404(Provider.objects.select_related('commune', 'category'), slug=slug, is_active=True)
+    if not es_bot(request):
+        Provider.objects.filter(pk=provider.pk).update(whatsapp_clicks_count=F('whatsapp_clicks_count') + 1)
+        registrar(request, LeadEvent.WHATSAPP_CLICK, origen=request.GET.get('desde', 'provider_detail')[:40],
+                  provider=provider, category_slug=provider.category.slug,
+                  commune_slug=provider.commune.slug, group=provider.category.group)
 
     message = 'Hola, vi tu perfil en SERVIPLACE y quiero hacerte una consulta.'
     return redirect(f'https://wa.me/{provider.clean_whatsapp_number}?text={quote(message)}')
