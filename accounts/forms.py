@@ -2,11 +2,14 @@ import re
 
 from django import forms
 from django.contrib.auth import get_user_model
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.utils import timezone
 from django.utils.html import strip_tags
 
+from django.core.files.uploadedfile import UploadedFile
+
 from core.antispam import AntispamFormMixin
+from directory.imagenes import procesar_foto
 from directory.models import Category, Commune, Provider
 
 User = get_user_model()
@@ -42,6 +45,18 @@ def formatear_telefono(valor):
     if len(digitos) == 11 and digitos.startswith('56'):
         return f'+56 {digitos[2]} {digitos[3:7]} {digitos[7:]}'
     return limpiar_texto(valor)
+
+
+class LoginForm(AuthenticationForm):
+    """El formulario de Django tal cual no trae las clases del sitio: los campos
+    salían con el estilo del navegador y la etiqueta pegada al lado."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['username'].label = 'Nombre de usuario'
+        self.fields['password'].label = 'Contraseña'
+        self.fields['username'].widget.attrs.update({'class': 'form-control', 'autocomplete': 'username'})
+        self.fields['password'].widget.attrs.update({'class': 'form-control', 'autocomplete': 'current-password'})
 
 
 class RegisterForm(AntispamFormMixin, UserCreationForm):
@@ -96,6 +111,7 @@ class ProviderForm(AntispamFormMixin, forms.ModelForm):
             'category',
             'commune',
             'sector',
+            'foto',
             'short_description',
             'description',
             'phone',
@@ -124,6 +140,7 @@ class ProviderForm(AntispamFormMixin, forms.ModelForm):
             'email': 'Correo (opcional)',
             'address': 'Dirección (opcional)',
             'service_area': 'Dónde atiendes (opcional)',
+            'foto': 'Tu logo o una foto tuya',
             'attends_home': 'A domicilio',
             'attends_office': 'En consulta o local',
             'attends_online': 'Online',
@@ -136,15 +153,20 @@ class ProviderForm(AntispamFormMixin, forms.ModelForm):
             'short_description': 'Máximo 220 caracteres. Es lo que se ve en la tarjeta.',
             'whatsapp_number': 'Celular chileno. Es el botón principal de tu perfil.',
             'service_area': 'Ej: Maipú, Cerrillos y Pudahuel',
+            'foto': 'JPG, PNG o WebP. La achicamos y le quitamos los datos de ubicación del celular.',
             'profession_title': 'Ej: Kinesióloga, Psicólogo, Profesora de inglés.',
             'business_name': 'Tu negocio o tu nombre profesional. Ej: Camila Rojas Kinesiología, Gasfitería Pérez.',
             'institution': 'Ej: Universidad de Concepción, INACAP, Duoc UC.',
             'graduation_year': 'Si todavía estudias, el año en que te titulas.',
             'health_registry': 'Solo si eres profesional de la salud. Tus pacientes pueden comprobarlo en el registro público.',
         }
+        error_messages = {
+            'foto': {'invalid_image': 'No pudimos leer ese archivo como imagen. Usa JPG, PNG o WebP.'},
+        }
         widgets = {
             'short_description': forms.TextInput(attrs={'maxlength': 220, 'placeholder': 'Ej: Kinesióloga a domicilio, rehabilitación y adulto mayor'}),
             'description': forms.Textarea(attrs={'rows': 6, 'placeholder': 'Qué haces, cómo trabajas, horarios, valores de referencia, si entregas boleta…'}),
+            'foto': forms.ClearableFileInput(attrs={'accept': 'image/jpeg,image/png,image/webp'}),
             'profession_title': forms.TextInput(attrs={'placeholder': 'Ej: Kinesióloga'}),
             'institution': forms.TextInput(attrs={'placeholder': 'Ej: Universidad de Concepción'}),
             'graduation_year': forms.NumberInput(attrs={'placeholder': 'Ej: 2025', 'inputmode': 'numeric'}),
@@ -156,6 +178,8 @@ class ProviderForm(AntispamFormMixin, forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        # Para borrar la foto anterior si la reemplaza o la quita.
+        self._foto_anterior = self.instance.foto.name if self.instance.pk and self.instance.foto else ''
         self.fields['category'].queryset = Category.objects.filter(is_active=True)
         self.fields['commune'].queryset = Commune.objects.filter(is_active=True).select_related('region').order_by('name')
         self.fields['category'].empty_label = 'Elige un rubro'
@@ -165,7 +189,7 @@ class ProviderForm(AntispamFormMixin, forms.ModelForm):
         categorias = list(self.fields['category'].queryset)
         nombres = dict(Category.GROUP_CHOICES)
         self.fields['category'].choices = [('', 'Elige un rubro')] + [
-            (nombres[clave], [(c.pk, f'{c.icon} {c.name}'.strip()) for c in categorias if c.group == clave])
+            (nombres[clave], [(c.pk, c.name) for c in categorias if c.group == clave])
             for clave, _, _ in Category.GRUPOS
             if any(c.group == clave for c in categorias)
         ]
@@ -214,6 +238,20 @@ class ProviderForm(AntispamFormMixin, forms.ModelForm):
         if not digitos:
             raise forms.ValidationError('El WhatsApp debe ser un celular chileno: +56 9 XXXX XXXX.')
         return digitos
+
+    def clean_foto(self):
+        foto = self.cleaned_data.get('foto')
+        # Solo se procesa lo recién subido. False = "quitar foto"; un archivo ya
+        # guardado = no la cambió.
+        if isinstance(foto, UploadedFile):
+            return procesar_foto(foto)
+        return foto
+
+    def save(self, commit=True):
+        provider = super().save(commit=commit)
+        if commit and self._foto_anterior and self._foto_anterior != (provider.foto.name or ''):
+            provider.foto.storage.delete(self._foto_anterior)
+        return provider
 
     def clean_profession_title(self):
         return limpiar_texto(self.cleaned_data.get('profession_title', ''))

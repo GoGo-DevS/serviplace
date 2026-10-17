@@ -12,7 +12,8 @@ def categorias_por_grupo(solo_grupos=None):
     """[{clave, nombre, descripcion, categorias:[Category con .n_activos]}], en el orden de GRUPOS."""
     categorias = list(
         Category.objects.filter(is_active=True)
-        .annotate(n_activos=Count('providers', filter=Q(providers__is_active=True)))
+        # Solo perfiles públicos (con dueño): los importados no cuentan.
+        .annotate(n_activos=Count('providers', filter=Q(providers__is_active=True, providers__owner__isnull=False)))
         .order_by('display_order', 'name')
     )
     grupos = []

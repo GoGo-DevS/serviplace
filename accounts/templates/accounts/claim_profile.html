@@ -26,7 +26,7 @@
     {% if pendiente %}
       <div class="alert alert-info mb-0">Ya enviaste una solicitud para este perfil el {{ pendiente.created_at|date:"d-m-Y" }}. Te avisamos apenas la revisemos.</div>
     {% elif user.is_authenticated %}
-      <form method="post" novalidate>
+      <form method="post" novalidate data-un-envio>
         {% csrf_token %}
         {% comment %}
         Hasta el 17-10-2026 este formulario mandaba SOLO el token: ningún

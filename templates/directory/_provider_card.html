@@ -8,7 +8,7 @@ incompleto. El nombre es el enlace a la ficha; WhatsApp es el botón.
   <article class="ficha">
     <div class="ficha-top"><b>{{ provider.category.name }}</b><span>{{ provider.commune.name }}</span></div>
     <div class="ficha-who">
-      <div class="ficha-avatar" aria-hidden="true">{{ provider.business_name|first|upper }}</div>
+      <div class="ficha-avatar{% if provider.foto %} con-foto{% endif %}" aria-hidden="true">{% if provider.foto %}<img src="{{ provider.foto.url }}" alt="" loading="lazy" width="46" height="52">{% else %}{{ provider.business_name|first|upper }}{% endif %}</div>
       <div>
         <h3><a href="{{ provider.get_absolute_url }}">{{ provider.business_name }}</a></h3>
         <p>{{ provider.sector }}</p>

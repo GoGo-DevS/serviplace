@@ -16,23 +16,17 @@ def home(request):
     registrar(request, LeadEvent.PAGE_VIEW, origen='home')
     categories = Category.objects.filter(is_active=True)
     # Destacados = lo mejor del directorio, no lo primero que aparezca: solo
-    # perfiles publicados por su dueño Y con foto. Mientras no haya ninguno,
-    # la sección no se muestra (18-10-2026: se veían 12 importados sin logo,
-    # marcados "Verificado" sin estarlo).
+    # perfiles públicos (con dueño) Y con logo o foto. Mientras no haya
+    # ninguno, la sección no se muestra (18-10-2026: se veían 12 importados
+    # sin logo, marcados "Verificado" sin estarlo).
     featured_providers = (
-        Provider.objects.filter(is_active=True, owner__isnull=False, images__isnull=False)
+        Provider.objects.publicos().exclude(foto='')
         .select_related('category', 'commune').distinct()
         .order_by('-is_featured', '-is_verified', 'business_name', 'pk')[:6]
     )
-    total_providers = Provider.objects.filter(is_active=True).count()
-    communes_count = Commune.objects.filter(is_active=True, providers__is_active=True).distinct().count()
-    # Los pines del mapa son datos reales: las comunas con más perfiles hoy.
-    # El mapa es ilustrativo y lo dice; las cifras no.
-    top_comunas = list(
-        Commune.objects.filter(is_active=True, providers__is_active=True)
-        .annotate(n=Count('providers', filter=Q(providers__is_active=True)))
-        .order_by('-n', 'name')[:4]
-    )
+    publicos = Provider.objects.publicos()
+    total_providers = publicos.count()
+    communes_count = Commune.objects.filter(is_active=True, providers__in=publicos).distinct().count()
     regions_with_communes = Region.objects.filter(is_active=True).prefetch_related(
         Prefetch('communes', queryset=Commune.objects.filter(is_active=True).order_by('name'), to_attr='active_communes')
     ).order_by('name')
@@ -43,7 +37,6 @@ def home(request):
         'featured_providers': featured_providers,
         'total_providers': total_providers,
         'communes_count': communes_count,
-        'top_comunas': top_comunas,
         'regions_with_communes': regions_with_communes,
         'ref_code': ref_code,
         'page_title': 'SERVIPLACE | Maestros y profesionales en tu comuna — Contacto directo',

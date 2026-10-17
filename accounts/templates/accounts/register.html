@@ -12,21 +12,15 @@
 <section class="container py-5">
   <div class="auth-card">
     <p class="form-microcopy">Sin moderación previa. Publicas y queda visible de inmediato.</p>
-    <form method="post" novalidate>
+    {% include "_errores_form.html" %}
+    <form method="post" novalidate data-un-envio>
       {% csrf_token %}
       {% if ref_code %}<input type="hidden" name="ref" value="{{ ref_code }}">{% endif %}
       {% include "_antispam.html" %}
       {% for field in form.visible_fields %}{% if field.name != "sitio_web_confirmacion" %}
-        <div class="mb-3">
-          <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
-          {{ field }}
-          {% if field.help_text %}<div class="form-text text-muted">{{ field.help_text }}</div>{% endif %}
-          {% if field.errors %}
-            {% for error in field.errors %}<div class="text-danger mt-1" style="font-size:.85rem;font-weight:600">{{ error }}</div>{% endfor %}
-          {% endif %}
-        </div>
+        <div class="mb-3">{% include "accounts/_campo.html" with campo=field %}</div>
       {% endif %}{% endfor %}
-      <button type="submit" class="btn btn-primary w-100 btn-lg mt-2">Crear cuenta gratis</button>
+      <button type="submit" class="btn btn-primary w-100 btn-lg mt-2" data-enviando="Creando tu cuenta…">Crear cuenta gratis</button>
     </form>
     <p class="text-center text-muted mt-3" style="font-size:.88rem">
       ¿Ya tienes cuenta? <a href="{% url 'accounts:login' %}">Iniciar sesión</a>

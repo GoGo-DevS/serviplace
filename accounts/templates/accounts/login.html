@@ -10,21 +10,15 @@
 
 <section class="container py-5">
   <div class="auth-card">
-    <form method="post" novalidate>
+    <form method="post" novalidate data-un-envio>
       {% csrf_token %}
       {% for field in form %}
-        <div class="mb-3">
-          <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
-          {{ field }}
-          {% if field.errors %}
-            {% for error in field.errors %}<div class="text-danger mt-1" style="font-size:.85rem;font-weight:600">{{ error }}</div>{% endfor %}
-          {% endif %}
-        </div>
+        <div class="mb-3">{% include "accounts/_campo.html" with campo=field %}</div>
       {% endfor %}
       {% if form.non_field_errors %}
-        <div class="alert alert-danger" role="alert">{{ form.non_field_errors }}</div>
+        <div class="form-resumen-errores" role="alert">{% for e in form.non_field_errors %}<p class="mb-0">{{ e }}</p>{% endfor %}</div>
       {% endif %}
-      <button type="submit" class="btn btn-primary w-100 btn-lg mt-2">Iniciar sesión</button>
+      <button type="submit" class="btn btn-primary w-100 btn-lg mt-2" data-enviando="Entrando…">Iniciar sesión</button>
     </form>
     <p class="text-center text-muted mt-3" style="font-size:.88rem">
       ¿Sin cuenta? <a href="{% url 'accounts:register' %}">Crear cuenta gratis →</a>

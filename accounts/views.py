@@ -13,7 +13,7 @@ from directory.models import Provider, ProviderReport
 from leads.models import LeadEvent
 from leads.registro import registrar
 
-from .forms import ProviderForm, RegisterForm
+from .forms import LoginForm, ProviderForm, RegisterForm
 from .models import LoginAttempt, UserProfile
 
 
@@ -21,6 +21,7 @@ class LoginThrottledView(LoginView):
     """Login con freno de fuerza bruta: N fallos por IP en M minutos → se bloquea la ventana."""
 
     template_name = 'accounts/login.html'
+    authentication_form = LoginForm
     redirect_authenticated_user = True
 
     def _bloqueado(self):
@@ -127,7 +128,7 @@ def dashboard(request):
 def provider_create(request):
     profile, _ = UserProfile.objects.get_or_create(user=request.user)
     if request.method == 'POST':
-        form = ProviderForm(request.POST)
+        form = ProviderForm(request.POST, request.FILES)
         ip = ip_cliente(request)
         limite, minutos = settings.LIMITE_PERFILES_POR_IP
         if excede_limite_ip(Provider, ip, limite, minutos):
@@ -172,7 +173,7 @@ def provider_create(request):
 def provider_edit(request, slug):
     provider = get_object_or_404(Provider, slug=slug, owner=request.user)
     if request.method == 'POST':
-        form = ProviderForm(request.POST, instance=provider)
+        form = ProviderForm(request.POST, request.FILES, instance=provider)
         if form.is_valid():
             form.save()
             messages.success(request, 'Perfil actualizado.')

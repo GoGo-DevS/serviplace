@@ -76,6 +76,20 @@ class Category(models.Model):
         return self.name
 
 
+class ProviderQuerySet(models.QuerySet):
+    def publicos(self):
+        """Lo que puede ver el público: activo Y publicado o reclamado por su dueño.
+
+        18-10-2026 — Decisión de Diego: los 361 perfiles importados de Google
+        Maps dejan de mostrarse. Eran datos sin validar, sin logo y sin
+        consentimiento (la Ley 21.719 rige desde el 01-12-2026). No se borran:
+        quedan como lista para invitar a sus dueños, y el enlace de "Reclamar
+        perfil" sigue funcionando; al aprobar el reclamo pasan a ser públicos.
+        Toda vista, conteo o sitemap de cara al público parte de acá.
+        """
+        return self.filter(is_active=True, owner__isnull=False)
+
+
 class Provider(models.Model):
     PUBLIC_PROSPECT = 'prospecto_publico'
     CONTACTED = 'contactado'
@@ -132,6 +146,10 @@ class Provider(models.Model):
         blank=True,
         help_text='Número del Registro Nacional de Prestadores Individuales. Público y comprobable.',
     )
+    # Logo o foto de perfil (18-10-2026). Se guarda ya procesada: WebP de
+    # menos de 100 KB, sin EXIF (una foto de celular puede traer el GPS de la
+    # casa). Ver directory/imagenes.py. En producción va a R2.
+    foto = models.ImageField('logo o foto', upload_to='perfiles/%Y/%m/', blank=True)
     attends_home = models.BooleanField('atiende a domicilio', default=False)
     attends_office = models.BooleanField('atiende en consulta o local', default=False)
     attends_online = models.BooleanField('atiende online', default=False)
@@ -158,6 +176,8 @@ class Provider(models.Model):
     created_ip = models.GenericIPAddressField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    objects = ProviderQuerySet.as_manager()
 
     class Meta:
         ordering = ['-is_featured', '-is_verified', 'business_name']

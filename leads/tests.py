@@ -29,7 +29,8 @@ class Base(TestCase):
         self.maipu = Commune.objects.create(region=region, name='Maipú', slug='maipu', is_active=True)
         call_command('seed_categorias', stdout=StringIO())
         self.gasfiter = Category.objects.get(slug='gasfiteria')
-        self.perfil = Provider.objects.create(
+        dueno = User.objects.create_user('dueno-de-prueba', password='clave-larga-de-verdad-99')
+        self.perfil = Provider.objects.create(owner=dueno, 
             business_name='Gásfiter Uno', contact_name='Juan', category=self.gasfiter, commune=self.maipu,
             sector='Centro', description='Descripción.', short_description='Corta.',
             phone='+56 9 1111 2222', whatsapp_number='56911112222', is_active=True)

@@ -23,7 +23,7 @@ class ProviderSitemap(Sitemap):
     protocol = 'https'
 
     def items(self):
-        return Provider.objects.filter(is_active=True).only('slug', 'updated_at').order_by('slug')
+        return Provider.objects.publicos().only('slug', 'updated_at').order_by('slug')
 
     def lastmod(self, obj):
         return obj.updated_at
@@ -41,8 +41,7 @@ class CategoryCommuneSitemap(Sitemap):
 
     def items(self):
         return (
-            Provider.objects
-            .filter(is_active=True)
+            Provider.objects.publicos()
             .values('category__slug', 'commune__slug')
             .annotate(n=Count('id'))
             .filter(n__gt=0)
@@ -62,7 +61,7 @@ class CommunitySitemap(Sitemap):
     def items(self):
         return (
             Commune.objects
-            .filter(is_active=True, providers__is_active=True)
+            .filter(is_active=True, providers__in=Provider.objects.publicos())
             .distinct()
             .order_by('slug')
         )

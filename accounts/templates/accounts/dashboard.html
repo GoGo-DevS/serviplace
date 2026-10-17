@@ -103,9 +103,7 @@
         <h4>Tu enlace de referido</h4>
         <p style="font-size:.85rem;color:var(--sp-muted);margin-bottom:.65rem">Comparte este enlace y gana visibilidad cuando alguien se registre con tu código.</p>
         <code class="referral-url">{{ request.scheme }}://{{ request.get_host }}{% url 'accounts:register' %}?ref={{ profile.referral_code }}</code>
-        <button class="btn btn-sm btn-outline-primary" onclick="navigator.clipboard.writeText('{{ request.scheme }}://{{ request.get_host }}{% url 'accounts:register' %}?ref={{ profile.referral_code }}').then(()=>alert('¡Enlace copiado!'))">
-          Copiar enlace
-        </button>
+        <button class="btn btn-sm btn-outline-primary" type="button" data-copiar="{{ request.scheme }}://{{ request.get_host }}{% url 'accounts:register' %}?ref={{ profile.referral_code }}">Copiar enlace</button>
       </div>
 
       <!-- Hazte verificado -->
@@ -113,6 +111,14 @@
         <h4 class="h6 mb-2">Hazte verificado</h4>
         <p style="font-size:.85rem;color:var(--sp-muted);margin-bottom:.75rem">Destaca sobre la competencia con el badge de negocio verificado. Más vistas, más confianza.</p>
         <a class="btn btn-sm btn-primary w-100" href="{% url 'accounts:hazte_verificado' %}">Saber más →</a>
+      </div>
+
+      <!-- GoGoDevS -->
+      <div class="gogodevs-box mt-3">
+        <span class="gogodevs-tag">GoGoDevS</span>
+        <h4 class="h6 mb-2">¿Quieres tu propia página web?</h4>
+        <p>Con tu dominio, tu catálogo o tu agenda. La hace GoGoDevS, el equipo detrás de ServiPlace.</p>
+        <a href="https://gogodevs.cl/?utm_source=serviplace&amp;utm_medium=referral&amp;utm_campaign=panel" target="_blank" rel="noopener">Conocer GoGoDevS →</a>
       </div>
     </div>
   </div>

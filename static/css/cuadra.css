@@ -126,7 +126,7 @@ a:hover { color: var(--sp-blue-dark); }
 .ficha-cred dd { margin: 0; font-weight: 700; color: var(--sp-ink); min-width: 0; }
 .ficha-tags { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: .7rem; }
 .ficha-acciones { display: flex; align-items: center; justify-content: space-between; gap: .75rem; margin-top: auto; padding-top: .95rem; }
-.ficha-acciones .btn { min-height: 42px; display: inline-flex; align-items: center; gap: .4rem; padding-inline: 1rem; }
+.ficha-acciones .btn { min-height: 44px; display: inline-flex; align-items: center; gap: .4rem; padding-inline: 1rem; }
 .ficha-acciones .ficha-ver { font-size: .92rem; }
 .ficha-estado { margin-top: .6rem; font-size: .78rem; color: var(--sp-muted); }
 .ficha-estado.is-ok { color: var(--sp-green-dark); font-weight: 700; }
@@ -239,3 +239,106 @@ a:hover { color: var(--sp-blue-dark); }
   .ficha, .pin, .category-tile, .btn { transition: none; }
   .ficha:hover, .pin:hover, .category-tile:hover { transform: none; }
 }
+
+/* ---- Logo o foto del perfil ---- */
+.ficha-avatar.con-foto, .provider-detail-avatar.con-foto { padding: 0; overflow: hidden; background: var(--sp-line-soft); }
+.ficha-avatar.con-foto img, .provider-detail-avatar.con-foto img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.foto-campo { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: 1rem; align-items: start; }
+.foto-preview { width: 72px; height: 80px; font-size: 1.6rem; }
+.foto-preview img { width: 100%; height: 100%; object-fit: cover; border-radius: 12px; }
+.foto-campo-input input[type="file"] { display: block; margin-top: .25rem; }
+
+/* ---- Portada "dos puertas": busco / ofrezco ---- */
+.puertas-intro { padding-top: 40px; max-width: 760px; }
+.puertas-intro h1 { font-size: clamp(2.3rem, 5.4vw, 4rem); line-height: .98; letter-spacing: -.045em; margin: .45rem 0 0; }
+.puertas-atajos { display: none; }
+.puertas { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; padding-block: 26px 52px; align-items: stretch; }
+.puerta { border-radius: 24px; padding: clamp(1.3rem, 3vw, 2rem); display: flex; flex-direction: column; gap: .9rem; min-width: 0; }
+.puerta h2 { margin: 0; font-size: clamp(1.45rem, 2.6vw, 2rem); line-height: 1.05; letter-spacing: -.035em; }
+.puerta-tag { align-self: flex-start; font-family: var(--font-mono); font-size: .74rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; padding: .3rem .6rem; border-radius: 8px; }
+.puerta-busco { background: #fff; box-shadow: var(--sp-sh-lg); }
+.puerta-busco .puerta-tag { background: var(--sp-blue-light); color: var(--sp-blue-dark); }
+.puerta-busco .buscador-nota { margin-top: auto; }
+.puerta-ofrezco {
+  color: #fff; box-shadow: var(--sp-sh-lg);
+  background:
+    repeating-linear-gradient(90deg, transparent 0 74px, rgba(255, 255, 255, .05) 74px 81px),
+    repeating-linear-gradient(0deg, transparent 0 56px, rgba(255, 255, 255, .05) 56px 62px),
+    var(--sp-ink);
+}
+.puerta-ofrezco h2 { color: #fff; }
+.puerta-ofrezco .puerta-tag { background: rgba(255, 255, 255, .12); color: #f6c3af; }
+.puerta-lista { list-style: none; margin: 0; padding: 0; display: grid; gap: .55rem; }
+.puerta-lista li { position: relative; padding-left: 1.6rem; color: rgba(255, 255, 255, .9); line-height: 1.45; }
+.puerta-lista li::before { content: ""; position: absolute; left: .1rem; top: .45em; width: .7rem; height: .7rem; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); background: var(--sp-accent-deco); }
+.puerta-acciones { margin-top: auto; display: flex; flex-wrap: wrap; align-items: center; gap: .6rem 1.2rem; }
+.puerta-link { color: #fff; border-bottom: 2px solid var(--sp-accent-deco); padding-bottom: 2px; }
+.puerta-link:hover { color: #ffd9cb; }
+.section-heading > div p { margin-top: .35rem; max-width: 60ch; }
+
+@media (max-width: 767px) {
+  .puertas { grid-template-columns: 1fr; padding-block: 18px 32px; }
+  .puertas-intro { padding-top: 24px; }
+  .puertas-atajos { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; margin-top: 1rem; }
+  .puertas-atajos a { display: flex; align-items: center; justify-content: center; text-align: center; min-height: 52px; padding: .5rem .75rem; border-radius: 14px; font-weight: 700; line-height: 1.2; }
+  .puertas-atajos a:first-child { background: var(--sp-accent); color: #fff; }
+  .puertas-atajos a:last-child { background: var(--sp-ink); color: #fff; }
+  .puerta { scroll-margin-top: 84px; }
+}
+
+/* ==========================================================================
+   QA de formularios y layout (18-10-2026). Defectos vistos en vivo: el login
+   con campos del navegador y la etiqueta al lado, texto de botón pegado
+   arriba, franja gris bajo el pie, manchón azul en el encabezado.
+   ========================================================================== */
+
+/* El pie siempre abajo, aunque la página sea corta */
+body { display: flex; flex-direction: column; min-height: 100vh; }
+main { flex: 1 0 auto; }
+.site-footer { flex-shrink: 0; }
+
+/* Restos del diseño anterior */
+.page-header::before { display: none; }
+
+/* Botones: el texto siempre centrado, también en los de altura mínima */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: .45rem; text-align: center; line-height: 1.2; }
+.btn.is-enviando { opacity: .7; pointer-events: none; }
+
+/* Etiqueta SIEMPRE arriba del campo */
+.form-label { display: block; margin-bottom: .4rem; }
+
+/* Red de seguridad: un campo que llegue sin clase (formularios de Django tal
+   cual) igual se ve como los demás. :where() deja ganar a .form-control. */
+:where(form) :where(input[type="text"], input[type="email"], input[type="password"], input[type="number"],
+  input[type="tel"], input[type="url"], input[type="search"], select, textarea):not(.hp-field) {
+  display: block; width: 100%; min-height: 48px; padding: .6rem .85rem; font: inherit; color: var(--sp-ink);
+  background: #fff; border: 2px solid var(--sp-line); border-radius: 12px;
+}
+:where(form) textarea { min-height: 120px; }
+input[type="file"].form-control { padding: .55rem .7rem; min-height: 48px; }
+input[type="file"].form-control::file-selector-button { border: 0; border-radius: 8px; background: var(--sp-ink); color: #fff; padding: .4rem .8rem; margin-right: .75rem; font-weight: 700; cursor: pointer; }
+
+/* Errores: junto al campo, legibles, y el campo marcado */
+.campo-error { margin-top: .35rem; color: #a3260f; font-size: .88rem; font-weight: 700; }
+.campo-error p { margin: 0; }
+.form-control[aria-invalid="true"], .form-select[aria-invalid="true"] { border-color: #c2412b; background: #fff8f6; }
+.form-resumen-errores { margin-bottom: 1.25rem; padding: .9rem 1.1rem; border-radius: 12px; border-left: 5px solid #c2412b; background: #fff3ef; color: var(--sp-ink); }
+.form-resumen-errores:focus { outline: 3px solid rgba(191, 70, 30, .45); outline-offset: 2px; }
+.form-resumen-errores ul { margin: .4rem 0 0; padding-left: 1.1rem; }
+.form-resumen-errores a { color: #8f2a10; }
+
+/* Tarjetas de formulario: mismo lenguaje que las fichas */
+.auth-card, .application-card, .claim-card { border: 0; border-radius: 20px; box-shadow: var(--sp-sh-md); background: #fff; }
+.auth-card { padding: clamp(1.25rem, 3vw, 2rem); }
+.form-text { color: var(--sp-muted); font-size: .86rem; }
+.form-microcopy { background: var(--sp-bg); border-left: 4px solid var(--sp-ink); border-radius: 0 10px 10px 0; color: var(--sp-slate); }
+
+/* Firma GoGoDevS */
+.firma-gogodevs { font-weight: 800; color: var(--sp-ink); border-bottom: 2px solid var(--sp-accent-deco); }
+.firma-gogodevs:hover { color: var(--sp-accent); }
+.gogodevs-box { border-radius: 16px; padding: 1rem 1.1rem; background: #0d1017; color: #fff; }
+.gogodevs-box h4 { color: #fff; }
+.gogodevs-box p { font-size: .86rem; color: rgba(255, 255, 255, .78); margin-bottom: .6rem; }
+.gogodevs-box a { color: #e3c77d; }
+.gogodevs-tag { display: inline-block; font-family: var(--font-mono); font-size: .68rem; letter-spacing: .08em; text-transform: uppercase; color: #c9a84c; margin-bottom: .35rem; }
+.footer-bottom { flex-wrap: wrap; gap: .5rem 1rem; }

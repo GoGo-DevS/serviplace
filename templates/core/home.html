@@ -2,59 +2,61 @@
 
 {% block content %}
 {% comment %}
-Portada "Cuadra" (18-10-2026). Dos recorridos, con distinto peso:
-  1. Buscar (principal): qué necesitas + en qué comuna.
-  2. Publicar (permanente, sin competir): la franja oscura bajo el buscador
-     y el botón fijo del menú.
-El mapa es ilustrativo y lo dice; los pines son las comunas con más perfiles,
-con su cifra real.
+Portada "dos puertas" (18-10-2026, pedido de Diego): lo primero que se ve
+separa al que busca del que ofrece. Cada puerta tiene su propia acción:
+buscar (qué + comuna) o publicar. En el teléfono, dos botones arriba de todo
+llevan a cada puerta antes de cualquier scroll.
 {% endcomment %}
 <section class="cuadra-hero">
   <div class="cuadra-mapa" aria-hidden="true"></div>
   <div class="cuadra-avenida" aria-hidden="true"></div>
   <div class="container">
-    <div class="cuadra-grid">
-      <div>
-        <div class="buscador-card">
-          <span class="eyebrow">Maestros y profesionales en tu comuna</span>
-          <h1>Encuentra a quien necesitas, <u>en tu comuna</u></h1>
-          <p class="lede">Gásfiter, electricista, kinesióloga, psicólogo, profe particular y más. Le escribes directo por WhatsApp, sin intermediarios.</p>
-          <form class="buscador-campos" action="{% url 'directory:provider_list' %}" method="get" role="search">
-            <div>
-              <label for="q">¿Qué necesitas?</label>
-              <input class="form-control form-control-lg" id="q" name="q" type="search" placeholder="Ej: gásfiter, kinesiólogo, clases de inglés">
-            </div>
-            <div>
-              <label for="comuna">¿En qué comuna?</label>
-              <select class="form-select form-select-lg" id="comuna" name="comuna">
-                <option value="">Todas las comunas</option>
-                {% for region in regions_with_communes %}
-                  <optgroup label="{{ region.name }}">
-                    {% for commune in region.active_communes %}<option value="{{ commune.slug }}">{{ commune.name }}</option>{% endfor %}
-                  </optgroup>
-                {% endfor %}
-              </select>
-            </div>
-            <button class="btn btn-primary btn-lg" type="submit">Buscar</button>
-          </form>
-          <p class="buscador-nota">{{ total_providers }} perfiles en {{ communes_count }} comunas · {{ categories|length }} especialidades · sin comisión</p>
-        </div>
-
-        <div class="publica-card">
+    <div class="puertas-intro">
+      <span class="eyebrow">Maestros y profesionales independientes en tu comuna</span>
+      <h1>¿Buscas o ofreces un servicio?</h1>
+      <nav class="puertas-atajos" aria-label="Elige qué vienes a hacer">
+        <a href="#busco">Busco un servicio</a>
+        <a href="#ofrezco">Ofrezco un servicio</a>
+      </nav>
+    </div>
+    <div class="puertas">
+      <article class="puerta puerta-busco" id="busco">
+        <span class="puerta-tag">Busco un servicio</span>
+        <h2>Encuentra a quien necesitas en tu comuna</h2>
+        <form class="buscador-campos" action="{% url 'directory:provider_list' %}" method="get" role="search">
           <div>
-            <strong>¿Ofreces un servicio?</strong>
-            <span>Crea tu perfil gratis y compártelo con tus clientes.</span>
+            <label for="q">¿Qué necesitas?</label>
+            <input class="form-control form-control-lg" id="q" name="q" type="search" placeholder="Ej: gásfiter, kinesiólogo, clases de inglés">
           </div>
-          <a href="{% url 'core:para_profesionales' %}">Quiero publicar mis servicios →</a>
-        </div>
-      </div>
+          <div>
+            <label for="comuna">¿En qué comuna?</label>
+            <select class="form-select form-select-lg" id="comuna" name="comuna">
+              <option value="">Todas las comunas</option>
+              {% for region in regions_with_communes %}
+                <optgroup label="{{ region.name }}">
+                  {% for commune in region.active_communes %}<option value="{{ commune.slug }}">{{ commune.name }}</option>{% endfor %}
+                </optgroup>
+              {% endfor %}
+            </select>
+          </div>
+          <button class="btn btn-primary btn-lg" type="submit">Buscar</button>
+        </form>
+        <p class="buscador-nota">{% if total_providers %}{{ total_providers }} perfil{{ total_providers|pluralize:"es" }} publicado{{ total_providers|pluralize }} por sus dueños · contacto directo por WhatsApp · sin comisión{% else %}El directorio recién parte: los primeros profesionales se están sumando. Contacto directo por WhatsApp, sin comisión.{% endif %}</p>
+      </article>
 
-      <div class="pines" aria-label="Comunas con más perfiles">
-        {% for comuna in top_comunas %}
-          <a class="pin" href="{% url 'directory:provider_list' %}?comuna={{ comuna.slug }}"><i>{{ comuna.n }}</i>{{ comuna.name }} <small>perfiles</small></a>
-        {% endfor %}
-        <p class="mapa-nota">Mapa ilustrativo. Las cifras de cada comuna son reales.</p>
-      </div>
+      <article class="puerta puerta-ofrezco" id="ofrezco">
+        <span class="puerta-tag">Ofrezco un servicio</span>
+        <h2>Publica tu perfil gratis y consigue clientes</h2>
+        <ul class="puerta-lista">
+          <li>Tu página profesional con link propio, para compartir donde quieras</li>
+          <li>Tu logo, tu formación y cómo atiendes, a la vista</li>
+          <li>Te escriben directo a tu WhatsApp. Sin comisión</li>
+        </ul>
+        <div class="puerta-acciones">
+          <a class="btn btn-light btn-lg" href="{% url 'accounts:register' %}?desde=portada">Publicar mis servicios</a>
+          <a class="puerta-link" href="{% url 'core:para_profesionales' %}">Cómo funciona →</a>
+        </div>
+      </article>
     </div>
   </div>
 </section>
@@ -62,8 +64,11 @@ con su cifra real.
 <!-- CATEGORÍAS POR GRUPO -->
 <section class="container py-5">
   <div class="section-heading">
-    <h2>¿Qué estás buscando?</h2>
-    <a href="{% url 'directory:provider_list' %}">Ver todos →</a>
+    <div>
+      <h2>{% if total_providers %}¿Qué estás buscando?{% else %}Especialidades{% endif %}</h2>
+      {% if not total_providers %}<p class="text-muted mb-0">Todavía sin perfiles publicados. Si te dedicas a una de estas, publica primero y aparece arriba.</p>{% endif %}
+    </div>
+    {% if total_providers %}<a href="{% url 'directory:provider_list' %}">Ver todos →</a>{% endif %}
   </div>
 
   {% for grupo in grupos %}
@@ -137,23 +142,4 @@ con su cifra real.
 </section>
 {% endif %}
 
-<!-- PARA PROFESIONALES -->
-<section class="container py-5">
-  <div class="pro-band">
-    <div class="pro-band-copy">
-      <span class="pro-band-eyebrow">Para profesionales independientes</span>
-      <h2>¿Te titulaste hace poco? No necesitas otro portal de empleos: necesitas clientes.</h2>
-      <p>Crea tu perfil gratis, muestra tu título, tu institución y tu registro, y compártelo con un link propio. Las consultas te llegan directo a tu WhatsApp.</p>
-      <ul class="pro-band-list">
-        <li>Un link profesional para tu Instagram y tu WhatsApp</li>
-        <li>Tu formación a la vista, aunque todavía no tengas reseñas</li>
-        <li>El precio y la agenda los pones tú: sin comisión</li>
-      </ul>
-    </div>
-    <div class="pro-band-actions">
-      <a class="btn btn-light btn-lg" href="{% url 'core:para_profesionales' %}">Ver cómo funciona →</a>
-      <a class="pro-band-link" href="{% url 'accounts:register' %}?desde=portada">Crear mi perfil ahora</a>
-    </div>
-  </div>
-</section>
 {% endblock %}

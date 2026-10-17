@@ -43,12 +43,13 @@ class Base(TestCase):
         self.kine = Category.objects.get(slug='kinesiologia')
         self.clases = Category.objects.get(slug='clases-particulares')
         self.gasfiter = Category.objects.get(slug='gasfiteria')
+        self.dueno = User.objects.create_user('dueno-de-prueba', password='clave-larga-de-verdad-99')
 
     def _perfil(self, categoria, nombre='Perfil', **extra):
         datos = dict(
             business_name=nombre, contact_name='Camila', category=categoria, commune=self.comuna,
             sector='Centro', description='Descripción.', short_description='Corta.',
-            phone='+56 9 1111 2222', whatsapp_number='56911112222', is_active=True,
+            phone='+56 9 1111 2222', whatsapp_number='56911112222', is_active=True, owner=self.dueno,
         )
         datos.update(extra)
         return Provider.objects.create(**datos)
@@ -120,25 +121,28 @@ class PortadaYLanding(Base):
     def test_la_portada_no_hace_una_consulta_por_categoria(self):
         """G-04: 27 categorías no pueden ser 27 consultas."""
         self.client.get(reverse('core:home'))
-        with self.assertNumQueries(8) as con_27:
+        with self.assertNumQueries(6) as con_27:
             self.client.get(reverse('core:home'))
         for i in range(10):
             Category.objects.create(name=f'Extra {i}', slug=f'extra-{i}', group=Category.PROFESIONAL)
         with self.assertNumQueries(len(con_27.captured_queries)):
             self.client.get(reverse('core:home'))
 
-    def test_los_pines_del_mapa_son_comunas_reales_con_su_cifra(self):
-        """El mapa es ilustrativo; las cifras no pueden serlo."""
-        for i in range(3):
-            self._perfil(self.gasfiter, f'Gásfiter {i}')
+    def test_sin_perfiles_publicos_la_portada_dice_que_recien_parte(self):
+        """Con los importados ocultos, la portada no puede contar 361 perfiles."""
+        self._perfil(self.gasfiter, 'Importado', owner=None)
         html = self.client.get(reverse('core:home')).content.decode()
-        self.assertIn('?comuna=concepcion"><i>3</i>Concepción', html)
-        self.assertIn('Mapa ilustrativo', html)
+        self.assertIn('El directorio recién parte', html)
+        self.assertNotIn('Importado', html)
 
-    def test_publicar_esta_a_la_vista_sin_competir_con_buscar(self):
+    def test_la_portada_separa_al_que_busca_del_que_ofrece(self):
+        """Pedido de Diego: lo primero que se ve son dos puertas."""
         html = self.client.get(reverse('core:home')).content.decode()
-        self.assertIn('Quiero publicar mis servicios', html)
-        self.assertIn('name="comuna"', html, 'el buscador de la portada pide la comuna')
+        self.assertIn('id="busco"', html)
+        self.assertIn('id="ofrezco"', html)
+        self.assertLess(html.index('id="busco"'), html.index('Especialidades'))
+        self.assertIn('name="comuna"', html, 'la puerta de buscar pide la comuna')
+        self.assertIn(reverse('accounts:register') + '?desde=portada', html)
 
     def test_la_landing_de_profesionales_responde_y_lleva_al_registro(self):
         r = self.client.get(reverse('core:para_profesionales'))
@@ -344,7 +348,7 @@ class ReclamarPerfil(Base):
 
     def setUp(self):
         super().setUp()
-        self.perfil = self._perfil(self.gasfiter, 'Gásfiter de Google Maps', source_name='Google Maps')
+        self.perfil = self._perfil(self.gasfiter, 'Gásfiter de Google Maps', source_name='Google Maps', owner=None)
         self.user = User.objects.create_user('dueno', email='d@example.cl', password='clave-larga-de-verdad-99')
         self.client.force_login(self.user)
         self.url = reverse('accounts:claim_profile', args=[self.perfil.slug])
@@ -430,7 +434,7 @@ class AprobarReclamoEnElAdmin(Base):
         from django.contrib.admin.sites import site
         from django.test import RequestFactory
         from django.contrib.messages.storage.fallback import FallbackStorage
-        perfil = self._perfil(self.gasfiter, 'Gásfiter de Maps', source_name='Google Maps')
+        perfil = self._perfil(self.gasfiter, 'Gásfiter de Maps', source_name='Google Maps', owner=None)
         dueno = User.objects.create_user('dueno', password='clave-larga-de-verdad-99')
         reporte = ProviderReport.objects.create(provider=perfil, claimant=dueno, kind=ProviderReport.CLAIM,
                                                 reporter_name='Dueño', reporter_contact='+56 9 1111 2222',
@@ -473,14 +477,22 @@ class LoImportadoNoSePresentaComoValidado(Base):
     """12 perfiles importados de Maipú traían is_verified=True de un seed
     viejo y salían en la portada como "Verificado / Datos revisados"."""
 
-    def test_un_importado_con_is_verified_no_dice_verificado(self):
+    def test_un_importado_no_se_ve_en_ninguna_parte_publica(self):
+        """Decisión del 18-10-2026: los importados de Google Maps se ocultan."""
         p = self._perfil(self.gasfiter, 'Cerrajero de Maps', is_verified=True, owner=None)
-        tarjeta = self.client.get(reverse('directory:provider_list')).content.decode()
-        ficha = self.client.get(p.get_absolute_url()).content.decode()
-        for html in (tarjeta, ficha):
-            self.assertNotIn('>Verificado<', html)
-            self.assertNotIn('Datos revisados', html)
-        self.assertIn('fuentes públicas, sin revisar', tarjeta)
+        self.assertNotIn('Cerrajero de Maps', self.client.get(reverse('directory:provider_list')).content.decode())
+        self.assertEqual(self.client.get(p.get_absolute_url()).status_code, 404)
+        self.assertEqual(self.client.get(reverse('directory:whatsapp_redirect', args=[p.slug])).status_code, 404)
+        self.assertNotIn(p.slug, self.client.get('/sitemap.xml').content.decode())
+
+    def test_pero_su_dueno_puede_reclamarlo_por_el_enlace(self):
+        """No se borra: se invita al dueño con el enlace de reclamo."""
+        p = self._perfil(self.gasfiter, 'Cerrajero de Maps', owner=None)
+        quien = User.objects.create_user('quien', password='clave-larga-de-verdad-99')
+        self.client.force_login(quien)
+        r = self.client.get(reverse('accounts:claim_profile', args=[p.slug]))
+        self.assertEqual(r.status_code, 200)
+        self.assertIn('Cerrajero de Maps', r.content.decode())
 
     def test_verificado_si_tiene_duena_y_lo_verificamos(self):
         duena = User.objects.create_user('duena', password='clave-larga-de-verdad-99')
@@ -494,10 +506,9 @@ class LoImportadoNoSePresentaComoValidado(Base):
         self.assertNotIn('Perfiles destacados', html)
         self.assertNotIn('Cerrajero de Maps', html)
 
-    def test_lo_publicado_por_su_dueno_va_primero(self):
-        duena = User.objects.create_user('duena', password='clave-larga-de-verdad-99')
-        self._perfil(self.gasfiter, 'AAA Importado', owner=None)
-        self._perfil(self.gasfiter, 'ZZZ Con dueña', owner=duena)
-        html = self.client.get(reverse('directory:provider_list')).content.decode()
-        self.assertLess(html.index('ZZZ Con dueña'), html.index('AAA Importado'))
+    def test_los_conteos_publicos_no_suman_importados(self):
+        self._perfil(self.gasfiter, 'Importado', owner=None)
+        self._perfil(self.gasfiter, 'Con dueño')
+        html = self.client.get(reverse('core:home')).content.decode()
+        self.assertIn('1 perfil publicado por sus dueños', html)
 

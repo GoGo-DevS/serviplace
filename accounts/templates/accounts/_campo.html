@@ -1,9 +1,9 @@
 {% comment %}
-Un campo con su etiqueta, su ayuda y SUS errores. Antes solo el nombre
-mostraba errores: si el WhatsApp venía mal escrito, el formulario volvía sin
-decir por qué y la persona se iba.
+Un campo con su etiqueta arriba, su ayuda y SUS errores debajo. Django marca
+el campo con aria-describedby="<id>_helptext <id>_error": esos ids tienen que
+existir o el lector de pantalla no asocia el error con el campo.
 {% endcomment %}
 <label class="form-label" for="{{ campo.id_for_label }}">{{ campo.label }}</label>
 {{ campo }}
-{% if campo.help_text %}<div class="form-text">{{ campo.help_text }}</div>{% endif %}
-{% for error in campo.errors %}<div class="text-danger mt-1" style="font-size:.85rem;font-weight:600">{{ error }}</div>{% endfor %}
+{% if campo.help_text %}<div class="form-text" id="{{ campo.auto_id }}_helptext">{{ campo.help_text }}</div>{% endif %}
+{% if campo.errors %}<div class="campo-error" id="{{ campo.auto_id }}_error">{% for error in campo.errors %}<p>{{ error }}</p>{% endfor %}</div>{% endif %}

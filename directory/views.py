@@ -25,7 +25,7 @@ def provider_list(request):
     if group_slug not in grupos_validos:
         group_slug = ''
 
-    providers = Provider.objects.filter(is_active=True).select_related('category', 'commune')
+    providers = Provider.objects.publicos().select_related('category', 'commune')
 
     if query:
         providers = providers.filter(
@@ -123,9 +123,8 @@ def provider_list(request):
 
 def provider_detail(request, slug):
     provider = get_object_or_404(
-        Provider.objects.select_related('category', 'commune').prefetch_related('images'),
+        Provider.objects.publicos().select_related('category', 'commune').prefetch_related('images'),
         slug=slug,
-        is_active=True,
     )
     # Un bot (Google, la vista previa de WhatsApp) no es una visita: no suma
     # al contador que ve el profesional en su panel ni al embudo.
@@ -136,19 +135,26 @@ def provider_detail(request, slug):
                   group=provider.category.group)
         provider.views_count += 1
 
+    # Al compartir la ficha por WhatsApp, la vista previa muestra su logo o
+    # foto. En R2 la URL ya es absoluta; en disco local hay que completarla.
+    og_image = provider.foto.url if provider.foto else ''
+    if og_image.startswith('/'):
+        og_image = request.build_absolute_uri(og_image)
+
     context = {
         'provider': provider,
         'cover_image': provider.images.filter(is_cover=True).first(),
         'page_title': f'{provider.business_name} | {provider.category.name} en {provider.commune.name}',
         'meta_description': provider.short_description,
         'og_title': f'{provider.business_name} en SERVIPLACE',
+        'og_image': og_image,
         'og_description': provider.short_description,
     }
     return render(request, 'directory/provider_detail.html', context)
 
 
 def whatsapp_redirect(request, slug):
-    provider = get_object_or_404(Provider.objects.select_related('commune', 'category'), slug=slug, is_active=True)
+    provider = get_object_or_404(Provider.objects.publicos().select_related('commune', 'category'), slug=slug)
     if not es_bot(request):
         Provider.objects.filter(pk=provider.pk).update(whatsapp_clicks_count=F('whatsapp_clicks_count') + 1)
         registrar(request, LeadEvent.WHATSAPP_CLICK, origen=request.GET.get('desde', 'provider_detail')[:40],

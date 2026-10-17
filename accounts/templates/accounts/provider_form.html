@@ -17,11 +17,9 @@
         <p class="form-microcopy">Tu perfil es tu responsabilidad. SERVIPLACE es una vitrina: asegúrate de que tus datos de contacto sean correctos y tu descripción, veraz. <a href="{% url 'core:terms' %}">Ver términos →</a></p>
         {% endif %}
 
-        {% if form.non_field_errors %}
-        <div class="alert alert-danger" role="alert">{% for error in form.non_field_errors %}{{ error }}{% if not forloop.last %}<br>{% endif %}{% endfor %}</div>
-        {% endif %}
+        {% include "_errores_form.html" %}
 
-        <form method="post" novalidate>
+        <form method="post" enctype="multipart/form-data" novalidate data-un-envio>
           {% csrf_token %}
           {% include "_antispam.html" %}
 
@@ -32,6 +30,14 @@
             <div class="col-md-6">{% include "accounts/_campo.html" with campo=form.category %}</div>
             <div class="col-md-6">{% include "accounts/_campo.html" with campo=form.commune %}</div>
             <div class="col-12">{% include "accounts/_campo.html" with campo=form.sector %}</div>
+          </div>
+
+          <h3 class="form-section-title">Tu logo o foto</h3>
+          <div class="foto-campo mb-4">
+            <div class="ficha-avatar foto-preview" aria-hidden="true">{% if provider.foto %}<img src="{{ provider.foto.url }}" alt="">{% else %}{{ form.business_name.value|default:"?"|first|upper }}{% endif %}</div>
+            <div class="foto-campo-input">{% include "accounts/_campo.html" with campo=form.foto %}
+              <div class="form-text">Los perfiles con logo o foto generan más confianza, y solo esos pueden aparecer como destacados.</div>
+            </div>
           </div>
 
           <h3 class="form-section-title">Cómo atiendes</h3>
@@ -66,7 +72,7 @@
           </div>
 
           <div class="d-flex gap-2 flex-wrap">
-            <button type="submit" class="btn btn-primary btn-lg">
+            <button type="submit" class="btn btn-primary btn-lg" data-enviando="{% if is_create %}Publicando…{% else %}Guardando…{% endif %}">
               {% if is_create %}Publicar perfil ahora{% else %}Guardar cambios{% endif %}
             </button>
             <a class="btn btn-outline-primary btn-lg" href="{% url 'accounts:dashboard' %}">Cancelar</a>

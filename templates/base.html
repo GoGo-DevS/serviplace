@@ -109,13 +109,47 @@
         </nav>
       </div>
       <div class="footer-bottom">
-        <span>© 2026 SERVIPLACE. Hecho en Chile.</span>
+        <span>© 2026 ServiPlace · Hecho en Chile por <a class="firma-gogodevs" href="https://gogodevs.cl/?utm_source=serviplace&amp;utm_medium=referral&amp;utm_campaign=footer" target="_blank" rel="noopener">GoGoDevS</a>, desarrollo web, apps y sistemas.</span>
         <a href="{% url 'core:terms' %}">Términos de uso</a>
       </div>
     </div>
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Un envío por formulario: un doble clic en "Publicar" creaba dos perfiles.
+    document.addEventListener('submit', function (e) {
+      var f = e.target;
+      if (!f.matches('form[data-un-envio]')) return;
+      if (f.dataset.enviado) { e.preventDefault(); return; }
+      f.dataset.enviado = '1';
+      f.querySelectorAll('button[type="submit"]').forEach(function (b) {
+        b.classList.add('is-enviando');
+        b.setAttribute('aria-disabled', 'true');
+        if (b.dataset.enviando) { b.dataset.texto = b.textContent; b.textContent = b.dataset.enviando; }
+      });
+    });
+    // Al volver con "atrás", el formulario vuelve a estar disponible.
+    window.addEventListener('pageshow', function () {
+      document.querySelectorAll('form[data-enviado]').forEach(function (f) {
+        delete f.dataset.enviado;
+        f.querySelectorAll('button.is-enviando').forEach(function (b) {
+          b.classList.remove('is-enviando'); b.removeAttribute('aria-disabled');
+          if (b.dataset.texto) b.textContent = b.dataset.texto;
+        });
+      });
+    });
+    // Copiar sin alert(): el botón confirma con su propio texto.
+    document.querySelectorAll('[data-copiar]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var texto = b.getAttribute('data-copiar') || window.location.href;
+        var original = b.textContent;
+        var aviso = function (t) { b.textContent = t; setTimeout(function () { b.textContent = original; }, 2400); };
+        if (!navigator.clipboard) { aviso('Cópialo desde la barra'); return; }
+        navigator.clipboard.writeText(texto).then(function () { aviso('Copiado'); }, function () { aviso('Cópialo desde la barra'); });
+      });
+    });
+  </script>
   {% block extra_js %}{% endblock %}
 </body>
 </html>

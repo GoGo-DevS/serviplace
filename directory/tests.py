@@ -21,11 +21,14 @@ class Base(TestCase):
                                              slug='maipu', is_active=True)
         self.categoria = Category.objects.create(name='Gasfitería', slug='gasfiteria',
                                                  is_active=True)
+        # Desde el 18-10-2026 solo lo que tiene dueño es público: por defecto
+        # cada prestador de prueba lo tiene; los importados se crean con owner=None.
+        self.dueno = User.objects.create_user('dueno-de-prueba', password='clave-larga-de-verdad-99')
 
     def _prestador(self, nombre='Gasfitería Uno', **extra):
         datos = dict(
             business_name=nombre, category=self.categoria, commune=self.comuna,
-            whatsapp_number='56911112222', is_active=True,
+            whatsapp_number='56911112222', is_active=True, owner=self.dueno,
             source_name='Google Maps', source_url='https://maps.google.com/x',
         )
         datos.update(extra)
