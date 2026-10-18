@@ -67,6 +67,44 @@ class CargarClientes(TestCase):
         self.assertEqual(Provider.objects.filter(whatsapp_number='56961192192').count(), 1)
         self.assertEqual(Provider.objects.get(whatsapp_number='56961192192').owner, dueña)
 
+    def test_las_fotos_se_cargan_con_portada_y_texto_alternativo(self):
+        self.cargar()
+        for c in CLIENTES:
+            perfil = Provider.objects.get(source_name=FUENTE, source_url=c['web'])
+            imagenes = list(perfil.images.order_by('display_order'))
+            self.assertEqual(len(imagenes), len(c.get('fotos', [])), c['slug'])
+            if imagenes:
+                self.assertTrue(imagenes[0].is_cover, f"{c['slug']}: la primera es la portada")
+                self.assertEqual(sum(i.is_cover for i in imagenes), 1, c['slug'])
+                self.assertTrue(all(i.alt_text for i in imagenes), f"{c['slug']}: foto sin texto alternativo")
+
+    def test_las_fotos_no_se_duplican_ni_pisan_las_del_dueno(self):
+        self.cargar()
+        antes = {p.pk: p.images.count() for p in Provider.objects.filter(source_name=FUENTE)}
+        self.cargar()
+        self.assertEqual(antes, {p.pk: p.images.count() for p in Provider.objects.filter(source_name=FUENTE)})
+        # Si el dueño borra las fotos de la carga y sube las suyas, la carga no vuelve a meter las del sitio
+        from directory.models import ProviderImage
+        from django.core.files.base import ContentFile
+        medina = Provider.objects.get(business_name='Medina4x4')
+        medina.images.all().delete()
+        propia = ProviderImage(provider=medina, alt_text='Foto propia', is_cover=True)
+        with override_settings(MEDIA_ROOT=self.media):
+            propia.image.save('propia.webp', ContentFile(b'RIFF0000WEBP'), save=True)
+        self.cargar()
+        self.assertEqual(list(medina.images.values_list('alt_text', flat=True)), ['Foto propia'])
+
+    def test_cada_foto_de_la_lista_existe_y_pesa_menos_de_100_kb(self):
+        """Regla 12: imágenes guardadas ya achicadas."""
+        from pathlib import Path
+        carpeta = Path(__file__).resolve().parent / 'clientes_fotos'
+        for c in CLIENTES:
+            for archivo, alt in c.get('fotos', []):
+                ruta = carpeta / c['slug'] / archivo
+                self.assertTrue(ruta.exists(), ruta)
+                self.assertLessEqual(ruta.stat().st_size, 100 * 1024, ruta)
+                self.assertLessEqual(len(alt), 160, ruta)
+
     def test_un_cliente_desactivado_no_vuelve(self):
         self.cargar()
         Provider.objects.filter(business_name='Medina4x4').update(is_active=False)
@@ -111,3 +149,46 @@ class CargarClientes(TestCase):
         self.assertEqual(self.client.get('/profesionales/repuestos-automotrices/').status_code, 404)
         self.assertEqual(self.client.get('/profesionales/tatuajes/').status_code, 200)
         self.assertNotIn('/profesionales/automotoras/</loc>', self.client.get('/sitemap.xml').content.decode())
+
+
+class PortadasSinConsultaPorTarjeta(TestCase):
+    """G-04: la foto de portada de cada tarjeta no puede ser una consulta por fila."""
+
+    def setUp(self):
+        from django.core.files.base import ContentFile
+        self.media = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.media, ignore_errors=True)
+        call_command('seed_categorias', stdout=StringIO())
+        from directory.models import Region, ProviderImage
+        region = Region.objects.create(name='RM', slug='rm', is_active=True)
+        self.comuna = Commune.objects.create(region=region, name='Maipú', slug='maipu', is_active=True)
+        self.dueno = User.objects.create_user('d', password='clave-larga-de-verdad-99')
+        self.ProviderImage, self.ContentFile = ProviderImage, ContentFile
+
+    def perfil_con_portada(self, i):
+        p = Provider.objects.create(
+            business_name=f'Gasfitería {i}', contact_name='Ana', owner=self.dueno,
+            category=Category.objects.get(slug='gasfiteria'), commune=self.comuna, sector='Centro',
+            description='Descripción.', short_description='Resumen.', phone='+56 9 1111 2222',
+            whatsapp_number='56911112222', is_active=True)
+        img = self.ProviderImage(provider=p, is_cover=True)
+        with override_settings(MEDIA_ROOT=self.media):
+            img.image.save(f'p{i}.webp', self.ContentFile(b'RIFF0000WEBP'), save=True)
+        return p
+
+    def test_el_listado_trae_las_portadas_en_una_consulta(self):
+        url = '/servicios/gasfiteria/maipu/'
+        self.perfil_con_portada(0)
+        with override_settings(MEDIA_ROOT=self.media):
+            self.client.get(url)
+            from django.db import connection
+            from django.test.utils import CaptureQueriesContext
+            with CaptureQueriesContext(connection) as uno:
+                html = self.client.get(url).content.decode()
+            self.assertIn('class="ficha-portada"', html)
+            for i in range(1, 8):
+                self.perfil_con_portada(i)
+            with CaptureQueriesContext(connection) as ocho:
+                self.client.get(url)
+        self.assertEqual(len(ocho.captured_queries), len(uno.captured_queries),
+                         'cada portada nueva sumó consultas')

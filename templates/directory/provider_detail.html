@@ -40,6 +40,37 @@
         <p class="mb-0">{{ provider.description|linebreaksbr }}</p>
       </div>
 
+      <!-- Fotos -->
+      {% if provider.images.all %}
+      <div class="detail-block">
+        <h2>Fotos</h2>
+        <div class="row g-3">
+          {% for image in provider.images.all %}
+            <div class="col-sm-6">
+              <img class="provider-image" src="{{ image.image.url }}" alt="{{ image.alt_text|default:provider.business_name }}" loading="lazy" width="640" height="480">
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% elif provider.owner %}
+      {% comment %}
+      D4 — El hueco de fotos SOLO se muestra si el perfil tiene dueño.
+
+      Un perfil que vino de Google Maps no tiene a nadie que pueda subir una
+      foto, así que anunciar que le faltan no informa nada: se lee como que el
+      sitio está a medio hacer, y son la mayoría de las fichas. Al dueño sí le
+      sirve, porque es una tarea que puede hacer.
+      {% endcomment %}
+      <div class="detail-block">
+        <h2>Fotos</h2>
+        <div class="placeholder-photo" style="min-height:140px">
+          Todavía no subes fotos.
+          <a href="{% url 'accounts:provider_edit' provider.slug %}">Agregar fotos →</a>
+        </div>
+      </div>
+      {% endif %}
+
+
       {% if provider.has_professional_info %}
       <div class="detail-block credencial-block">
         <h2>Formación</h2>
@@ -72,42 +103,17 @@
         <p class="safety-note mb-0">SERVIPLACE conecta personas con profesionales y prestadores. La coordinación, el precio y el servicio se acuerdan directamente entre las partes. <a href="{% url 'core:trust_and_safety' %}">Ver recomendaciones →</a></p>
       </div>
 
-      <!-- Fotos -->
-      {% if provider.images.all %}
-      <div class="detail-block">
-        <h2>Fotos</h2>
-        <div class="row g-3">
-          {% for image in provider.images.all %}
-            <div class="col-sm-6">
-              <img class="provider-image" src="{{ image.image.url }}" alt="{{ image.alt_text|default:provider.business_name }}">
-            </div>
-          {% endfor %}
-        </div>
-      </div>
-      {% elif provider.owner %}
-      {% comment %}
-      D4 — El hueco de fotos SOLO se muestra si el perfil tiene dueño.
-
-      Un perfil que vino de Google Maps no tiene a nadie que pueda subir una
-      foto, así que anunciar que le faltan no informa nada: se lee como que el
-      sitio está a medio hacer, y son la mayoría de las fichas. Al dueño sí le
-      sirve, porque es una tarea que puede hacer.
-      {% endcomment %}
-      <div class="detail-block">
-        <h2>Fotos</h2>
-        <div class="placeholder-photo" style="min-height:140px">
-          Todavía no subes fotos.
-          <a href="{% url 'accounts:provider_edit' provider.slug %}">Agregar fotos →</a>
-        </div>
-      </div>
-      {% endif %}
-
       <!-- Compartir -->
       <div class="share-row mt-3">
         <span>Compartir este perfil</span>
-        <a class="share-btn wa" href="https://wa.me/?text={{ request.build_absolute_uri|urlencode }}%20—%20{{ provider.business_name|urlencode }}%20en%20SERVIPLACE" target="_blank" rel="noopener">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.555 4.117 1.528 5.845L0 24l6.335-1.652A11.95 11.95 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.943 0-3.771-.52-5.344-1.424l-.383-.226-3.963 1.033 1.055-3.857-.248-.396A9.928 9.928 0 012 12c0-5.514 4.486-10 10-10s10 4.486 10 10-4.486 10-10 10z"/></svg>
-          WhatsApp
+        {% comment %}
+        18-10-2026: este botón era verde y decía "WhatsApp", igual que el de
+        contacto: Diego lo leyó como un segundo botón para escribirle al
+        profesional. Es para COMPARTIR la ficha: neutro y con su nombre.
+        {% endcomment %}
+        <a class="share-btn" href="https://wa.me/?text={{ request.build_absolute_uri|urlencode }}%20—%20{{ provider.business_name|urlencode }}%20en%20ServiPlace" target="_blank" rel="noopener" data-compartir data-titulo="{{ provider.business_name }} en ServiPlace">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg>
+          Enviar a alguien
         </a>
         <button class="share-btn" type="button" data-copiar="">Copiar enlace</button>
       </div>
@@ -166,4 +172,12 @@
     Contactar por WhatsApp
   </a>
 </div>
+{% endblock %}
+
+{% block flotante %}
+{% if provider.instagram %}
+<a class="ig-flotante" href="https://www.instagram.com/{{ provider.instagram }}/" target="_blank" rel="ugc noopener" title="Instagram de {{ provider.business_name }}" data-ga="clic_instagram" data-ga-categoria="{{ provider.category.slug }}" data-ga-origen="flotante">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg><span class="visually-hidden">Instagram de {{ provider.business_name }}</span>
+</a>
+{% endif %}
 {% endblock %}

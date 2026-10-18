@@ -337,3 +337,23 @@ nomás; saferoom déjalo anotado en el CRM".
   WhatsApp en su sitio), Punto Parcelas (sin comuna), AZA (organización).
 Pruebas: 207.
 ---
+
+---
+[18-10-2026, tarde] — Diego: "fotos en cada perfil de mis clientes y GoGoDevS, que
+se vea lo máximo poblado; en la ficha hay doble botón de WhatsApp; botones
+flotantes de Instagram".
+  · 52 fotos de 11 clientes, tomadas de sus sitios por un agente y revisadas a ojo
+    en una hoja de contacto: trabajos, productos, locales y vehículos. Fuera las
+    generadas con IA (VOA no tiene ni una real; SafeRoom, Travesía, Popi, Medina y
+    Ruta Motors tenían varias con metadatos de OpenAI/Gemini) y las que muestran
+    a clientes. WebP 1024 px <100 KB en directory/clientes_fotos/ (la primera es
+    la portada). cargar_clientes las agrega solo si el perfil no tiene fotos.
+  · Tarjetas con foto de portada (prefetch: una consulta para todas, prueba G-04
+    con mutación detectada 18 vs 11). En la ficha, las fotos subieron debajo de
+    la descripción.
+  · El "doble WhatsApp" era el botón de COMPARTIR (verde, decía WhatsApp): ahora
+    "Enviar a alguien", neutro, con el menú de compartir del teléfono.
+  · Instagram flotante: en la ficha, el del profesional (si tiene); en el resto
+    del sitio público, el de @serviplace.cl; en /cuenta/ ninguno.
+Pruebas: 212.
+---

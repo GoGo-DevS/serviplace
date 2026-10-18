@@ -14,7 +14,7 @@ from core import guias
 
 from . import seo
 from .catalogo import categorias_por_grupo
-from .models import Category, Commune, Provider, Region
+from .models import Category, Commune, Provider, ProviderImage, Region
 
 # Cuántos prestadores por página. 24 entra en 3 columnas en escritorio y en 2
 # en tablet sin dejar una fila coja, y en el teléfono son ~6 pantallas de
@@ -134,7 +134,9 @@ def _textos(categoria, grupo, comuna, query, total):
 
 
 def _listado(request, *, categoria=None, grupo=None, comuna=None, query=''):
-    providers = Provider.objects.publicos().select_related('category', 'commune')
+    providers = Provider.objects.publicos().select_related('category', 'commune').prefetch_related(
+        # La foto de portada de cada tarjeta, en una sola consulta (G-04)
+        Prefetch('images', queryset=ProviderImage.objects.filter(is_cover=True), to_attr='portadas'))
     if query:
         providers = providers.filter(
             Q(business_name__icontains=query)

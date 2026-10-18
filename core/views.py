@@ -8,7 +8,7 @@ from urllib.parse import urlencode
 from django.utils import timezone
 
 from directory.catalogo import categorias_por_grupo
-from directory.models import Category, Commune, Provider, Region
+from directory.models import Category, Commune, Provider, ProviderImage, Region
 from leads.models import LeadEvent
 from directory import seo
 from core import guias, profesiones
@@ -26,6 +26,7 @@ def home(request):
     featured_providers = (
         Provider.objects.publicos().exclude(foto='')
         .select_related('category', 'commune').distinct()
+        .prefetch_related(Prefetch('images', queryset=ProviderImage.objects.filter(is_cover=True), to_attr='portadas'))
         .order_by('-is_featured', '-is_verified', 'business_name', 'pk')[:6]
     )
     publicos = Provider.objects.publicos()

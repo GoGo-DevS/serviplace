@@ -143,6 +143,19 @@
     </div>
   </footer>
 
+  {% comment %}
+  Instagram flotante (18-10-2026, pedido de Diego): en las fichas es el del
+  profesional (provider_detail lo reemplaza); en el resto del sitio público, el
+  de ServiPlace. No en las páginas de cuenta: ahí distrae de lo que se hace.
+  {% endcomment %}
+  {% block flotante %}
+  {% if not request.path|slice:":8" == "/cuenta/" %}
+  <a class="ig-flotante" href="https://www.instagram.com/serviplace.cl/" target="_blank" rel="me noopener" title="Síguenos en Instagram" data-ga="clic_instagram" data-ga-origen="flotante-serviplace">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg><span class="visually-hidden">Síguenos en Instagram</span>
+  </a>
+  {% endif %}
+  {% endblock %}
+
   <script src="{% static 'vendor/bootstrap/bootstrap.bundle.min.js' %}" defer></script>
   <script>
     // Un envío por formulario: un doble clic en "Publicar" creaba dos perfiles.
@@ -176,6 +189,14 @@
       gtag('event', a.dataset.ga, {
         categoria: a.dataset.gaCategoria || '', comuna: a.dataset.gaComuna || '',
         origen: a.dataset.gaOrigen || '', transport_type: 'beacon'
+      });
+    });
+    // Compartir: el menú nativo del teléfono si existe; si no, el enlace a WhatsApp.
+    document.querySelectorAll('[data-compartir]').forEach(function (a) {
+      a.addEventListener('click', function (e) {
+        if (!navigator.share) return;
+        e.preventDefault();
+        navigator.share({ title: a.dataset.titulo || document.title, url: window.location.href }).catch(function () {});
       });
     });
     // Copiar sin alert(): el botón confirma con su propio texto.

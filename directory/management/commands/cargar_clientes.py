@@ -29,9 +29,10 @@ from django.db.models import Q
 from django.utils import timezone
 
 from directory.clientes_gogodevs import CLIENTES, FUENTE
-from directory.models import Category, Commune, Provider
+from directory.models import Category, Commune, Provider, ProviderImage
 
 LOGOS = Path(__file__).resolve().parents[2] / 'clientes_logos'
+FOTOS = Path(__file__).resolve().parents[2] / 'clientes_fotos'
 
 
 class Command(BaseCommand):
@@ -95,5 +96,25 @@ class Command(BaseCommand):
                 perfil.foto.save(logo.name, ContentFile(logo.read_bytes()), save=False)
             perfil.save()
             creados.append(perfil.business_name)
-        self.stdout.write(f'cargar_clientes: {len(creados)} creados, {ya_estaban} ya estaban.'
-                          + (f" ({', '.join(creados)})" if creados else ''))
+        con_fotos = self._fotos()
+        self.stdout.write(f'cargar_clientes: {len(creados)} creados, {ya_estaban} ya estaban, '
+                          f'{con_fotos} con fotos nuevas.' + (f" ({', '.join(creados)})" if creados else ''))
+
+    def _fotos(self):
+        """Fotos de su sitio para los perfiles que cargó esta carga y que todavía
+        no tienen ninguna. Si el dueño ya subió las suyas, no se tocan; a un
+        cliente que se inscribió solo, tampoco (su perfil no es de la carga)."""
+        n = 0
+        for cliente in CLIENTES:
+            perfil = Provider.objects.filter(source_name=FUENTE, source_url=cliente['web']).first()
+            if not perfil or not cliente.get('fotos') or perfil.images.exists():
+                continue
+            for orden, (archivo, alt) in enumerate(cliente['fotos']):
+                ruta = FOTOS / cliente['slug'] / archivo
+                if not ruta.exists():
+                    continue
+                imagen = ProviderImage(provider=perfil, alt_text=alt[:160], is_cover=(orden == 0), display_order=orden)
+                imagen.image.save(f"{cliente['slug']}-{orden + 1}.webp", ContentFile(ruta.read_bytes()), save=False)
+                imagen.save()
+            n += 1
+        return n

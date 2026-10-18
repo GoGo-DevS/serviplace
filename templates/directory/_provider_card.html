@@ -6,6 +6,9 @@ incompleto. El nombre es el enlace a la ficha; WhatsApp es el botón.
 {% endcomment %}
 <div class="col-md-6 col-xl-4">
   <article class="ficha">
+    {% with portada=provider.portadas|first %}{% if portada %}
+    <a class="ficha-portada" href="{{ provider.get_absolute_url }}" tabindex="-1" aria-hidden="true"><img src="{{ portada.image.url }}" alt="" loading="lazy" width="480" height="270"></a>
+    {% endif %}{% endwith %}
     <div class="ficha-top"><b>{{ provider.category.name }}</b><span>{{ provider.commune.name }}</span></div>
     <div class="ficha-who">
       <div class="ficha-avatar{% if provider.foto %} con-foto{% endif %}" aria-hidden="true">{% if provider.foto %}<img src="{{ provider.foto.url }}" alt="" loading="lazy" width="46" height="52">{% else %}{{ provider.business_name|first|upper }}{% endif %}</div>

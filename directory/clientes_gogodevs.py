@@ -6,7 +6,10 @@ sitio en vivo; los dominios de correo tienen MX). Nada viene de las notas
 internas: lo que el cliente no publica, no se publica aquí.
 
 La carga la hace `manage.py cargar_clientes` (build.sh): crea los que faltan y
-NUNCA pisa un perfil existente. Para corregir un dato después de cargado, se
+NUNCA pisa un perfil existente. Las fotos (directory/clientes_fotos/, la primera
+es la portada) vienen de sus sitios: fotos reales de trabajos, productos o local;
+se dejaron fuera las generadas con IA (VOA no tiene ninguna real) y las que
+muestran a clientes. Se agregan solo si el perfil todavía no tiene fotos. Para corregir un dato después de cargado, se
 edita en el admin o en el panel; cambiarlo aquí no actualiza nada.
 
 VOA Chile y Travesía atienden todo Chile (lo confirmó Diego): comuna base
@@ -40,6 +43,13 @@ CLIENTES = [
                   'integraciones de pago y apps a medida. Trabaja en cinco etapas, con capacitación y soporte los '
                   'primeros 30 días después de la entrega. Atención de lunes a viernes de 9:00 a 19:00 y sábado de '
                   '10:00 a 14:00.'),
+        'fotos': [
+            ('1.webp', 'Sitio web de Púas Tatuajes hecho por GoGoDevS'),
+            ('2.webp', 'Sitio web de la pastelería Dulcecita'),
+            ('3.webp', 'Sitio web de Salón Amanda con reservas online'),
+            ('4.webp', 'Tienda online de repuestos 4x4 Medina4x4'),
+            ('5.webp', 'Catálogo online de Popi Uniformes Clínicos'),
+        ],
         'fuentes': ['https://www.gogodevs.cl'],
     },
     {
@@ -61,6 +71,13 @@ CLIENTES = [
                   'fineline y polinésico, y hace piercing. Se especializa en reparar y cubrir tatuajes antiguos con '
                   'diseño polinésico. Atienden también en inglés y portugués. Horario: lunes a viernes de 11:00 a '
                   '20:00 y sábado de 11:00 a 18:00.'),
+        'fotos': [
+            ('1.webp', 'Interior del estudio con cuadros y espejo'),
+            ('2.webp', 'Gabriel Púas tatuando en el estudio'),
+            ('3.webp', 'Tatuaje polinésico de felino en el hombro'),
+            ('4.webp', 'Tatuaje realista de brújula en el antebrazo'),
+            ('5.webp', 'Manga a color con calavera y vitral'),
+        ],
         'fuentes': ['https://puastatuajes.cl'],
     },
     {
@@ -82,6 +99,13 @@ CLIENTES = [
                   'permanente, extensiones soft gel y acrílico, y pedicure. También perfilado de cejas, depilación '
                   'facial, lash lifting y maquillaje social. Se reserva hora en línea o por WhatsApp. Horario: lunes a '
                   'viernes de 11:00 a 21:00, sábado de 11:00 a 20:00 y domingo de 11:00 a 18:00.'),
+        'fotos': [
+            ('1.webp', 'Interior del salón con estaciones de peinado'),
+            ('2.webp', 'Estaciones de peluquería con espejos iluminados'),
+            ('3.webp', 'Sala de tratamientos estéticos con camilla'),
+            ('4.webp', 'Manicure con diseño de lunares en las uñas'),
+            ('5.webp', 'Color y corte de cabello terminado'),
+        ],
         'fuentes': ['https://www.salonamanda.cl'],
     },
     {
@@ -101,6 +125,13 @@ CLIENTES = [
                   'mantención y limpieza de equipos, y repara con diagnóstico antes de cotizar. También vende equipos '
                   'y los instala. Trabaja con factura y garantía. En su sitio hay una calculadora de capacidad por '
                   'metro cuadrado; el cálculo exacto se hace en la visita técnica.'),
+        'fotos': [
+            ('1.webp', 'Unidad exterior de aire acondicionado instalada'),
+            ('2.webp', 'Split de aire acondicionado instalado en muro'),
+            ('3.webp', 'Técnico haciendo mantención de aire acondicionado'),
+            ('4.webp', 'Unidad condensadora exterior instalada'),
+            ('5.webp', 'Equipo split instalado en una oficina'),
+        ],
         'fuentes': ['https://fcoclimatizacion.cl'],
     },
     {
@@ -121,6 +152,10 @@ CLIENTES = [
                   'de riesgo del cliente, con comunicación al exterior y conexión con servicios de emergencia. La '
                   'asesoría es privada y confidencial, con soporte después de la instalación. Atención de lunes a '
                   'viernes de 9:00 a 19:00.'),
+        'fotos': [
+            ('1.webp', 'Safe room antiasalto con sus medidas'),
+            ('2.webp', 'Safe room antisísmico integrado en un living'),
+        ],
         'fuentes': ['https://saferoom.cl'],
     },
     {
@@ -144,6 +179,13 @@ CLIENTES = [
                   'carrocería. Tiene más de 20 años de experiencia, garantía y atención personalizada, y cotiza '
                   'repuestos que no están en el catálogo. Envíos a todo Chile y retiro gratis en el local. Horario: '
                   'lunes a viernes de 9:30 a 18:00 y sábado de 9:30 a 12:30.'),
+        'fotos': [
+            ('1.webp', 'Actuador de tracción para Ford F-150'),
+            ('2.webp', 'Acoplamiento actuador 4WD para Hyundai y Kia'),
+            ('3.webp', 'Acople viscoso de diferencial trasero Toyota RAV4'),
+            ('4.webp', 'Actuador de caja transfer para Suzuki Jimny'),
+            ('5.webp', 'Módulo selector de transfer Nissan Navara'),
+        ],
         'fuentes': ['https://medina4x4.cl'],
     },
     {
@@ -167,6 +209,13 @@ CLIENTES = [
                   'envíos a todo Chile, tiene servicio de post venta y cotiza con sus expertos los repuestos que no '
                   'están publicados. Se paga con tarjeta de crédito o débito, transferencia o efectivo en el local. '
                   'Horario: lunes a viernes de 9:00 a 18:00 y sábado de 9:30 a 12:30.'),
+        'fotos': [
+            ('1.webp', 'Bomba de dirección hidráulica Chevrolet S10'),
+            ('2.webp', 'Actuador de caja transfer Chevrolet D-Max'),
+            ('3.webp', 'Actuador de diferencial delantero Suzuki Grand Nomade'),
+            ('4.webp', 'Actuador de diferencial trasero Hyundai y Kia'),
+            ('5.webp', 'Distribuidor de encendido Honda Civic 1.5'),
+        ],
         'fuentes': ['https://www.comercialvillarreal.cl'],
     },
     {
@@ -190,6 +239,13 @@ CLIENTES = [
                   'colores. También joggers, polerones, gorros, turbantes y medias compresivas. En la tienda de '
                   'Antofagasta puedes ver los colores y probarte las prendas; algunos modelos se encargan a fábrica y '
                   'la disponibilidad se confirma por WhatsApp antes de pagar.'),
+        'fotos': [
+            ('1.webp', 'Delantal antifluidos azul rey, frente y espalda'),
+            ('2.webp', 'Delantal antifluidos negro para mujer'),
+            ('3.webp', 'Polerón clínico spandex azul marino'),
+            ('4.webp', 'Delantal clínico Tulipán color burdeo'),
+            ('5.webp', 'Pantalón clínico spandex negro'),
+        ],
         'fuentes': ['https://popiuniformes.cl'],
     },
     {
@@ -210,6 +266,13 @@ CLIENTES = [
                   'que se conversa por WhatsApp, y recibe tu auto como parte de pago. Acepta tarjeta de crédito y '
                   'débito. Horario: lunes a jueves de 9:30 a 17:30, viernes de 9:30 a 16:00 y sábado con previa '
                   'coordinación.'),
+        'fotos': [
+            ('1.webp', 'Volkswagen Amarok blanca en el patio'),
+            ('2.webp', 'Mitsubishi L200 Katana color grafito'),
+            ('3.webp', 'Camión Hyundai HD78 con caja furgón'),
+            ('4.webp', 'Toyota Hilux SR roja vista de frente'),
+            ('5.webp', 'Toyota Hilux DX gris vista de frente'),
+        ],
         'fuentes': ['https://rutamotors.onrender.com'],
     },
     {
@@ -231,6 +294,13 @@ CLIENTES = [
                   'por volumen para regalos corporativos y coffee breaks. Los pedidos parten desde 10 unidades por '
                   'producto (en "Arma tu box", desde 3) y salen 48 horas después de confirmados. Despacho a todo '
                   'Chile. Atención de lunes a sábado de 9:00 a 19:00.'),
+        'fotos': [
+            ('1.webp', 'Alfajores bañados en chocolate con hilo blanco'),
+            ('2.webp', 'Barquillos rellenos de manjar en bandeja'),
+            ('3.webp', 'Torta de cuchuflís con cinta rosada'),
+            ('4.webp', 'Box dieciochero con alfajores y dulces surtidos'),
+            ('5.webp', 'Barquillos con puntas bañadas en chocolate'),
+        ],
         'fuentes': ['https://dulcecita.cl'],
     },
     {
@@ -271,6 +341,13 @@ CLIENTES = [
                   'operador: camionetas, camión 3/4, camión de combustible, aljibes, tolvas, camión pluma, '
                   'retroexcavadora, excavadora y tracto camión con rampla y cama baja. Cubre de Arica a Punta Arenas, '
                   'con rutas a Argentina, Brasil y Paraguay.'),
+        'fotos': [
+            ('1.webp', 'Excavadora CAT sobre cama baja para traslado'),
+            ('2.webp', 'Motoniveladora cargada en cama baja'),
+            ('3.webp', 'Camión con plataforma cargada de tuberías'),
+            ('4.webp', 'Tracto camión trasladando maquinaria en faena'),
+            ('5.webp', 'Tracto camión en patio de contenedores'),
+        ],
         'fuentes': ['https://travesialogistica.cl', 'https://travesialogistica.cl/contacto/'],
     },
 ]

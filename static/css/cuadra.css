@@ -440,3 +440,27 @@ input[type="file"].form-control::file-selector-button { border: 0; border-radius
    descripción sin la negrita que heredan los enlaces */
 .guia-tarjeta, .contacto-motivo { align-content: start; }
 .guia-tarjeta span, .contacto-motivo span { font-weight: 400; }
+
+/* ---- Instagram flotante (18-10-2026) ---- */
+.ig-flotante {
+  position: fixed; right: 18px; bottom: 22px; z-index: 1025;
+  display: grid; place-items: center; width: 52px; height: 52px; border-radius: 50%;
+  color: #fff; text-decoration: none;
+  background: radial-gradient(circle at 30% 110%, #feda75 0%, #fa7e1e 25%, #d62976 50%, #962fbf 75%, #4f5bd5 100%);
+  box-shadow: 0 8px 22px -6px rgba(150, 47, 191, .55);
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+.ig-flotante:hover, .ig-flotante:focus-visible { color: #fff; transform: translateY(-2px); box-shadow: 0 12px 26px -6px rgba(150, 47, 191, .65); }
+.ig-flotante:focus-visible { outline: 3px solid var(--sp-ink); outline-offset: 3px; }
+/* En el celular la ficha tiene la barra de WhatsApp abajo: el botón va encima */
+@media (max-width: 767px) { .mobile-whatsapp-bar ~ .ig-flotante, body:has(.mobile-whatsapp-bar) .ig-flotante { bottom: 96px; } }
+@media (prefers-reduced-motion: reduce) { .ig-flotante { transition: none; } }
+
+/* ---- Foto de portada en la tarjeta (18-10-2026) ---- */
+.ficha-portada { display: block; margin: -1.05rem -1.1rem .9rem; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 18px 18px 0 0; background: var(--sp-bg); }
+.ficha-portada img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform .3s ease; }
+.ficha:hover .ficha-portada img { transform: scale(1.03); }
+.provider-image { aspect-ratio: 4 / 3; object-fit: cover; width: 100%; height: auto; }
+@media (prefers-reduced-motion: reduce) { .ficha-portada img { transition: none; } .ficha:hover .ficha-portada img { transform: none; } }
+/* Encuadre un poco arriba del centro: en fotos con personas no corta la cabeza */
+.ficha-portada img, .provider-image { object-position: 50% 30%; }

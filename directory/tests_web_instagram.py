@@ -16,7 +16,7 @@ from directory.models import Category, Commune, Provider, Region
 User = get_user_model()
 
 
-class WebEInstagram(TestCase):
+class Base(TestCase):
     def setUp(self):
         region = Region.objects.create(name='RM', slug='rm', is_active=True)
         self.maipu = Commune.objects.create(region=region, name='Maipú', slug='maipu', is_active=True)
@@ -34,6 +34,9 @@ class WebEInstagram(TestCase):
         }
         datos.update(extra)
         return self.client.post(reverse('accounts:provider_create'), datos)
+
+
+class WebEInstagram(Base):
 
     def test_instagram_se_guarda_como_usuario_venga_como_venga(self):
         for entrada in ('@camila.kine', 'camila.kine', 'https://www.instagram.com/camila.kine/?hl=es'):
@@ -65,3 +68,35 @@ class WebEInstagram(TestCase):
         schema = next(json.loads(b) for b in re.findall(r'<script type="application/ld\+json">(.*?)</script>', h, re.S)
                       if '#perfil' in b)
         self.assertEqual(schema['sameAs'], ['https://www.camilakine.cl/', 'https://www.instagram.com/camila.kine/'])
+
+
+class BotonesDeLaFicha(Base):
+    """18-10-2026: Diego vio "doble botón de WhatsApp para contactar" en la
+    ficha (el de compartir era verde y decía WhatsApp) y pidió Instagram
+    flotante."""
+
+    def ficha(self, **campos):
+        self.publicar(**campos)
+        return self.client.get(Provider.objects.get().get_absolute_url()).content.decode()
+
+    def test_compartir_ya_no_parece_un_boton_de_contacto(self):
+        h = self.ficha()
+        self.assertNotIn('share-btn wa', h)
+        self.assertIn('data-compartir', h)
+        self.assertIn('Enviar a alguien', h)
+        # contacto: uno para escritorio y la barra del celular (CSS muestra uno a la vez)
+        self.assertEqual(h.count('data-ga="contacto_whatsapp"'), 2)
+
+    def test_instagram_flotante_del_profesional_en_su_ficha(self):
+        h = self.ficha(instagram='camila.kine')
+        self.assertIn('class="ig-flotante" href="https://www.instagram.com/camila.kine/"', h)
+        self.assertNotIn('class="ig-flotante" href="https://www.instagram.com/serviplace.cl/"', h,
+                         'en una ficha el flotante es del profesional, no de ServiPlace')
+
+    def test_una_ficha_sin_instagram_no_muestra_flotante(self):
+        self.assertNotIn('class="ig-flotante"', self.ficha())
+
+    def test_en_el_resto_del_sitio_es_el_de_serviplace_y_no_en_la_cuenta(self):
+        self.assertIn('class="ig-flotante" href="https://www.instagram.com/serviplace.cl/"',
+                      self.client.get('/').content.decode())
+        self.assertNotIn('class="ig-flotante"', self.client.get(reverse('accounts:dashboard')).content.decode())
