@@ -170,6 +170,14 @@ def _listado(request, *, categoria=None, grupo=None, comuna=None, query=''):
         )
 
     total = paginador.count
+    ga4_busqueda = None
+    if (query or categoria or comuna or grupo) and not request.GET.get('page'):
+        ga4_busqueda = {
+            'search_term': (query or (categoria.nombre_busqueda if categoria else '') or '')[:80],
+            'categoria': categoria.slug if categoria else (grupo or ''),
+            'comuna': comuna.slug if comuna else '',
+            'resultados': total,
+        }
     h1, titulo, meta, intro = _textos(categoria, grupo, comuna, query, total)
     path = url_listado(categoria, grupo, comuna)
     es_pagina_limpia = bool(categoria or grupo or comuna) and not query
@@ -233,6 +241,7 @@ def _listado(request, *, categoria=None, grupo=None, comuna=None, query=''):
         'relacionados_categorias': relacionados_categorias,
         'page_title': titulo,
         'meta_description': meta,
+        'ga4_busqueda': ga4_busqueda,
         'canonical': settings.SITE_URL + (reverse('directory:provider_list') if query else canonical),
         # Búsqueda libre y páginas vacías: fuera del índice, pero se siguen sus enlaces.
         'robots': 'noindex, follow' if (query or vacia) else '',

@@ -193,3 +193,27 @@ Tarea completada: MARCA SERVIPLACE (logo + paleta turquesa).
     2,4:1: nunca. #9CA3AF de la guía solo para íconos (2,5:1 no sirve para texto).
 Pruebas: 123. Auditoría visual: 0 problemas reales.
 ---
+
+---
+[18-10-2026] — Modo: colaborativo
+Tarea completada: GA4 + REPORTE SEO SEMANAL DEL CRM.
+  · Propiedad GA4 "ServiPlace" 559460692 en la cuenta GoGoDevS (a408968389) de
+    diegodinamarca.a; flujo web 16150988442, ID G-RLX75T8KGM (no es secreto).
+    settings: GA4_MEASUREMENT_ID; en Render cae al G- aunque el Blueprint no
+    sincronice; en local vacío = no carga nada.
+  · No se mide: panel, métricas, edición de perfil, login, admin y staff.
+  · Eventos: contacto_whatsapp (tarjeta y ficha; es el que cuenta el reporte
+    del CRM), search, sign_up y publicar_perfil (se informan una vez, en la
+    página siguiente, vía sesión).
+  · CRM /reportes/: ServiPlace agregado (sc-domain:serviplace.cl, GA4
+    559460692, "envía eventos de contacto"). Sin "Actualizar ahora" todavía.
+Pruebas: 130 (core/tests_analitica.py, 7).
+PENDIENTE (Diego, el clasificador / la extensión lo bloquean):
+  1. GA4 > ServiPlace > Gestión de accesos: reportes-crm@gogodevs-reportes.iam
+     .gserviceaccount.com como Lector.
+  2. Search Console con diegodinamarca.a: propiedad de dominio serviplace.cl
+     (verificación DNS en Cloudflare), enviar /sitemap.xml y agregar la misma
+     cuenta de servicio como Restringido.
+  3. Cuando lleguen datos (~24 h): marcar contacto_whatsapp, sign_up y
+     publicar_perfil como eventos clave (GA4 no deja marcarlos antes).
+---

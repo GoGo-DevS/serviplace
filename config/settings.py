@@ -250,6 +250,11 @@ SITE_NAME = 'ServiPlace'
 SITE_DESCRIPTION = 'Maestros y profesionales independientes en tu comuna: gásfiter, kinesiólogo, psicólogo, profe particular y más. Contacto directo por WhatsApp, sin comisión.'
 DEFAULT_CONTACT_WHATSAPP = os.environ.get('DEFAULT_CONTACT_WHATSAPP', '')
 CONTACT_EMAIL = os.environ.get('CONTACT_EMAIL', 'contacto@serviplace.cl')
+# GA4: vacío = no se carga nada (ni el script ni una petición a Google). El
+# identificador no es secreto: se ve en el HTML de cualquier página. Propiedad
+# "ServiPlace" (559460692) en la cuenta GoGoDevS de diegodinamarca.a. En Render
+# se mide aunque el Blueprint no haya sincronizado la variable; en local, nunca.
+GA4_MEASUREMENT_ID = os.environ.get('GA4_MEASUREMENT_ID', 'G-RLX75T8KGM' if ON_RENDER else '').strip()
 GOOGLE_MAPS_API_KEY = os.environ.get('GOOGLE_MAPS_API_KEY', '')
 GOOGLE_MAPS_REGION = 'CL'
 

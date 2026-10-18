@@ -30,6 +30,17 @@
   <link rel="apple-touch-icon" href="{% static 'img/marca/apple-touch-icon.png' %}">
   <meta name="theme-color" content="#1b1f24">
   {{ jsonld }}
+  {% if ga4_id %}
+  <script async src="https://www.googletagmanager.com/gtag/js?id={{ ga4_id }}"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', '{{ ga4_id }}');
+  </script>
+  {% for evento in ga4_eventos %}<script>gtag('event', '{{ evento|escapejs }}');</script>{% endfor %}
+  {% if ga4_busqueda %}{{ ga4_busqueda|json_script:"ga4-busqueda" }}<script>gtag('event', 'search', JSON.parse(document.getElementById('ga4-busqueda').textContent));</script>{% endif %}
+  {% endif %}
   {% block extra_head %}{% endblock %}
 </head>
 <body>
@@ -144,6 +155,17 @@
           b.classList.remove('is-enviando'); b.removeAttribute('aria-disabled');
           if (b.dataset.texto) b.textContent = b.dataset.texto;
         });
+      });
+    });
+    // GA4: un clic en un enlace marcado con data-ga manda ese evento. El de
+    // WhatsApp se llama contacto_whatsapp porque es el que cuenta el reporte
+    // semanal del CRM como "alguien te contactó desde la web".
+    document.addEventListener('click', function (e) {
+      var a = e.target.closest('[data-ga]');
+      if (!a || typeof gtag !== 'function') return;
+      gtag('event', a.dataset.ga, {
+        categoria: a.dataset.gaCategoria || '', comuna: a.dataset.gaComuna || '',
+        origen: a.dataset.gaOrigen || '', transport_type: 'beacon'
       });
     });
     // Copiar sin alert(): el botón confirma con su propio texto.

@@ -80,6 +80,7 @@ def register(request):
             profile.save()
             login(request, user)
             registrar(request, LeadEvent.SIGNUP_DONE, origen='register')
+            request.session['ga4_eventos'] = request.session.get('ga4_eventos', []) + ['sign_up']
             messages.success(request, f'Bienvenido/a a ServiPlace, {user.username}. Ya puedes publicar tu servicio.')
             next_url = request.GET.get('next') or request.POST.get('next')
             # `startswith('/')` dejaba pasar `//sitio-ajeno.com`, que el
@@ -151,6 +152,7 @@ def provider_create(request):
                 provider.moderation_note = 'Retenido por el filtro antispam al publicar.'
             provider.save()
             if provider.is_active:
+                request.session['ga4_eventos'] = request.session.get('ga4_eventos', []) + ['publicar_perfil']
                 registrar(request, LeadEvent.PROFILE_PUBLISHED, origen='provider_create', provider=provider,
                           category_slug=provider.category.slug, commune_slug=provider.commune.slug,
                           group=provider.category.group)
