@@ -14,6 +14,8 @@ from django.conf import settings
 from django.templatetags.static import static
 from django.utils.safestring import mark_safe
 
+INSTAGRAM = 'https://www.instagram.com/serviplace.cl/'
+
 # Tipo de schema.org por especialidad. Lo que no está acá es ProfessionalService.
 TIPO_SCHEMA = {
     'gasfiteria': 'Plumber',
@@ -69,6 +71,9 @@ def organizacion_y_sitio():
                 'logo': _url(static('img/marca/serviplace-app-512.png')),
                 'description': settings.SITE_DESCRIPTION,
                 'areaServed': {'@type': 'Country', 'name': 'Chile'},
+                # Entidad: el mismo nombre en el dominio y en Instagram, enlazados
+                # en los dos sentidos (memoria seo-para-ias-entidad-de-marca).
+                'sameAs': [INSTAGRAM],
                 'parentOrganization': {
                     '@type': 'Organization',
                     'name': 'GoGoDevS',

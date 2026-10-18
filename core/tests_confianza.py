@@ -123,3 +123,16 @@ class OrdenDeTitulos(TestCase):
             self.assertEqual(niveles.count(1), 1, f'{url}: un solo h1')
             for antes, despues in zip(niveles, niveles[1:]):
                 self.assertLessEqual(despues - antes, 1, f'{url}: salta de h{antes} a h{despues}')
+
+
+class EntidadDeMarca(TestCase):
+    """El sitio y la cuenta de Instagram se declaran la misma entidad, en los
+    dos sentidos: sameAs en el schema y enlace visible en el pie."""
+
+    def test_instagram_en_el_schema_y_en_el_pie(self):
+        import json
+        html = self.client.get('/').content.decode()
+        bloques = [json.loads(b) for b in re.findall(r'<script type="application/ld\+json">(.*?)</script>', html, re.S)]
+        org = next(n for b in bloques for n in b.get('@graph', []) if n.get('@type') == 'Organization')
+        self.assertIn('https://www.instagram.com/serviplace.cl/', org['sameAs'])
+        self.assertIn('href="https://www.instagram.com/serviplace.cl/"', html)
