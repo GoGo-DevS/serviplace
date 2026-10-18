@@ -422,9 +422,10 @@ Analytics; falta un /links".
     diegotenxd y se cambió antes de tocar nada): propiedad de dominio
     sc-domain:serviplace.cl VERIFICADA por TXT en Cloudflare (registro agregado
     a mano; no se dio la autorización OAuth a Cloudflare que ofrecía Google).
-    Sitemap enviado (93 URLs; el primer estado fue "No se ha podido obtener",
-    pero responde 200 a Googlebot: revisar en unos días). reportes-crm agregado
-    como Restringido.
+    Sitemap enviado: el primer estado fue "No se ha podido obtener" y minutos
+    después "Correcto", 93 páginas descubiertas. reportes-crm agregado como
+    Restringido. (GA4 con ?authuser=<correo> deja en blanco el panel de
+    usuarios: usar el índice, ?authuser=2 = diegodinamarca.a en este Chrome.)
   · GA4 559460692 (cuenta GoGoDevS): reportes-crm como Lector. Dimensiones de
     evento registradas: categoria, comuna, origen, destino, texto_boton (cuentan
     desde hoy). Eventos clave: contacto_whatsapp, sign_up y publicar_perfil aún
@@ -438,4 +439,12 @@ Analytics; falta un /links".
     texto_boton (data-texto fija el nombre del rubro sin el conteo). noindex,
     fuera del sitemap. La visita queda en LeadEvent (source_page='links').
 Pruebas: 240.
+---
+
+[18-10-2026, tarde] Publicación de LinkedIn de ServiPlace cargada en el CRM
+(redes: pieza 74, publicación 177) en PENDIENTE y sin fecha: no sale sola.
+Lámina con capturas reales del sitio en vivo (contenido/salida/22-serviplace,
+subida a R2 con cargar_laminas). Texto revisado contra el código: "sin
+comisión" lo dice el sitio; "más de 300 importados ocultos" = los 361 que
+publicos() deja fuera.
 ---
