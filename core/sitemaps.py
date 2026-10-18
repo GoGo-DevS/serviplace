@@ -8,7 +8,7 @@ Reglas de la auditoría de Jorge (memoria checklist-seo-tecnico):
   - las pruebas piden cada <loc>; no basta con leer el generador.
 """
 from django.contrib.sitemaps import Sitemap
-from django.db.models import Count, Max
+from django.db.models import Count, F, Max
 from django.urls import reverse
 
 from directory.models import Category, Provider
@@ -49,6 +49,25 @@ class ListadosSitemap(Sitemap):
             filas.append((reverse('directory:listado_rubro_comuna',
                                   kwargs={'rubro': fila['category__slug'], 'comuna': fila['commune__slug']}),
                           fila['mod'], 0.9))
+        # Los otros rubros de cada perfil también abren listados (no vacíos).
+        vistas = {f[0] for f in filas}
+        otros = (Provider.otras_categorias.through.objects.filter(provider__in=publicos)
+                 .exclude(category=F('provider__category')).order_by())
+        nuevas = []
+        for fila in otros.values('category__slug').annotate(mod=Max('provider__updated_at')):
+            nuevas.append((reverse('directory:listado_rubro', kwargs={'rubro': fila['category__slug']}), fila['mod'], 0.7))
+        for fila in otros.values('category__group').annotate(mod=Max('provider__updated_at')):
+            slug = Category.GROUP_SLUGS.get(fila['category__group'])
+            if slug:
+                nuevas.append((reverse('directory:listado_rubro', kwargs={'rubro': slug}), fila['mod'], 0.6))
+        for fila in otros.values('category__slug', 'provider__commune__slug').annotate(mod=Max('provider__updated_at')):
+            nuevas.append((reverse('directory:listado_rubro_comuna',
+                                   kwargs={'rubro': fila['category__slug'], 'comuna': fila['provider__commune__slug']}),
+                           fila['mod'], 0.9))
+        for fila in nuevas:
+            if fila[0] not in vistas:
+                filas.append(fila)
+                vistas.add(fila[0])
         return sorted(filas)
 
     def location(self, item):

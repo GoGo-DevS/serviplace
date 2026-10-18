@@ -224,6 +224,7 @@ PROFESIONES = [
     ('construccion', r'maestro (?:constructor|mayor|de obras?|albanil)|albanil|constructor[a]? civil',
      r'construccion civil'),
     ('carpinteria', r'carpinter[oa]|mueblista', r'carpinteria|muebleria'),
+    ('soldadura', r'soldador[a]?|maestro soldador|estructurer[oa]', r'soldadura|estructuras metalicas'),
     ('pintura', r'pintor[a]?', r'pintura'),
     ('jardineria', r'jardiner[oa]|paisajista', r'jardineria|paisajismo'),
     ('limpieza', r'auxiliar de aseo|asesora del hogar|personal de aseo', r'servicio de aseo'),
@@ -288,9 +289,8 @@ def _nombre(lineas):
     return '', None
 
 
-def _profesion(lineas):
-    """El rubro que más aparece (lo de la cabecera vale más) y cómo se nombra
-    la persona: 'Kinesióloga' sale de 'kinesiólog[oa]', no de 'kinesiología'."""
+def _puntajes(lineas):
+    """Puntos por rubro (lo de la cabecera vale más) y cómo se nombra la persona."""
     planas = [list(l.plana) for l in lineas]
     puntos, primera = {}, {}
     for slug, quien, area in PROFESIONES:
@@ -303,6 +303,13 @@ def _profesion(lineas):
                     if peso == 3 and slug not in primera:
                         primera[slug] = l.texto[m.start():m.end()]
                     planas[l.i][m.start():m.end()] = ' ' * (m.end() - m.start())
+    return puntos, primera
+
+
+def _profesion(lineas):
+    """El rubro que más aparece (lo de la cabecera vale más) y cómo se nombra
+    la persona: 'Kinesióloga' sale de 'kinesiólog[oa]', no de 'kinesiología'."""
+    puntos, primera = _puntajes(lineas)
     if not puntos:
         return None, ''
     orden = list(puntos)  # a igual puntaje gana el que va primero en PROFESIONES
@@ -311,6 +318,17 @@ def _profesion(lineas):
         return None, ''
     titulo = primera.get(slug, '')
     return slug, ('TENS' if _plano(titulo) == 'tens' else _oracion(titulo))
+
+
+def _otras_profesiones(lineas, principal, tope=5):
+    """Los demás oficios que la persona se atribuye ("maestro constructor,
+    gásfiter, electricista"): al menos una mención como oficio (3 puntos), no
+    una palabra suelta en la experiencia."""
+    puntos, _ = _puntajes(lineas)
+    orden = list(puntos)
+    candidatos = sorted((s for s in puntos if s != principal and puntos[s] >= 3),
+                        key=lambda s: (-puntos[s], orden.index(s)))
+    return candidatos[:tope]
 
 
 def _titulo_explicito(lineas):
@@ -466,6 +484,10 @@ def proponer_perfil(texto):
         datos['business_name'] = f'{corto}, {titulo}'[:140] if titulo else nombre
     if categoria:
         datos['category'] = categoria.pk
+        otros = _otras_profesiones(lineas, slug)
+        pks = dict(Category.objects.filter(slug__in=otros, is_active=True).values_list('slug', 'pk'))
+        if pks:
+            datos['otras_categorias'] = [pks[s] for s in otros if s in pks]
     if titulo:
         datos['profession_title'] = titulo
     if institucion:

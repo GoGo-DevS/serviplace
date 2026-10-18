@@ -157,6 +157,7 @@ class ProviderForm(AntispamFormMixin, forms.ModelForm):
             'business_name',
             'contact_name',
             'category',
+            'otras_categorias',
             'commune',
             'sector',
             'foto',
@@ -181,6 +182,7 @@ class ProviderForm(AntispamFormMixin, forms.ModelForm):
             'business_name': 'Nombre con el que te presentas',
             'contact_name': 'Tu nombre',
             'category': 'Rubro',
+            'otras_categorias': 'Otros rubros que también haces',
             'commune': 'Comuna base',
             'sector': 'Sector o barrio',
             'short_description': 'En una frase, qué haces',
@@ -258,7 +260,16 @@ class ProviderForm(AntispamFormMixin, forms.ModelForm):
             for clave, _, _ in Category.GRUPOS
             if any(c.group == clave for c in categorias)
         ]
-        self.fields['category'].label = 'Rubro o especialidad'
+        self.fields['category'].label = 'Rubro principal'
+        # 18-10-2026: un maestro hace varias cosas. Se dibujan a mano en la
+        # plantilla, agrupados como el principal (ver otras_agrupadas).
+        self._categorias = categorias
+        self.max_otros = Provider.MAX_OTROS_RUBROS
+        otras = self.fields['otras_categorias']
+        otras.queryset = Category.objects.filter(is_active=True)
+        otras.required = False
+        otras.widget = forms.CheckboxSelectMultiple()
+        otras.help_text = f'Opcional, hasta {self.max_otros}. Apareces también en esos listados.'
         for name, field in self.fields.items():
             if name.startswith('sitio_web') or name.startswith('sello_'):
                 continue
@@ -269,6 +280,24 @@ class ProviderForm(AntispamFormMixin, forms.ModelForm):
                 field.widget.attrs['class'] = f'{css} form-select'.strip()
             else:
                 field.widget.attrs['class'] = f'{css} form-control'.strip()
+
+    def otras_agrupadas(self):
+        """[(grupo, [(pk, nombre, marcada)])] para dibujar los otros rubros por grupo."""
+        valor = self['otras_categorias'].value() or []
+        marcadas = {str(getattr(v, 'pk', v)) for v in valor}
+        nombres = dict(Category.GROUP_CHOICES)
+        return [
+            (nombres[clave], [(c.pk, c.name, str(c.pk) in marcadas) for c in self._categorias if c.group == clave])
+            for clave, _, _ in Category.GRUPOS
+            if any(c.group == clave for c in self._categorias)
+        ]
+
+    def clean_otras_categorias(self):
+        principal = self.cleaned_data.get('category')
+        otras = [c for c in (self.cleaned_data.get('otras_categorias') or []) if c != principal]
+        if len(otras) > self.max_otros:
+            raise forms.ValidationError(f'Elige hasta {self.max_otros} rubros además del principal.')
+        return otras
 
     # Sanitización: se guarda texto plano. Django escapa al mostrar.
     def clean_business_name(self):
@@ -391,17 +420,21 @@ class ProviderForm(AntispamFormMixin, forms.ModelForm):
     def clean(self):
         datos = super().clean()
         categoria = datos.get('category')
+        otras = list(datos.get('otras_categorias') or [])
         anio = datos.get('graduation_year')
+        # Con varios rubros, basta con que UNO sea de salud.
+        salud = [c for c in [categoria] + otras if c and c.pide_registro_salud]
         # El registro de la Superintendencia es solo de salud: en otro rubro no
         # se guarda (no tendría cómo comprobarse y confunde en la ficha).
-        if categoria and not categoria.pide_registro_salud:
+        if categoria and not salud:
             datos['health_registry'] = ''
         # Ofrecer atención de salud sin título es ejercicio ilegal de la
         # profesión. Quien está en práctica puede publicar igual, pero en lo
-        # que ya puede hacer (clases, apoyo), no como kinesiólogo.
-        if categoria and categoria.pide_registro_salud and anio and anio > timezone.localdate().year:
+        # que ya puede hacer (clases, apoyo), no como kinesiólogo. Vale también
+        # para un rubro de salud marcado entre los otros.
+        if salud and anio and anio > timezone.localdate().year:
             self.add_error(
-                'category',
+                'category' if categoria in salud else 'otras_categorias',
                 'La atención de salud solo puede ofrecerla quien ya está titulado/a. '
                 'Mientras terminas, puedes publicar en otra categoría, como clases particulares.',
             )

@@ -60,6 +60,23 @@
             <div class="col-md-4">{% include "accounts/_campo.html" with campo=form.contact_name %}</div>
             <div class="col-md-6">{% include "accounts/_campo.html" with campo=form.category %}</div>
             <div class="col-md-6">{% include "accounts/_campo.html" with campo=form.commune %}</div>
+            <div class="col-12">
+              {% comment %}18-10-2026: un maestro hace varias cosas (construcción, gasfitería, electricidad, soldadura).{% endcomment %}
+              <details class="otros-rubros"{% if form.otras_categorias.value or form.otras_categorias.errors %} open{% endif %}>
+                <summary>¿Haces más de una cosa? Agrega otros rubros <small>(opcional, hasta {{ form.max_otros }})</small></summary>
+                <p class="form-text mt-2 mb-2">Apareces también en esos listados. El principal es el que se ve en tu tarjeta.</p>
+                {% for grupo, cats in form.otras_agrupadas %}
+                <fieldset class="otros-grupo">
+                  <legend>{{ grupo }}</legend>
+                  <div class="otros-chips">
+                    {% for pk, nombre, marcada in cats %}<label class="otro-chip"><input type="checkbox" name="otras_categorias" value="{{ pk }}"{% if marcada %} checked{% endif %} data-otro-rubro> <span>{{ nombre }}</span></label>{% endfor %}
+                  </div>
+                </fieldset>
+                {% endfor %}
+                <p class="form-text mb-0" data-otros-aviso hidden></p>
+                {% if form.otras_categorias.errors %}<div class="campo-error" id="id_otras_categorias_error">{% for error in form.otras_categorias.errors %}<p>{{ error }}</p>{% endfor %}</div>{% endif %}
+              </details>
+            </div>
             <div class="col-12">{% include "accounts/_campo.html" with campo=form.sector %}</div>
           </div>
 
@@ -146,6 +163,7 @@
               <p data-previa="sector" data-vacio="Tu sector o barrio">Tu sector o barrio</p>
             </div>
           </div>
+          <p class="ficha-otros" data-previa-otros hidden></p>
           <p class="ficha-desc" data-previa="short_description" data-vacio="Una frase que diga qué haces y dónde.">Una frase que diga qué haces y dónde.</p>
           <dl class="ficha-cred" data-previa-cred hidden>
             <dt>Título</dt><dd data-previa="profession_title"></dd>
@@ -183,7 +201,10 @@
     var select = document.getElementById('id_category');
     if (!select) return;
     var info = JSON.parse(document.getElementById('categorias-info').textContent);
-    var salud = document.querySelector('[data-solo-salud]');
+    var saludEl = document.querySelector('[data-solo-salud]');
+    var otros = Array.prototype.slice.call(document.querySelectorAll('[data-otro-rubro]'));
+    var avisoOtros = document.querySelector('[data-otros-aviso]');
+    var MAX_OTROS = {{ form.max_otros }};
     var titulo = document.getElementById('id_profession_title');
     var institucion = document.getElementById('id_institution');
     var EJEMPLOS = {
@@ -197,11 +218,27 @@
     };
     function ajustar() {
       var c = info[select.value];
-      if (salud) salud.hidden = !(c && c.salud);
+      // El principal no se marca también como "otro", y hay un tope.
+      otros.forEach(function (o) {
+        var esPrincipal = o.value === select.value;
+        if (esPrincipal) o.checked = false;
+        o.closest('.otro-chip').classList.toggle('es-principal', esPrincipal);
+      });
+      var marcados = otros.filter(function (o) { return o.checked; });
+      var lleno = marcados.length >= MAX_OTROS;
+      otros.forEach(function (o) { o.disabled = o.value === select.value || (lleno && !o.checked); });
+      if (avisoOtros) {
+        avisoOtros.hidden = !lleno;
+        avisoOtros.textContent = 'Ya elegiste ' + MAX_OTROS + ' rubros extra, el máximo.';
+      }
+      // El registro de salud aparece si CUALQUIERA de los rubros es de salud.
+      var salud = (c && c.salud) || marcados.some(function (o) { var i = info[o.value]; return i && i.salud; });
+      if (saludEl) saludEl.hidden = !salud;
       var ej = EJEMPLOS[c ? c.grupo : ''];
       if (ej) { titulo.placeholder = ej[0]; institucion.placeholder = ej[1]; }
     }
     select.addEventListener('change', ajustar);
+    otros.forEach(function (o) { o.addEventListener('change', ajustar); });
     ajustar();
   })();
 
@@ -246,6 +283,11 @@
         }
       });
       tags.hidden = !tags.children.length;
+      var nombresOtros = Array.prototype.slice.call(form.querySelectorAll('[data-otro-rubro]:checked'))
+        .map(function (o) { return o.parentNode.textContent.trim(); });
+      var previaOtros = tarjeta.querySelector('[data-previa-otros]');
+      previaOtros.hidden = !nombresOtros.length;
+      previaOtros.textContent = 'También: ' + nombresOtros.join(', ');
       if (!urlLogo && !tarjeta.querySelector('[data-previa-avatar]').dataset.actual) {
         var nombre = valor('business_name');
         tarjeta.querySelector('[data-previa-avatar]').textContent = nombre ? nombre.charAt(0).toUpperCase() : '?';

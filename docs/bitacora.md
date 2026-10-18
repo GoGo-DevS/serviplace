@@ -448,3 +448,30 @@ subida a R2 con cargar_laminas). Texto revisado contra el código: "sin
 comisión" lo dice el sitio; "más de 300 importados ocultos" = los 361 que
 publicos() deja fuera.
 ---
+
+---
+[18-10-2026, noche] — Diego: "una persona puede tener más de una categoría: mi
+suegro es constructor, gásfiter, eléctrico, soldadura… y solo me dejó una".
+  · Provider.category sigue siendo el rubro PRINCIPAL (etiqueta, URL, schema,
+    miga) y se suma otras_categorias (M2M, migración 0016 aditiva), tope 5 en
+    el formulario. El principal no se repite entre los otros.
+  · El perfil aparece en el listado de cada rubro: ProviderQuerySet.del_rubro
+    y del_grupo filtran por SUBCONSULTA de ids, no por join (con join quien
+    tiene dos rubros del mismo grupo salía dos veces y la paginación contaba
+    de más; prueba con mutación lo detecta). Búsqueda por texto también.
+  · Todo lo que decide si enlazar un listado (vacío = 404) cuenta los otros
+    rubros: categorias_por_grupo, perfiles_por_rubro (rubros de la comuna,
+    guías), grupos_de (chips), sitemap (rubro, grupo y rubro×comuna).
+  · Tarjeta: en un listado de rubro la etiqueta es ESE rubro y abajo "También:
+    …" (filtro otros_rubros, del prefetch: mismas consultas con 1 o 5 perfiles).
+    Ficha: los otros rubros como etiquetas que enlazan a su listado en la
+    comuna; JSON-LD knowsAbout con todos. Panel: todas las etiquetas.
+  · Formulario: "¿Haces más de una cosa?" desplegable con los rubros agrupados;
+    el registro de salud aparece si CUALQUIER rubro es de salud, y la regla de
+    no ofrecer salud sin título vale también para un rubro extra. Vista previa
+    con "También:". El CV sugiere los otros oficios que la persona se atribuye.
+  · Rubro nuevo: Soldadura (Hogar), con su página /profesionales/soldadura/,
+    en la guía de contratar un maestro y en el lector de CV.
+  · Admin: filter_horizontal para los otros rubros.
+Pruebas: 253.
+---

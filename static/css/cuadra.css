@@ -543,3 +543,19 @@ body:has(.galeria-visor[open]) { overflow: hidden; }
 .tree-ig { display: inline-flex; align-items: center; gap: .45rem; min-height: 44px; padding: 0 1rem; border-radius: 999px; background: #fff; box-shadow: var(--sp-sh-sm); color: var(--sp-ink); font-weight: 700; text-decoration: none; }
 .tree-pie p { margin: 0; font-size: .82rem; color: var(--sp-muted); }
 @media (prefers-reduced-motion: reduce) { .tree-btn { transition: none; } }
+
+/* ---- Varios rubros por perfil (18-10-2026) ---- */
+.ficha-otros { margin: .55rem 0 0; font-size: .8rem; color: var(--sp-muted); line-height: 1.35; }
+.badge-otro { text-decoration: none; opacity: .85; }
+.badge-otro:hover { opacity: 1; color: var(--sp-ink); }
+.otros-rubros { border: 2px dashed var(--sp-line); border-radius: 14px; padding: .7rem .9rem; background: #fff; }
+.otros-rubros[open] { border-style: solid; }
+.otros-rubros summary { cursor: pointer; font-weight: 700; color: var(--sp-accent); }
+.otros-rubros summary small { font-weight: 400; color: var(--sp-muted); }
+.otros-grupo { margin: .6rem 0 0; padding: 0; border: 0; }
+.otros-grupo legend { float: none; width: auto; margin: 0 0 .35rem; font-family: var(--font-mono); font-size: .66rem; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--sp-muted); }
+.otros-chips { display: flex; flex-wrap: wrap; gap: .4rem; }
+.otro-chip { display: inline-flex; align-items: center; gap: .35rem; min-height: 40px; padding: .3rem .7rem; border: 2px solid var(--sp-line); border-radius: 999px; font-size: .88rem; font-weight: 600; cursor: pointer; user-select: none; }
+.otro-chip:has(input:checked) { border-color: var(--sp-accent); background: var(--sp-blue-light); }
+.otro-chip:has(input:disabled) { opacity: .45; cursor: not-allowed; }
+.otro-chip.es-principal { display: none; }

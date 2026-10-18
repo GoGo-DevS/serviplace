@@ -12,6 +12,7 @@
       <div class="provider-detail-info">
         <div class="d-flex flex-wrap gap-2 mb-2 align-items-center">
           <span class="badge badge-category">{{ provider.category.name }}</span>
+          {% for otro in otros_rubros %}<a class="badge badge-category badge-otro" href="{{ otro.url }}">{{ otro.categoria.name }}</a>{% endfor %}
           {% if provider.verificado_publico %}<span class="badge badge-verified">Verificado</span>{% endif %}
           {% if not provider.owner %}
             <a class="badge badge-new" href="{% url 'accounts:claim_profile' provider.slug %}">¿Es tuyo? Reclámalo</a>
@@ -123,7 +124,7 @@
 
       <div class="detail-block">
         <h2>Antes de contratar</h2>
-        {% if provider.category.pide_registro_salud %}
+        {% if provider.pide_registro_salud %}
         <p>Confirma el valor de la sesión, la disponibilidad y si entrega boleta. Antes de atenderte, comprueba que esté inscrito en el registro de prestadores de la Superintendencia de Salud.</p>
         {% else %}
         <p>Confirma precio, disponibilidad y alcance del trabajo antes de empezar.</p>

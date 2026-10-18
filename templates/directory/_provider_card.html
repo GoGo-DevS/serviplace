@@ -4,12 +4,15 @@ comuna; después quién es, qué hace y, si lo declaró, su formación. Un ofici
 sin título no muestra el bloque de formación: no tiene por qué verse
 incompleto. El nombre es el enlace a la ficha; WhatsApp es el botón.
 {% endcomment %}
+{% load rubros %}
+{% comment %}En un listado de rubro la etiqueta es ESE rubro (puede ser uno de los otros del perfil).{% endcomment %}
+{% with rubro=selected_category|default:provider.category %}
 <div class="col-md-6 col-xl-4">
   <article class="ficha">
     {% with portada=provider.portadas|first %}{% if portada %}
     <a class="ficha-portada" href="{{ provider.get_absolute_url }}" tabindex="-1" aria-hidden="true"><img src="{{ portada.image.url }}" alt="" loading="lazy" width="480" height="270"></a>
     {% endif %}{% endwith %}
-    <div class="ficha-top"><b>{{ provider.category.name }}</b><span>{{ provider.commune.name }}</span></div>
+    <div class="ficha-top"><b>{{ rubro.name }}</b><span>{{ provider.commune.name }}</span></div>
     <div class="ficha-who">
       <div class="ficha-avatar{% if provider.foto %} con-foto{% endif %}" aria-hidden="true">{% if provider.foto %}<img src="{{ provider.foto.url }}" alt="" loading="lazy" width="46" height="52">{% else %}{{ provider.business_name|first|upper }}{% endif %}</div>
       <div>
@@ -17,6 +20,8 @@ incompleto. El nombre es el enlace a la ficha; WhatsApp es el botón.
         <p>{{ provider.sector }}</p>
       </div>
     </div>
+
+    {% with otros=provider|otros_rubros:rubro %}{% if otros %}<p class="ficha-otros">También: {{ otros|join:", " }}</p>{% endif %}{% endwith %}
 
     <p class="ficha-desc">{{ provider.short_description }}</p>
 
@@ -38,7 +43,7 @@ incompleto. El nombre es el enlace a la ficha; WhatsApp es el botón.
 
     <div class="ficha-acciones">
       <a class="ficha-ver" href="{{ provider.get_absolute_url }}">Ver ficha →</a>
-      <a class="btn btn-success" href="{% url 'directory:whatsapp_redirect' provider.slug %}?desde=tarjeta" target="_blank" rel="noopener" data-ga="contacto_whatsapp" data-ga-categoria="{{ provider.category.slug }}" data-ga-comuna="{{ provider.commune.slug }}" data-ga-origen="tarjeta">
+      <a class="btn btn-success" href="{% url 'directory:whatsapp_redirect' provider.slug %}?desde=tarjeta" target="_blank" rel="noopener" data-ga="contacto_whatsapp" data-ga-categoria="{{ rubro.slug }}" data-ga-comuna="{{ provider.commune.slug }}" data-ga-origen="tarjeta">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.555 4.117 1.528 5.845L0 24l6.335-1.652A11.95 11.95 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.943 0-3.771-.52-5.344-1.424l-.383-.226-3.963 1.033 1.055-3.857-.248-.396A9.928 9.928 0 012 12c0-5.514 4.486-10 10-10s10 4.486 10 10-4.486 10-10 10z"/></svg>
         WhatsApp
       </a>
@@ -46,3 +51,4 @@ incompleto. El nombre es el enlace a la ficha; WhatsApp es el botón.
     <p class="ficha-estado{% if provider.verificado_publico %} is-ok{% endif %}">{% if provider.verificado_publico %}Verificado por ServiPlace{% elif provider.de_sitio_oficial %}Datos de su sitio web oficial{% elif provider.owner_id %}Publicado por su dueño{% else %}Información de fuentes públicas, sin revisar{% endif %}</p>
   </article>
 </div>
+{% endwith %}

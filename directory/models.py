@@ -127,8 +127,22 @@ class ProviderQuerySet(models.QuerySet):
         """
         return self.filter(is_active=True, owner__isnull=False)
 
+    def del_rubro(self, categoria):
+        """Los que tienen ese rubro como principal O entre sus otros rubros.
+
+        Subconsulta por id, no un join: con el join quien tiene dos rubros del
+        mismo grupo sale dos veces y la paginación cuenta de más.
+        """
+        otros = Provider.otras_categorias.through.objects.filter(category=categoria).values('provider_id')
+        return self.filter(models.Q(category=categoria) | models.Q(pk__in=otros))
+
+    def del_grupo(self, grupo):
+        otros = Provider.otras_categorias.through.objects.filter(category__group=grupo).values('provider_id')
+        return self.filter(models.Q(category__group=grupo) | models.Q(pk__in=otros))
+
 
 class Provider(models.Model):
+    MAX_OTROS_RUBROS = 5
     PUBLIC_PROSPECT = 'prospecto_publico'
     CONTACTED = 'contactado'
     AUTHORIZED = 'autorizado'
@@ -162,6 +176,13 @@ class Provider(models.Model):
         related_name='providers',
     )
     category = models.ForeignKey(Category, on_delete=models.PROTECT, related_name='providers')
+    # 18-10-2026 — Un maestro hace varias cosas (el suegro de Diego: construcción,
+    # gasfitería, electricidad y soldadura) y el formulario lo obligaba a elegir
+    # una. `category` sigue siendo el rubro PRINCIPAL (etiqueta de la tarjeta,
+    # URL, schema); estos son los demás, y el perfil aparece también en esos
+    # listados. El tope lo pone el formulario: MAX_OTROS_RUBROS.
+    otras_categorias = models.ManyToManyField(
+        Category, blank=True, related_name='providers_secundarios', verbose_name='otros rubros')
     commune = models.ForeignKey(Commune, on_delete=models.PROTECT, related_name='providers')
     sector = models.CharField(max_length=120)
     description = models.TextField()
@@ -320,6 +341,15 @@ class Provider(models.Model):
                 (self.attends_online, 'Online'),
             ) if activa
         ]
+
+    @property
+    def rubros(self):
+        """El principal primero y después los otros (usa el prefetch si lo hay)."""
+        return [self.category] + [c for c in self.otras_categorias.all() if c.pk != self.category_id]
+
+    @property
+    def pide_registro_salud(self):
+        return any(c.pide_registro_salud for c in self.rubros)
 
 
 class ProviderImage(models.Model):

@@ -116,7 +116,8 @@ def register(request):
 
 @login_required
 def dashboard(request):
-    my_providers = Provider.objects.filter(owner=request.user).select_related('category', 'commune')
+    my_providers = Provider.objects.filter(owner=request.user).select_related('category', 'commune').prefetch_related(
+        'otras_categorias')
     profile, _ = UserProfile.objects.get_or_create(user=request.user)
     claims = ProviderReport.objects.filter(claimant=request.user, kind=ProviderReport.CLAIM).select_related('provider')
     total_views = sum(p.views_count for p in my_providers)
@@ -192,6 +193,7 @@ def provider_create(request):
                 provider.hidden_at = timezone.now()
                 provider.moderation_note = 'Retenido por el filtro antispam al publicar.'
             provider.save()
+            form.save_m2m()  # los otros rubros: con commit=False no se guardan solos
             form.guardar_fotos(provider)
             request.session.pop('cv_borrador', None)
             if provider.is_active:

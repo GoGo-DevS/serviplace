@@ -43,7 +43,7 @@ GUIAS = [
         'title': 'Antes de contratar a un maestro: qué acordar',
         'meta': 'Checklist para contratar a un gásfiter, electricista, pintor o maestro constructor sin sorpresas: presupuesto por escrito, plazos, materiales, pagos y garantía.',
         'resumen': 'La mayoría de los problemas con un trabajo en la casa no vienen de un mal maestro, sino de algo que nadie dejó por escrito. Esta lista te ayuda a acordarlo antes de partir.',
-        'rubros': ['gasfiteria', 'electricidad', 'construccion', 'pintura', 'carpinteria', 'climatizacion'],
+        'rubros': ['gasfiteria', 'electricidad', 'construccion', 'soldadura', 'pintura', 'carpinteria', 'climatizacion'],
         'publicada': date(2026, 10, 18),
         'actualizada': date(2026, 10, 18),
     },

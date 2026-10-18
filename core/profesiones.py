@@ -844,6 +844,33 @@ PROFESIONES = {
             ('¿Puedo poner varias comunas?', 'Elige una comuna base y nombra en la descripción todas las comunas donde trabajas.'),
         ],
     },
+    'soldadura': {
+        'clientes': 'clientes',
+        'titulo': 'Soldador independiente: consigue clientes',
+        'h1': 'Soldador independiente: rejas, portones y estructuras para tu comuna',
+        'meta': 'Publica tu perfil de soldador gratis: rejas, portones, estructuras y reparaciones en fierro. Los vecinos te escriben directo por WhatsApp, sin comisión.',
+        'intro': 'Quien busca soldador casi siempre tiene algo concreto en mente: una reja que proteja la casa, un portón que ya no cierra o un techo para el auto. Quiere ver trabajos terminados y saber si vas a medir antes de cotizar.',
+        'buscan': [
+            'Rejas y protecciones para ventanas y antejardín.',
+            'Portones nuevos y reparación de los que se traban.',
+            'Estructuras para techos, cobertizos y escaleras.',
+            'Reparaciones y refuerzos en fierro.',
+        ],
+        'credencial': None,
+        'credencial_texto': 'No hay un registro obligatorio para soldar en casas. Si hiciste un curso o tienes una certificación de soldadura, ponla en tu formación: le muestra al cliente que sabes lo que haces.',
+        'tips': [
+            'Usa como foto una reja o un portón tuyo terminado.',
+            'Di con qué trabajas: fierro, perfiles, metalcon, acero inoxidable.',
+            'Explica si incluyes la pintura anticorrosiva y la instalación.',
+            'Cuenta cómo cotizas: visita, medidas y plazo de fabricación.',
+        ],
+        'ejemplo_corta': 'Soldador en San Bernardo: rejas, portones y estructuras metálicas a medida.',
+        'ejemplo_larga': 'Soy soldador y fabrico rejas, portones y estructuras metálicas a medida. Voy a tomar medidas, te muestro el diseño y te doy un plazo antes de empezar. Entrego todo con pintura anticorrosiva e instalado. También reparo portones que se traban y refuerzo estructuras. Trabajo en San Bernardo, El Bosque y La Cisterna.',
+        'faq': [
+            ('¿Puedo publicar si también hago gasfitería o construcción?', 'Sí. Elige tu rubro principal y agrega los demás: apareces en cada uno de esos listados.'),
+            ('¿Cuánto cuesta publicar?', 'Nada. No cobramos por publicar ni comisión por trabajo.'),
+        ],
+    },
     'carpinteria': {
         'clientes': 'clientes',
         'titulo': 'Carpintero independiente: consigue clientes',

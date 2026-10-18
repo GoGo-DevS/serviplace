@@ -23,6 +23,7 @@ TIPO_SCHEMA = {
     'cerrajeria': 'Locksmith',
     'climatizacion': 'HVACBusiness',
     'construccion': 'GeneralContractor',
+    'soldadura': 'HomeAndConstructionBusiness',
     'pintura': 'HousePainter',
     'carpinteria': 'HomeAndConstructionBusiness',
     'jardineria': 'HomeAndConstructionBusiness',
@@ -206,6 +207,10 @@ def perfil(provider, request):
         datos['image'] = request.build_absolute_uri(url) if url.startswith('/') else url
     if provider.profession_title:
         datos['knowsAbout'] = provider.profession_title
+    otros = [c.nombre_busqueda for c in provider.rubros[1:]]
+    if otros:
+        datos['knowsAbout'] = ([provider.profession_title] if provider.profession_title else []) + \
+            [provider.category.nombre_busqueda] + otros
     mismos = [u for u in (provider.website, provider.instagram_url) if u]
     if mismos:
         datos['sameAs'] = mismos

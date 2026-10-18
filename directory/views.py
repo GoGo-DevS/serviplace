@@ -13,7 +13,7 @@ from leads.registro import es_bot, registrar, sanear_busqueda
 from core import guias
 
 from . import seo
-from .catalogo import categorias_por_grupo
+from .catalogo import categorias_por_grupo, grupos_de, perfiles_por_rubro
 from .models import Category, Commune, Provider, ProviderImage, Region
 
 # Cuántos prestadores por página. 24 entra en 3 columnas en escritorio y en 2
@@ -136,7 +136,8 @@ def _textos(categoria, grupo, comuna, query, total):
 def _listado(request, *, categoria=None, grupo=None, comuna=None, query=''):
     providers = Provider.objects.publicos().select_related('category', 'commune').prefetch_related(
         # La foto de portada de cada tarjeta, en una sola consulta (G-04)
-        Prefetch('images', queryset=ProviderImage.objects.filter(is_cover=True), to_attr='portadas'))
+        Prefetch('images', queryset=ProviderImage.objects.filter(is_cover=True), to_attr='portadas'),
+        'otras_categorias')
     if query:
         providers = providers.filter(
             Q(business_name__icontains=query)
@@ -145,13 +146,16 @@ def _listado(request, *, categoria=None, grupo=None, comuna=None, query=''):
             | Q(description__icontains=query)
             | Q(sector__icontains=query)
             | Q(category__name__icontains=query)
+            | Q(pk__in=Provider.otras_categorias.through.objects
+                .filter(category__name__icontains=query).values('provider_id'))
             | Q(profession_title__icontains=query)
             | Q(institution__icontains=query)
         )
+    # Principal u otro rubro: el maestro que también es gásfiter sale en Gasfitería.
     if categoria:
-        providers = providers.filter(category=categoria)
+        providers = providers.del_rubro(categoria)
     elif grupo:
-        providers = providers.filter(category__group=grupo)
+        providers = providers.del_grupo(grupo)
     if comuna:
         providers = providers.filter(commune=comuna)
 
@@ -212,18 +216,22 @@ def _listado(request, *, categoria=None, grupo=None, comuna=None, query=''):
     relacionados_comunas, relacionados_categorias = [], []
     if categoria:
         relacionados_comunas = list(
-            publicos.filter(category=categoria).exclude(commune=comuna)
+            publicos.del_rubro(categoria).exclude(commune=comuna)
             .values('commune__slug', 'commune__name').annotate(n=Count('id')).order_by('-n', 'commune__name')[:12]
         )
         for fila in relacionados_comunas:
             fila['url'] = reverse('directory:listado_rubro_comuna',
                                   kwargs={'rubro': categoria.slug, 'comuna': fila['commune__slug']})
     if comuna:
-        relacionados_categorias = list(
-            publicos.filter(commune=comuna).exclude(category=categoria)
-            .values('category__slug', 'category__name', 'category__seo_nombre').annotate(n=Count('id'))
-            .order_by('-n', 'category__name')[:12]
-        )
+        conteo = perfiles_por_rubro(publicos.filter(commune=comuna))
+        otras = Category.objects.filter(slug__in=conteo)
+        if categoria:
+            otras = otras.exclude(pk=categoria.pk)
+        relacionados_categorias = sorted(
+            ({'category__slug': c.slug, 'category__name': c.name, 'category__seo_nombre': c.seo_nombre,
+              'n': conteo[c.slug]} for c in otras),
+            key=lambda f: (-f['n'], f['category__name']),
+        )[:12]
         for fila in relacionados_categorias:
             fila['url'] = reverse('directory:listado_rubro_comuna',
                                   kwargs={'rubro': fila['category__slug'], 'comuna': comuna.slug})
@@ -239,9 +247,8 @@ def _listado(request, *, categoria=None, grupo=None, comuna=None, query=''):
         # Grupos con perfiles en ESTA comuna (o en todo el país): el chip de un
         # grupo vacío enlazaba a un listado que responde 404 a propósito, y
         # eso eran enlaces internos rotos en cada listado (rastreo 18-10-2026).
-        'grupos_con_perfiles': set(
+        'grupos_con_perfiles': grupos_de(
             Provider.objects.publicos().filter(**({'commune': comuna} if comuna else {}))
-            .values_list('category__group', flat=True).distinct()
         ),
         'selected_group': grupo or '',
         'selected_category': categoria,
@@ -274,7 +281,8 @@ def _listado(request, *, categoria=None, grupo=None, comuna=None, query=''):
 
 def provider_detail(request, slug):
     provider = get_object_or_404(
-        Provider.objects.publicos().select_related('category', 'commune__region').prefetch_related('images'),
+        Provider.objects.publicos().select_related('category', 'commune__region').prefetch_related(
+            'images', 'otras_categorias'),
         slug=slug,
     )
     # Un bot (Google, la vista previa de WhatsApp) no es una visita: no suma
@@ -306,6 +314,13 @@ def provider_detail(request, slug):
         'jsonld': seo.como_script(seo.miga(pasos), seo.perfil(provider, request)),
         'cover_image': provider.images.filter(is_cover=True).first(),
         'guias_rubro': guias.para_rubro(provider.category.slug),
+        # Los otros rubros enlazan a su listado en la comuna: él está ahí, así
+        # que nunca es un listado vacío (404).
+        'otros_rubros': [
+            {'categoria': c, 'url': reverse('directory:listado_rubro_comuna',
+                                            kwargs={'rubro': c.slug, 'comuna': provider.commune.slug})}
+            for c in provider.rubros[1:]
+        ],
         'page_title': f'{titulo} | ServiPlace',
         'meta_description': (provider.short_description + f' Atiende en {provider.commune.name}. Contacto directo por WhatsApp.')[:158],
         'og_title': f'{provider.business_name} en SERVIPLACE',

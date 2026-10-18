@@ -7,7 +7,7 @@ from django.urls import reverse
 from urllib.parse import urlencode
 from django.utils import timezone
 
-from directory.catalogo import categorias_por_grupo
+from directory.catalogo import categorias_por_grupo, perfiles_por_rubro
 from directory.models import Category, Commune, Provider, ProviderImage, Region
 from leads.models import LeadEvent
 from directory import seo
@@ -25,7 +25,7 @@ def home(request):
     # sin logo, marcados "Verificado" sin estarlo).
     featured_providers = (
         Provider.objects.publicos().exclude(foto='')
-        .select_related('category', 'commune').distinct()
+        .select_related('category', 'commune').prefetch_related('otras_categorias').distinct()
         .prefetch_related(Prefetch('images', queryset=ProviderImage.objects.filter(is_cover=True), to_attr='portadas'))
         .order_by('-is_featured', '-is_verified', 'business_name', 'pk')[:6]
     )
@@ -235,7 +235,7 @@ def profesion(request, rubro):
     categoria = Category.objects.filter(slug=rubro, is_active=True).exclude(group=Category.TIENDAS).first()
     if not contenido or not categoria:
         raise Http404('Especialidad sin página')
-    n_publicos = Provider.objects.publicos().filter(category=categoria).count()
+    n_publicos = Provider.objects.publicos().del_rubro(categoria).count()
     grupo = dict(Category.GROUP_CHOICES).get(categoria.group, '')
     hermanas = [c for c in Category.objects.filter(is_active=True, group=categoria.group).exclude(pk=categoria.pk)
                 .order_by('display_order', 'name') if profesiones.para(c.slug)]
@@ -285,10 +285,7 @@ def guia(request, slug):
     # listado es 404 a propósito); a la página para profesionales si no.
     rubros = []
     if datos['rubros']:
-        con_perfiles = dict(
-            Provider.objects.publicos().filter(category__slug__in=datos['rubros'])
-            .values_list('category__slug').annotate(n=Count('id'))
-        )
+        con_perfiles = perfiles_por_rubro(Provider.objects.publicos())
         for categoria in Category.objects.filter(slug__in=datos['rubros'], is_active=True).order_by('name'):
             rubros.append({'categoria': categoria, 'n': con_perfiles.get(categoria.slug, 0)})
     registrar(request, LeadEvent.PAGE_VIEW, origen=f'guia-{slug}'[:120])
