@@ -10,8 +10,14 @@
 </section>
 
 <section class="container py-5">
-  <div class="row justify-content-center">
-    <div class="col-lg-8">
+  {% comment %}
+  18-10-2026: el formulario iba en una columna centrada de 8/12 y en un
+  computador quedaba media pantalla vacía. A la derecha va lo que el
+  formulario produce: la tarjeta tal como la verá un cliente, al día con lo
+  que se escribe. En el celular no se muestra: ahí el ancho ya es del formulario.
+  {% endcomment %}
+  <div class="row g-4 g-xl-5">
+    <div class="col-lg-7 col-xl-8">
       <div class="application-card">
         {% if is_create %}
         <p class="form-microcopy">Tu perfil es tu responsabilidad. SERVIPLACE es una vitrina: asegúrate de que tus datos de contacto sean correctos y tu descripción, veraz. <a href="{% url 'core:terms' %}">Ver términos →</a></p>
@@ -44,7 +50,7 @@
 
         {% include "_errores_form.html" %}
 
-        <form method="post" enctype="multipart/form-data" novalidate data-un-envio>
+        <form method="post" enctype="multipart/form-data" novalidate data-un-envio data-vista-previa>
           {% csrf_token %}
           {% include "_antispam.html" %}
 
@@ -64,6 +70,25 @@
               <div class="form-text">Los perfiles con logo o foto generan más confianza, y solo esos pueden aparecer como destacados.</div>
             </div>
           </div>
+
+          <h3 class="form-section-title" id="fotos">Fotos de tus trabajos</h3>
+          <p class="form-text mt-0 mb-3">Lo que más convence a un cliente es ver lo que haces. La que marques como portada sale en tu tarjeta.</p>
+          {% if provider and provider.images.all %}
+          <div class="galeria-editar mb-3">
+            {% for imagen in provider.images.all %}
+            <figure class="galeria-item">
+              <img src="{{ imagen.image.url }}" alt="{{ imagen.alt_text }}" loading="lazy" width="200" height="150">
+              <figcaption>
+                <label><input type="radio" name="portada" value="{{ imagen.pk }}"{% if imagen.is_cover %} checked{% endif %}> Portada</label>
+                <label><input type="checkbox" name="quitar_fotos" value="{{ imagen.pk }}"> Quitar</label>
+              </figcaption>
+            </figure>
+            {% endfor %}
+          </div>
+          {% endif %}
+          <div class="galeria-editar galeria-nuevas mb-2" data-fotos-nuevas hidden></div>
+          <p class="campo-error" data-fotos-aviso hidden></p>
+          <div class="mb-4">{% include "accounts/_campo.html" with campo=form.fotos %}</div>
 
           <h3 class="form-section-title">Cómo atiendes</h3>
           <div class="modality-options mb-4">
@@ -107,6 +132,44 @@
         </form>
       </div>
     </div>
+
+    <aside class="col-lg-5 col-xl-4 d-none d-lg-block" aria-labelledby="previa-titulo">
+      <div class="form-aside">
+        <h2 class="form-aside-rotulo" id="previa-titulo">Así se verá tu tarjeta</h2>
+        <article class="ficha ficha-previa" id="vista-previa" aria-hidden="true">
+          <div class="ficha-portada" data-previa-portada hidden><img src="" alt="" width="480" height="270"></div>
+          <div class="ficha-top"><b data-previa="category" data-vacio="Tu rubro">Tu rubro</b><span data-previa="commune" data-vacio="Tu comuna">Tu comuna</span></div>
+          <div class="ficha-who">
+            <div class="ficha-avatar{% if provider.foto %} con-foto{% endif %}" data-previa-avatar{% if provider.foto %} data-actual="{{ provider.foto.url }}"{% endif %}>{% if provider.foto %}<img src="{{ provider.foto.url }}" alt="" width="46" height="52">{% else %}?{% endif %}</div>
+            <div>
+              <p class="ficha-nombre" data-previa="business_name" data-vacio="Tu nombre o el de tu negocio">Tu nombre o el de tu negocio</p>
+              <p data-previa="sector" data-vacio="Tu sector o barrio">Tu sector o barrio</p>
+            </div>
+          </div>
+          <p class="ficha-desc" data-previa="short_description" data-vacio="Una frase que diga qué haces y dónde.">Una frase que diga qué haces y dónde.</p>
+          <dl class="ficha-cred" data-previa-cred hidden>
+            <dt>Título</dt><dd data-previa="profession_title"></dd>
+            <dt data-previa-inst>Estudió en</dt><dd data-previa="institution" data-previa-inst></dd>
+          </dl>
+          <div class="ficha-tags" data-previa-tags>{% if provider.verificado_publico %}<span class="badge badge-verified">Verificado</span>{% endif %}</div>
+          <div class="ficha-acciones">
+            <span class="ficha-ver" aria-disabled="true">Ver ficha →</span>
+            <span class="btn btn-success">WhatsApp</span>
+          </div>
+          <p class="ficha-estado{% if provider.verificado_publico %} is-ok{% endif %}">{% if provider.verificado_publico %}Verificado por ServiPlace{% else %}Publicado por su dueño{% endif %}</p>
+        </article>
+
+        <div class="form-consejos">
+          <h3>Lo que hace que te escriban</h3>
+          <ol>
+            <li><b>Una foto de un trabajo tuyo</b> de portada: es lo primero que se mira.</li>
+            <li><b>Qué haces y dónde</b>, concreto: «Destapes en Maipú» dice más que «Servicio de calidad».</li>
+            <li><b>Un WhatsApp que contestes:</b> es el botón que la gente aprieta.</li>
+          </ol>
+        </div>
+        {% if not is_create %}<a class="small" href="{{ provider.get_absolute_url }}" target="_blank" rel="noopener">Ver mi ficha publicada →</a>{% endif %}
+      </div>
+    </aside>
   </div>
 </section>
 {% endblock %}
@@ -140,6 +203,111 @@
     }
     select.addEventListener('change', ajustar);
     ajustar();
+  })();
+
+  // Vista previa de la tarjeta y de las fotos nuevas, sin subir nada: las
+  // imágenes se muestran desde el propio equipo con createObjectURL.
+  (function () {
+    var form = document.querySelector('form[data-vista-previa]');
+    var tarjeta = document.getElementById('vista-previa');
+    if (!form || !tarjeta) return;
+    var MAX_FOTOS = {{ max_fotos }};
+    var MODALIDADES = {id_attends_home: 'A domicilio', id_attends_office: 'En consulta o local', id_attends_online: 'Online'};
+    var nuevas = form.querySelector('[data-fotos-nuevas]');
+    var aviso = form.querySelector('[data-fotos-aviso]');
+    var inputFotos = document.getElementById('id_fotos');
+    var inputLogo = document.getElementById('id_foto');
+    var urlLogo = null;
+
+    function valor(nombre) {
+      var el = form.elements[nombre];
+      if (!el) return '';
+      if (el.tagName === 'SELECT') return el.value ? el.options[el.selectedIndex].text : '';
+      return el.value.trim();
+    }
+    function textos() {
+      tarjeta.querySelectorAll('[data-previa]').forEach(function (el) {
+        var v = valor(el.getAttribute('data-previa'));
+        el.textContent = v || el.getAttribute('data-vacio') || '';
+        el.classList.toggle('es-ejemplo', !v);
+      });
+      var titulo = valor('profession_title'), inst = valor('institution');
+      tarjeta.querySelector('[data-previa-cred]').hidden = !titulo;
+      tarjeta.querySelectorAll('[data-previa-inst]').forEach(function (el) { el.hidden = !inst; });
+      var tags = tarjeta.querySelector('[data-previa-tags]');
+      tags.querySelectorAll('.mini-pill').forEach(function (el) { el.remove(); });
+      Object.keys(MODALIDADES).forEach(function (id) {
+        var c = document.getElementById(id);
+        if (c && c.checked) {
+          var pill = document.createElement('span');
+          pill.className = 'mini-pill';
+          pill.textContent = MODALIDADES[id];
+          tags.appendChild(pill);
+        }
+      });
+      tags.hidden = !tags.children.length;
+      if (!urlLogo && !tarjeta.querySelector('[data-previa-avatar]').dataset.actual) {
+        var nombre = valor('business_name');
+        tarjeta.querySelector('[data-previa-avatar]').textContent = nombre ? nombre.charAt(0).toUpperCase() : '?';
+      }
+    }
+    function logo() {
+      var archivo = inputLogo && inputLogo.files[0];
+      if (urlLogo) { URL.revokeObjectURL(urlLogo); urlLogo = null; }
+      if (archivo && archivo.type.indexOf('image/') === 0) urlLogo = URL.createObjectURL(archivo);
+      var src = urlLogo || tarjeta.querySelector('[data-previa-avatar]').dataset.actual;
+      document.querySelectorAll('[data-previa-avatar], .foto-preview').forEach(function (caja) {
+        if (!src) return;
+        caja.classList.add('con-foto');
+        caja.innerHTML = '';
+        var img = document.createElement('img');
+        img.src = src; img.alt = '';
+        caja.appendChild(img);
+      });
+    }
+    function fotosNuevas() {
+      nuevas.querySelectorAll('img').forEach(function (img) { URL.revokeObjectURL(img.src); });
+      nuevas.innerHTML = '';
+      var archivos = inputFotos ? Array.prototype.slice.call(inputFotos.files) : [];
+      archivos.forEach(function (archivo) {
+        if (archivo.type.indexOf('image/') !== 0) return;
+        var fig = document.createElement('figure');
+        fig.className = 'galeria-item';
+        fig.innerHTML = '<img alt=""><figcaption><span>Nueva</span></figcaption>';
+        fig.querySelector('img').src = URL.createObjectURL(archivo);
+        nuevas.appendChild(fig);
+      });
+      nuevas.hidden = !nuevas.children.length;
+      var quedan = form.querySelectorAll('.galeria-editar:not(.galeria-nuevas) input[name="quitar_fotos"]:not(:checked)').length;
+      var total = quedan + archivos.length;
+      aviso.hidden = total <= MAX_FOTOS;
+      aviso.textContent = 'Son ' + total + ' fotos y el máximo es ' + MAX_FOTOS + ': quita alguna o elige menos.';
+    }
+    function portada() {
+      var src = '';
+      var marcada = form.querySelector('input[name="portada"]:checked');
+      var fig = marcada && marcada.closest('figure');
+      if (fig && !fig.querySelector('input[name="quitar_fotos"]').checked) src = fig.querySelector('img').src;
+      if (!src) {
+        form.querySelectorAll('.galeria-editar:not(.galeria-nuevas) figure').forEach(function (f) {
+          if (!src && !f.querySelector('input[name="quitar_fotos"]').checked) src = f.querySelector('img').src;
+        });
+      }
+      if (!src) { var primera = nuevas.querySelector('img'); if (primera) src = primera.src; }
+      var caja = tarjeta.querySelector('[data-previa-portada]');
+      caja.hidden = !src;
+      if (src) caja.querySelector('img').src = src;
+    }
+
+    form.addEventListener('input', textos);
+    form.addEventListener('change', function (e) {
+      if (e.target === inputLogo) logo();
+      if (e.target === inputFotos || e.target.name === 'quitar_fotos') fotosNuevas();
+      textos();
+      portada();
+    });
+    textos();
+    portada();
   })();
 </script>
 {% endblock %}

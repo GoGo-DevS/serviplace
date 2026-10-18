@@ -11,7 +11,28 @@ from django.core.files.uploadedfile import UploadedFile
 from accounts.cv import ACEPTA, CVIlegible, extraer_texto
 from core.antispam import AntispamFormMixin
 from directory.imagenes import procesar_foto
-from directory.models import Category, Commune, Provider
+from directory.models import Category, Commune, Provider, ProviderImage
+
+MAX_FOTOS = 8
+
+
+class VariasFotosInput(forms.ClearableFileInput):
+    allow_multiple_selected = True
+
+
+class VariasFotosField(forms.FileField):
+    """Un <input type=file multiple>: devuelve una lista (patrón de la doc de Django)."""
+
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault('widget', VariasFotosInput(attrs={'accept': 'image/jpeg,image/png,image/webp',
+                                                            'multiple': True}))
+        super().__init__(*args, **kwargs)
+
+    def clean(self, data, initial=None):
+        uno = super().clean
+        if isinstance(data, (list, tuple)):
+            return [uno(d, initial) for d in data if d]
+        return [uno(data, initial)] if data else []
 
 User = get_user_model()
 
@@ -123,6 +144,13 @@ class RegisterForm(AntispamFormMixin, UserCreationForm):
 
 
 class ProviderForm(AntispamFormMixin, forms.ModelForm):
+    # 18-10-2026: la ficha decía "Todavía no subes fotos. Agregar fotos →" y el
+    # formulario solo tenía el logo: no había dónde subir los trabajos.
+    fotos = VariasFotosField(
+        required=False, label='Agregar fotos',
+        help_text=f'Hasta {MAX_FOTOS}. JPG, PNG o WebP; las achicamos y les quitamos la ubicación del celular.',
+    )
+
     class Meta:
         model = Provider
         fields = [
@@ -306,6 +334,38 @@ class ProviderForm(AntispamFormMixin, forms.ModelForm):
         if valor and not re.fullmatch(r'[A-Za-z0-9._]{1,30}', valor):
             raise forms.ValidationError('Escribe solo tu usuario de Instagram, por ejemplo: camila.kine')
         return valor
+
+    def clean_fotos(self):
+        nuevas = self.cleaned_data.get('fotos') or []
+        quitar = set(self.data.getlist('quitar_fotos')) if hasattr(self.data, 'getlist') else set()
+        actuales = self.instance.images.exclude(pk__in=[q for q in quitar if q.isdigit()]).count() \
+            if self.instance.pk else 0
+        if actuales + len(nuevas) > MAX_FOTOS:
+            raise forms.ValidationError(
+                f'Puedes tener hasta {MAX_FOTOS} fotos. Ya tienes {actuales}: quita alguna o sube menos.')
+        return [procesar_foto(f, lado_maximo=1024) for f in nuevas]
+
+    def guardar_fotos(self, provider):
+        """Quita las marcadas, agrega las nuevas y deja una portada. Se llama
+        después de guardar el perfil (al crear, el perfil no existía antes)."""
+        quitar = [q for q in self.data.getlist('quitar_fotos') if q.isdigit()] if hasattr(self.data, 'getlist') else []
+        for imagen in provider.images.filter(pk__in=quitar):
+            imagen.image.storage.delete(imagen.image.name)
+            imagen.delete()
+        orden = (provider.images.order_by('-display_order').values_list('display_order', flat=True).first() or 0) + 1
+        for n, archivo in enumerate(self.cleaned_data.get('fotos') or []):
+            imagen = ProviderImage(provider=provider, display_order=orden + n,
+                                   alt_text=f'Trabajo de {provider.business_name}'[:160])
+            imagen.image.save(archivo.name, archivo, save=False)
+            imagen.save()
+        portada = self.data.get('portada') if hasattr(self.data, 'get') else None
+        imagenes = provider.images.all()
+        if portada and portada.isdigit() and imagenes.filter(pk=portada).exists():
+            imagenes.update(is_cover=False)
+            imagenes.filter(pk=portada).update(is_cover=True)
+        elif imagenes.exists() and not imagenes.filter(is_cover=True).exists():
+            primera = imagenes.order_by('display_order', 'pk').first()
+            imagenes.filter(pk=primera.pk).update(is_cover=True)
 
     def clean_profession_title(self):
         return limpiar_texto(self.cleaned_data.get('profession_title', ''))

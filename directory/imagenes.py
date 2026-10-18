@@ -18,8 +18,9 @@ SUBIDA_MAXIMA = 8 * 1024 * 1024
 FORMATOS = {'JPEG', 'PNG', 'WEBP', 'GIF', 'MPO'}
 
 
-def procesar_foto(archivo):
-    """Devuelve un ContentFile WebP listo para guardar, o lanza ValidationError."""
+def procesar_foto(archivo, lado_maximo=LADO_MAXIMO):
+    """Devuelve un ContentFile WebP listo para guardar, o lanza ValidationError.
+    El logo va a 640 px; las fotos de trabajos, a 1024."""
     if archivo.size > SUBIDA_MAXIMA:
         raise ValidationError('La imagen pesa más de 8 MB. Prueba con otra o recórtala.')
     try:
@@ -33,7 +34,7 @@ def procesar_foto(archivo):
 
     imagen = ImageOps.exif_transpose(imagen)  # la foto del celular, derecha
     imagen = imagen.convert('RGBA' if imagen.mode in ('RGBA', 'LA', 'P') else 'RGB')
-    imagen.thumbnail((LADO_MAXIMO, LADO_MAXIMO), Image.LANCZOS)
+    imagen.thumbnail((lado_maximo, lado_maximo), Image.LANCZOS)
 
     for calidad in (82, 72, 62, 52):
         salida = io.BytesIO()
@@ -41,7 +42,7 @@ def procesar_foto(archivo):
         if salida.tell() <= PESO_MAXIMO:
             break
     else:
-        imagen.thumbnail((LADO_MAXIMO // 2, LADO_MAXIMO // 2), Image.LANCZOS)
+        imagen.thumbnail((lado_maximo // 2, lado_maximo // 2), Image.LANCZOS)
         salida = io.BytesIO()
         imagen.save(salida, 'WEBP', quality=60, method=6)
 

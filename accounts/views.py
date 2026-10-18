@@ -15,7 +15,7 @@ from leads.models import LeadEvent
 from leads.registro import registrar
 
 from .cv import ACEPTA, CVIlegible, extraer_texto, proponer_perfil
-from .forms import LoginForm, ProviderForm, RegisterForm, formatear_telefono
+from .forms import LoginForm, ProviderForm, RegisterForm, formatear_telefono, MAX_FOTOS
 from .models import LoginAttempt, UserProfile
 
 
@@ -192,6 +192,7 @@ def provider_create(request):
                 provider.hidden_at = timezone.now()
                 provider.moderation_note = 'Retenido por el filtro antispam al publicar.'
             provider.save()
+            form.guardar_fotos(provider)
             request.session.pop('cv_borrador', None)
             if provider.is_active:
                 request.session['ga4_eventos'] = request.session.get('ga4_eventos', []) + ['publicar_perfil']
@@ -215,6 +216,7 @@ def provider_create(request):
     return render(request, 'accounts/provider_form.html', {
         'form': form,
         'is_create': True,
+        'max_fotos': MAX_FOTOS,
         'cv_campos': [form.fields[n].label for n in form.fields if n in borrador],
         'cv_error': request.session.pop('cv_error', ''),
         'cv_acepta': ACEPTA,
@@ -230,6 +232,7 @@ def provider_edit(request, slug):
         form = ProviderForm(request.POST, request.FILES, instance=provider)
         if form.is_valid():
             form.save()
+            form.guardar_fotos(provider)
             messages.success(request, 'Perfil actualizado.')
             return redirect(provider.get_absolute_url() if provider.is_active else 'accounts:dashboard')
     else:
@@ -239,6 +242,7 @@ def provider_edit(request, slug):
         'form': form,
         'provider': provider,
         'is_create': False,
+        'max_fotos': MAX_FOTOS,
         'page_title': f'Editar {provider.business_name} | ServiPlace',
         'robots': 'noindex',
     })

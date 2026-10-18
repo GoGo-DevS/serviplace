@@ -357,3 +357,37 @@ flotantes de Instagram".
     del sitio público, el de @serviplace.cl; en /cuenta/ ninguno.
 Pruebas: 212.
 ---
+
+---
+[18-10-2026, noche] — Rendimiento y formulario por rubro (3effdf9, 44446a9).
+  · gtag.js bloqueaba ~600 ms en móvil (Lighthouse portada 62): ahora la cola
+    dataLayer se arma al tiro y el script carga en la primera interacción o a
+    los 3,5 s. Falta volver a medir en vivo después del push.
+  · A un ingeniero en informática el formulario le pedía el registro de la
+    Superintendencia de Salud y le daba "Kinesióloga" de ejemplo. El registro
+    solo aparece en rubros de salud (y se limpia en el servidor si no aplica);
+    los ejemplos de título e institución cambian según el grupo del rubro.
+    El CV reconoce desarrollo web.
+---
+
+---
+[18-10-2026, noche] — Diego: "no sé cómo agregar fotos para mostrar mis trabajos,
+la única foto es el logo" y "siento que hay mucho espacio vacío en la web".
+  · La ficha decía "Todavía no subes fotos. Agregar fotos →" y el formulario no
+    tenía dónde: solo el logo. Nueva sección "Fotos de tus trabajos" al crear y
+    al editar: hasta 8, WebP 1024 px <100 KB sin EXIF (procesar_foto ganó el
+    parámetro lado_maximo), cada una con "Portada" y "Quitar". Quitar borra el
+    archivo (no deja huérfanos en R2); si se quita la portada, pasa a la
+    siguiente. Los ids que llegan del formulario se buscan SOLO dentro del
+    perfil propio (G-02): una prueba con mutación lo comprueba.
+  · El aviso de la ficha ahora lleva directo a #fotos.
+  · Formulario en dos columnas (7/5, 8/4 en xl): a la derecha, fija al hacer
+    scroll, la tarjeta tal como la verá un cliente, al día con lo que se escribe
+    (nombre, rubro, comuna, descripción, logo, portada, modalidades) y tres
+    consejos. En el celular no se muestra. Las fotos nuevas se previsualizan
+    antes de subirlas y avisa si pasan de 8.
+  · Verificado con Playwright en un servidor local (SQLite): escritorio y
+    celular sin errores JS ni scroll horizontal; envío real con una foto nueva y
+    cambio de portada, la ficha mostró las 3. Usuario de prueba borrado.
+Pruebas: 230.
+---

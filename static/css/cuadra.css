@@ -464,3 +464,23 @@ input[type="file"].form-control::file-selector-button { border: 0; border-radius
 @media (prefers-reduced-motion: reduce) { .ficha-portada img { transition: none; } .ficha:hover .ficha-portada img { transform: none; } }
 /* Encuadre un poco arriba del centro: en fotos con personas no corta la cabeza */
 .ficha-portada img, .provider-image { object-position: 50% 30%; }
+
+/* ---- Fotos de trabajos en el formulario (18-10-2026) ---- */
+.galeria-editar { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: .75rem; }
+.galeria-item { margin: 0; border: 1px solid var(--sp-line); border-radius: 12px; overflow: hidden; background: #fff; }
+.galeria-item img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+.galeria-item figcaption { display: flex; justify-content: space-between; gap: .4rem; padding: .1rem .5rem; font-size: .82rem; }
+.galeria-item label, .galeria-item figcaption span { display: inline-flex; align-items: center; gap: .3rem; min-height: 40px; cursor: pointer; }
+
+/* ---- Formulario en dos columnas: la tarjeta en vivo (18-10-2026) ---- */
+.form-aside { position: sticky; top: 90px; display: grid; gap: 1rem; }
+.form-aside-rotulo { margin: 0; font-family: var(--font-mono); font-size: .7rem; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--sp-muted); }
+.ficha-previa { height: auto; pointer-events: none; }
+.ficha-previa:hover { transform: none; box-shadow: var(--sp-sh-sm); }
+.ficha-previa .es-ejemplo { color: var(--sp-muted) !important; font-style: italic; }
+.ficha-previa .ficha-portada { pointer-events: none; }
+.form-consejos { padding: 1.1rem 1.2rem; border-radius: 18px; background: #fff; box-shadow: var(--sp-sh-sm); border-left: 4px solid var(--sp-brand); }
+.form-consejos h3 { margin: 0 0 .6rem; font-size: 1rem; }
+.form-consejos ol { margin: 0; padding-left: 1.1rem; display: grid; gap: .55rem; font-size: .9rem; color: var(--sp-slate); line-height: 1.45; }
+.form-consejos b { color: var(--sp-ink); }
+.galeria-nuevas .galeria-item figcaption { color: var(--sp-accent); font-weight: 700; }
