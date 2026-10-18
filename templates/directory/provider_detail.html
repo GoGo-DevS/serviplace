@@ -41,25 +41,52 @@
       </div>
 
       <!-- Fotos -->
-      {% if provider.images.all %}
+      {% with fotos=provider.images.all %}
+      {% if fotos %}
+      {% comment %}
+      18-10-2026 — Diego: "las fotos no las puedo ver, como galería". Eran
+      miniaturas fijas de 2 en 2 que no se abrían. Ahora: mosaico con la
+      portada grande (se ven 3; la tercera dice "+N" si hay más) y cada foto
+      abre el visor a pantalla completa. Cada una es un enlace a la imagen:
+      sin JavaScript, igual se abre.
+      {% endcomment %}
       <div class="detail-block">
-        <h2>Fotos</h2>
-        <div class="row g-3">
-          {% for image in provider.images.all %}
-            <div class="col-sm-6">
-              <img class="provider-image" src="{{ image.image.url }}" alt="{{ image.alt_text|default:provider.business_name }}" loading="lazy" width="640" height="480">
-            </div>
+        <h2>Fotos <small class="text-muted fw-normal">{{ fotos|length }}</small></h2>
+        <div class="galeria-ficha" data-n="{% if fotos|length > 3 %}3{% else %}{{ fotos|length }}{% endif %}">
+          {% for image in fotos %}
+            <a class="galeria-ficha-foto" href="{{ image.image.url }}" data-galeria-foto{% if forloop.counter > 3 %} hidden{% endif %} aria-label="Ver foto {{ forloop.counter }} de {{ fotos|length }}">
+              <img src="{{ image.image.url }}" alt="{{ image.alt_text|default:provider.business_name }}" loading="lazy" width="640" height="480">
+              {% if forloop.counter == 3 and fotos|length > 3 %}<span class="galeria-ficha-mas">+{{ fotos|length|add:"-3" }} fotos</span>{% endif %}
+            </a>
           {% endfor %}
         </div>
       </div>
-      {% elif provider.owner %}
+      <dialog class="galeria-visor" id="galeria-visor" aria-label="Fotos de {{ provider.business_name }}">
+        <figure class="galeria-visor-figura">
+          <img src="" alt="">
+          <figcaption data-visor="contador" aria-live="polite"></figcaption>
+        </figure>
+        <button type="button" class="galeria-visor-btn is-cerrar" data-visor="cerrar" aria-label="Cerrar">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+        {% if fotos|length > 1 %}
+        <button type="button" class="galeria-visor-btn is-prev" data-visor="prev" aria-label="Foto anterior">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+        </button>
+        <button type="button" class="galeria-visor-btn is-next" data-visor="next" aria-label="Foto siguiente">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+        </button>
+        {% endif %}
+      </dialog>
+      {% elif user.is_authenticated and provider.owner_id == user.id %}
       {% comment %}
-      D4 — El hueco de fotos SOLO se muestra si el perfil tiene dueño.
+      D4 — El hueco de fotos SOLO lo ve el dueño del perfil.
 
       Un perfil que vino de Google Maps no tiene a nadie que pueda subir una
       foto, así que anunciar que le faltan no informa nada: se lee como que el
-      sitio está a medio hacer, y son la mayoría de las fichas. Al dueño sí le
-      sirve, porque es una tarea que puede hacer.
+      sitio está a medio hacer. Al dueño sí le sirve, porque es una tarea que
+      puede hacer. 18-10-2026: la condición era "el perfil tiene dueño", y el
+      "Todavía no subes fotos" se lo mostraba a CUALQUIER visitante.
       {% endcomment %}
       <div class="detail-block">
         <h2>Fotos</h2>
@@ -69,6 +96,7 @@
         </div>
       </div>
       {% endif %}
+      {% endwith %}
 
 
       {% if provider.has_professional_info %}
@@ -172,6 +200,54 @@
     Contactar por WhatsApp
   </a>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Visor de fotos: flechas, teclado (← →, Esc), deslizar con el dedo y tocar
+  // fuera de la foto para cerrar. <dialog> nativo: atrapa el foco solo.
+  (function () {
+    var visor = document.getElementById('galeria-visor');
+    var fotos = Array.prototype.slice.call(document.querySelectorAll('[data-galeria-foto]'));
+    if (!visor || !fotos.length || typeof visor.showModal !== 'function') return;
+    var img = visor.querySelector('img');
+    var contador = visor.querySelector('[data-visor="contador"]');
+    var actual = 0, x0 = null;
+    function mostrar(i) {
+      actual = (i + fotos.length) % fotos.length;
+      img.src = fotos[actual].href;
+      img.alt = fotos[actual].querySelector('img').alt;
+      contador.textContent = fotos.length > 1 ? (actual + 1) + ' de ' + fotos.length : '';
+    }
+    function boton(nombre, fn) {
+      var b = visor.querySelector('[data-visor="' + nombre + '"]');
+      if (b) b.addEventListener('click', fn);
+    }
+    fotos.forEach(function (foto, i) {
+      foto.addEventListener('click', function (e) {
+        e.preventDefault();
+        mostrar(i);
+        visor.showModal();
+        if (window.gtag) gtag('event', 'ver_fotos', {origen: 'ficha'});
+      });
+    });
+    boton('prev', function () { mostrar(actual - 1); });
+    boton('next', function () { mostrar(actual + 1); });
+    boton('cerrar', function () { visor.close(); });
+    visor.addEventListener('click', function (e) { if (e.target === visor || e.target.tagName === 'FIGURE') visor.close(); });
+    visor.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowLeft') mostrar(actual - 1);
+      if (e.key === 'ArrowRight') mostrar(actual + 1);
+    });
+    visor.addEventListener('touchstart', function (e) { x0 = e.touches[0].clientX; }, {passive: true});
+    visor.addEventListener('touchend', function (e) {
+      if (x0 === null || fotos.length < 2) return;
+      var dx = e.changedTouches[0].clientX - x0;
+      if (Math.abs(dx) > 40) mostrar(actual + (dx < 0 ? 1 : -1));
+      x0 = null;
+    });
+  })();
+</script>
 {% endblock %}
 
 {% block flotante %}

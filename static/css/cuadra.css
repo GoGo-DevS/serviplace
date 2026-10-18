@@ -484,3 +484,31 @@ input[type="file"].form-control::file-selector-button { border: 0; border-radius
 .form-consejos ol { margin: 0; padding-left: 1.1rem; display: grid; gap: .55rem; font-size: .9rem; color: var(--sp-slate); line-height: 1.45; }
 .form-consejos b { color: var(--sp-ink); }
 .galeria-nuevas .galeria-item figcaption { color: var(--sp-accent); font-weight: 700; }
+
+/* ---- Galería de la ficha y visor (18-10-2026) ---- */
+.galeria-ficha { display: grid; gap: .5rem; border-radius: 16px; overflow: hidden; }
+.galeria-ficha[data-n="1"] { aspect-ratio: 16 / 9; }
+.galeria-ficha[data-n="2"] { grid-template-columns: 1fr 1fr; aspect-ratio: 2 / 1; }
+.galeria-ficha[data-n="3"] { grid-template-columns: 2fr 1fr; grid-template-rows: 1fr 1fr; aspect-ratio: 3 / 2; }
+.galeria-ficha[data-n="3"] .galeria-ficha-foto:first-child { grid-row: span 2; }
+.galeria-ficha-foto { position: relative; display: block; min-height: 0; overflow: hidden; background: var(--sp-bg); cursor: zoom-in; }
+.galeria-ficha-foto[hidden] { display: none; }
+.galeria-ficha-foto img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; transition: transform .3s ease; }
+.galeria-ficha-foto:hover img { transform: scale(1.03); }
+.galeria-ficha-foto:focus-visible { outline: 3px solid var(--sp-accent); outline-offset: -3px; }
+.galeria-ficha-mas { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(15, 23, 32, .55); color: #fff; font-family: var(--font-head); font-weight: 800; font-size: 1.15rem; }
+
+.galeria-visor { width: 100vw; height: 100dvh; max-width: none; max-height: none; margin: 0; padding: 0; border: 0; background: rgba(10, 14, 20, .94); color: #fff; }
+.galeria-visor::backdrop { background: rgba(10, 14, 20, .94); }
+.galeria-visor[open] { display: grid; place-items: center; }
+body:has(.galeria-visor[open]) { overflow: hidden; }
+.galeria-visor-figura { margin: 0; width: 100%; height: 100%; display: grid; place-items: center; padding: 4.25rem 1rem 1.5rem; }
+.galeria-visor-figura img { max-width: min(100%, 1024px); max-height: 100%; object-fit: contain; border-radius: 10px; user-select: none; }
+.galeria-visor-figura figcaption { position: absolute; top: 1.55rem; left: 1.1rem; font-family: var(--font-mono); font-size: .82rem; letter-spacing: .06em; color: rgba(255, 255, 255, .85); }
+.galeria-visor-btn { position: absolute; display: grid; place-items: center; width: 48px; height: 48px; border: 0; border-radius: 999px; background: rgba(255, 255, 255, .14); color: #fff; transition: background .15s ease; }
+.galeria-visor-btn:hover { background: rgba(255, 255, 255, .26); }
+.galeria-visor-btn:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+.galeria-visor-btn.is-cerrar { top: .75rem; right: .75rem; }
+.galeria-visor-btn.is-prev { left: .75rem; top: 50%; transform: translateY(-50%); }
+.galeria-visor-btn.is-next { right: .75rem; top: 50%; transform: translateY(-50%); }
+@media (prefers-reduced-motion: reduce) { .galeria-ficha-foto img { transition: none; } }

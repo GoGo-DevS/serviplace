@@ -160,3 +160,32 @@ class FotosDeTrabajos(TestCase):
             self.assertIn(f'name="portada" value="{imagen.pk}"', html)
             self.assertIn(f'name="quitar_fotos" value="{imagen.pk}"', html)
         self.assertIn('Así se verá tu tarjeta', html)
+
+    def test_la_ficha_es_una_galeria_que_abre_cada_foto(self):
+        """18-10-2026: "las fotos no las puedo ver, como galería"."""
+        p = self._publicar(5)
+        ficha = self.client.get(p.get_absolute_url()).content.decode()
+        self.assertIn('id="galeria-visor"', ficha)
+        self.assertIn('data-n="3"', ficha)
+        self.assertIn('+2 fotos', ficha)
+        for imagen in p.images.all():
+            self.assertIn(f'href="{imagen.image.url}" data-galeria-foto', ficha,
+                          'cada foto debe ser un enlace: sin JavaScript igual se abre')
+        self.assertIn('data-visor="next"', ficha)
+
+    def test_con_una_sola_foto_el_visor_no_tiene_flechas(self):
+        p = self._publicar(1)
+        ficha = self.client.get(p.get_absolute_url()).content.decode()
+        self.assertIn('id="galeria-visor"', ficha)
+        self.assertIn('data-n="1"', ficha)
+        self.assertNotIn('data-visor="next"', ficha)
+
+    def test_el_aviso_de_que_faltan_fotos_solo_lo_ve_el_dueno(self):
+        """Se lo mostraba a cualquier visitante de un perfil con dueño."""
+        p = self._publicar()
+        self.assertIn('Todavía no subes fotos', self.client.get(p.get_absolute_url()).content.decode())
+        self.client.logout()
+        self.assertNotIn('Todavía no subes fotos', self.client.get(p.get_absolute_url()).content.decode())
+        otro = User.objects.create_user('visita', password='clave-larga-de-verdad-99')
+        self.client.force_login(otro)
+        self.assertNotIn('Todavía no subes fotos', self.client.get(p.get_absolute_url()).content.decode())

@@ -397,3 +397,20 @@ Pruebas: 230.
 Lighthouse móvil en vivo: portada 62 → 99 (TBT 610 → 0 ms, LCP 1,9 s); ficha de
 Púas 84 → 100 (LCP 1,7 s). Una sola corrida de cada una.
 ---
+
+---
+[18-10-2026, tarde] — Diego: "las fotos no las puedo ver, como galería".
+  · En la ficha las fotos eran miniaturas fijas de 2 en 2 que no se abrían.
+    Ahora: mosaico con la portada grande y dos más a la derecha (la tercera dice
+    "+N fotos" si hay más) y un visor a pantalla completa (<dialog> nativo):
+    flechas, teclado ← → y Esc, deslizar con el dedo, tocar fuera para cerrar,
+    contador "2 de 5". Cada foto es un enlace a la imagen: sin JavaScript igual
+    se abre. Evento GA4 `ver_fotos` al abrir el visor.
+  · Bug: "Todavía no subes fotos. Agregar fotos →" se mostraba a CUALQUIER
+    visitante de un perfil con dueño (la condición era provider.owner). Ahora
+    solo al dueño. Prueba con mutación detectada.
+  · Verificado con Playwright en local (Púas, 5 fotos), escritorio y celular:
+    abre, avanza, da la vuelta, desliza, cierra con Esc y tocando fuera; sin
+    errores JS ni scroll horizontal.
+Pruebas: 233.
+---
