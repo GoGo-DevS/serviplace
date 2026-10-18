@@ -228,6 +228,13 @@ def _listado(request, *, categoria=None, grupo=None, comuna=None, query=''):
         'pagina': pagina,
         'total_resultados': total,
         'grupos': categorias_por_grupo(),
+        # Grupos con perfiles en ESTA comuna (o en todo el país): el chip de un
+        # grupo vacío enlazaba a un listado que responde 404 a propósito, y
+        # eso eran enlaces internos rotos en cada listado (rastreo 18-10-2026).
+        'grupos_con_perfiles': set(
+            Provider.objects.publicos().filter(**({'commune': comuna} if comuna else {}))
+            .values_list('category__group', flat=True).distinct()
+        ),
         'selected_group': grupo or '',
         'selected_category': categoria,
         'selected_commune': comuna,

@@ -175,3 +175,36 @@ class Sitemap(Base):
     def test_una_especialidad_apagada_sale_del_sitemap(self):
         Category.objects.filter(slug='pintura').update(is_active=False)
         self.assertNotIn('/profesionales/pintura/</loc>', self.client.get('/sitemap.xml').content.decode())
+
+
+class CredencialesEnElPerfil(Base):
+    """La formación va en el schema del perfil como credencial: lo que pesa
+    sin reseñas. Solo lo que la ficha muestra, y un estudiante no declara título."""
+
+    def perfil(self, **campos):
+        dueno = User.objects.create_user(f'd{Provider.objects.count()}', password='clave-larga-de-verdad-99')
+        datos = dict(business_name='Camila Rojas, Kinesióloga', contact_name='Camila Rojas',
+                     category=Category.objects.get(slug='kinesiologia'), commune=self.maipu, sector='Centro',
+                     description='Descripción.', short_description='Resumen.', phone='+56 9 1111 2222',
+                     whatsapp_number='56911112222', is_active=True, owner=dueno)
+        datos.update(campos)
+        p = Provider.objects.create(**datos)
+        h = self.client.get(p.get_absolute_url()).content.decode()
+        return next(b for b in jsonld(h) if b.get('@id', '').endswith('#perfil'))
+
+    def test_titulo_institucion_y_registro_como_credenciales(self):
+        schema = self.perfil(profession_title='Kinesióloga', institution='Universidad de Concepción',
+                             graduation_year=2019, health_registry='654321')
+        persona = schema['founder']
+        self.assertEqual(persona['name'], 'Camila Rojas')
+        self.assertEqual(persona['alumniOf']['name'], 'Universidad de Concepción')
+        tipos = {c['credentialCategory']: c for c in persona['hasCredential']}
+        self.assertEqual(tipos['degree']['recognizedBy']['name'], 'Universidad de Concepción')
+        self.assertIn('654321', tipos['license']['name'])
+        self.assertEqual(tipos['license']['recognizedBy']['name'], 'Superintendencia de Salud')
+
+    def test_un_estudiante_no_declara_un_titulo_que_no_tiene(self):
+        from django.utils import timezone
+        schema = self.perfil(profession_title='Kinesiología', graduation_year=timezone.localdate().year + 1,
+                             category=Category.objects.get(slug='clases-particulares'))
+        self.assertNotIn('hasCredential', schema['founder'])

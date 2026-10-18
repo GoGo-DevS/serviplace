@@ -11,7 +11,11 @@
     <div class="group-chips mt-3" aria-label="Filtrar por tipo de servicio">
       <a class="group-chip{% if not selected_group and not selected_category %} is-active{% endif %}" href="{{ url_comuna_todo }}">Todo</a>
       {% for grupo in grupos %}
+        {% if grupo.clave in grupos_con_perfiles %}
         <a class="group-chip{% if selected_group == grupo.clave or selected_category.group == grupo.clave %} is-active{% endif %}" href="{% if selected_commune %}{% url 'directory:listado_rubro_comuna' grupo.slug selected_commune.slug %}{% else %}{% url 'directory:listado_rubro' grupo.slug %}{% endif %}">{{ grupo.nombre }}</a>
+        {% else %}
+        <span class="group-chip is-vacio" title="Todavía sin perfiles{% if selected_commune %} en {{ selected_commune.name }}{% endif %}">{{ grupo.nombre }}</span>
+        {% endif %}
       {% endfor %}
     </div>
   </div>

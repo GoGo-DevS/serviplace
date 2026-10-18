@@ -433,3 +433,6 @@ input[type="file"].form-control::file-selector-button { border: 0; border-radius
 @media (max-width: 991.98px) { .guia-lateral { position: static; } }
 /* En la tarjeta de ejemplo el texto largo ES el contenido: sin el recorte a 3 líneas de .ficha-desc */
 .ficha-desc.profesion-ejemplo { display: block; -webkit-line-clamp: unset; overflow: visible; }
+/* Grupo sin perfiles en esta comuna: se ve, pero no enlaza a un 404 */
+.group-chip.is-vacio { color: var(--sp-muted); border-style: dashed; cursor: default; }
+.group-chip.is-vacio:hover { border-color: var(--sp-line); color: var(--sp-muted); }

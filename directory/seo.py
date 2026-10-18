@@ -193,4 +193,38 @@ def perfil(provider, request):
         datos['image'] = request.build_absolute_uri(url) if url.startswith('/') else url
     if provider.profession_title:
         datos['knowsAbout'] = provider.profession_title
+    persona = _persona(provider)
+    if persona:
+        datos['founder'] = persona
     return datos
+
+
+def _persona(provider):
+    """Quién está detrás del servicio, con su formación como credencial
+    (18-10-2026). Es la señal de confianza que más pesa sin reseñas, y solo se
+    declara lo que la ficha ya muestra: nombre, título, institución, registro."""
+    if not provider.contact_name:
+        return None
+    persona = {'@type': 'Person', 'name': provider.contact_name}
+    if provider.profession_title:
+        persona['jobTitle'] = provider.profession_title
+    if provider.institution:
+        persona['alumniOf'] = {'@type': 'EducationalOrganization', 'name': provider.institution}
+    credenciales = []
+    if provider.profession_title and provider.graduation_year and not provider.is_student:
+        titulo = {'@type': 'EducationalOccupationalCredential', 'credentialCategory': 'degree',
+                  'name': provider.profession_title}
+        if provider.institution:
+            titulo['recognizedBy'] = {'@type': 'EducationalOrganization', 'name': provider.institution}
+        credenciales.append(titulo)
+    if provider.health_registry:
+        credenciales.append({
+            '@type': 'EducationalOccupationalCredential',
+            'credentialCategory': 'license',
+            'name': f'Registro Nacional de Prestadores Individuales de Salud N° {provider.health_registry}',
+            'recognizedBy': {'@type': 'GovernmentOrganization', 'name': 'Superintendencia de Salud',
+                             'url': 'https://www.superdesalud.gob.cl/'},
+        })
+    if credenciales:
+        persona['hasCredential'] = credenciales
+    return persona

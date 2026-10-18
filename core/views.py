@@ -46,6 +46,7 @@ def home(request):
         # El schema de la organización va SOLO acá (auditoría de Jorge): el
         # resto de las páginas la referencia por @id.
         'jsonld': seo.como_script(seo.organizacion_y_sitio()),
+        'guias_vecinos': [g for g in guias.GUIAS if g['publico'] == 'vecinos'],
         'page_title': 'ServiPlace: maestros y profesionales en tu comuna',
         'meta_description': 'Gásfiter, electricista, kinesiólogo, psicólogo, profe particular y más en tu comuna. Contacto directo por WhatsApp, sin comisión.',
         'og_title': 'SERVIPLACE — Maestros y profesionales en tu comuna',
