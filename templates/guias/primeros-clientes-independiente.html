@@ -1,0 +1,56 @@
+{% extends "guias/_guia.html" %}
+{% block cuerpo %}
+<p>Tus primeros clientes como independiente casi siempre llegan por dos caminos: gente que ya te conoce y gente de tu comuna que te encuentra cuando busca lo que haces. Lo que más sirve al principio es ordenar esos dos caminos: decir en una frase qué haces, contárselo a tu red, tener un solo link para compartir, mostrar tus credenciales y responder rápido.</p>
+<p>No necesitas una página web propia ni pagar publicidad para partir. Lo que necesitas es que quien te recomiende tenga algo concreto que reenviar, y que quien te encuentre tenga razones para escribirte a ti.</p>
+
+<h2>Define en una frase qué haces y para quién</h2>
+<p>Antes de avisarle a nadie, escribe una frase que otra persona pueda repetir de memoria: qué haces, para quién y dónde. Por ejemplo: "Kinesióloga, atiendo a domicilio a adultos mayores en Maipú" o "Clases particulares de matemáticas para media, en Puente Alto y en línea".</p>
+<p>"Hago de todo un poco" no se recuerda. Una frase concreta sí, y es la que tu tía va a repetir cuando una amiga le pregunte si conoce a alguien.</p>
+
+<h2>Cuéntale a tu red cercana</h2>
+<p>Tu primer cliente probablemente está a una o dos personas de distancia. Avísales a todos, con tu frase y tu link:</p>
+<ul>
+<li><strong>Estado de WhatsApp.</strong> Publícalo más de una vez, en días distintos: no todos tus contactos lo ven el mismo día.</li>
+<li><strong>Familia.</strong> Pídeles algo concreto: no "avísame si sabes de alguien", sino "¿le puedes reenviar esto a quien le sirva?".</li>
+<li><strong>Ex compañeros de estudio o de trabajo.</strong> Muchas veces tienen pacientes, alumnos o clientes que no alcanzan a atender y que podrían derivarte.</li>
+<li><strong>Grupos de tu comuna.</strong> Grupos de vecinos, de apoderados o de tu condominio, siempre respetando las reglas de cada grupo.</li>
+</ul>
+
+<h2>Ten un solo link profesional para compartir</h2>
+<p>Cuando alguien te recomienda, lo que reenvía es un link. Si ese link muestra qué haces, en qué comuna atiendes, tu formación y una forma directa de escribirte, la recomendación se sostiene sola, aunque tú no estés en la conversación.</p>
+<p>Un perfil en ServiPlace sirve justamente para eso: es gratis, aparece cuando alguien busca tu servicio en tu comuna y el contacto te llega directo a tu WhatsApp, sin comisión. Si todavía no lo tienes, puedes <a href="{% url 'accounts:register' %}">crear tu perfil</a> y usar ese mismo link en tu estado, en tu firma de correo y en tus redes.</p>
+
+<h2>Muestra tus credenciales</h2>
+<p>Si recién empiezas y todavía no tienes reseñas, tu formación es lo que más pesa. Pon tu título, la institución donde estudiaste y el año en que te titulaste. Y si tu rubro tiene un registro o una licencia oficial, muéstrala, porque es lo que tus clientes revisan antes de escribirte:</p>
+<ul>
+<li><strong>Salud:</strong> tu número del Registro Nacional de Prestadores Individuales de Salud. Así es como tus pacientes lo comprueban: <a href="{% url 'core:guia' 'verificar-registro-profesional-de-salud' %}">cómo verificar si un profesional de la salud está registrado</a>.</li>
+<li><strong>Electricidad y gas:</strong> tu licencia SEC y su clase. Así es como tus clientes la buscan: <a href="{% url 'core:guia' 'verificar-instalador-sec' %}">cómo saber si un electricista o un gásfiter está autorizado por la SEC</a>.</li>
+<li><strong>Otros oficios:</strong> cursos, certificados y, sobre todo, fotos de trabajos que hayas hecho.</li>
+</ul>
+
+<h2>Aparece donde te buscan: tu comuna</h2>
+<p>Quien necesita un gásfiter, una psicóloga o un profe particular suele buscar cerca de su casa o, en algunos rubros, en línea. Deja clara la comuna donde atiendes y, si vas a domicilio, las comunas que alcanzas a cubrir. Si atiendes en línea, dilo también.</p>
+<p>Cada rubro tiene lo suyo. Hay páginas con ideas de qué contar en tu perfil según lo que haces, por ejemplo para <a href="{% url 'core:profesion' 'kinesiologia' %}">kinesiología</a>, <a href="{% url 'core:profesion' 'psicologia' %}">psicología</a>, <a href="{% url 'core:profesion' 'clases-particulares' %}">clases particulares</a> y <a href="{% url 'core:profesion' 'gasfiteria' %}">gasfitería</a>.</p>
+
+<h2>Responde rápido</h2>
+<p>Cuando alguien te escribe, es probable que también le haya escrito a otras personas. Muchas veces se queda con el trabajo el primero que responde con claridad. No hace falta contestar en un minuto, pero sí el mismo día.</p>
+<p>Ten listo un mensaje corto que puedas adaptar: saludo, una o dos preguntas para entender qué necesita y cuándo podrías atenderlo. Si no puedes tomar el trabajo, dilo igual. Esa persona se acuerda de quien le respondió.</p>
+
+<h2>Pide que te recomienden</h2>
+<p>Un cliente contento no siempre recomienda por iniciativa propia: muchas veces hay que pedírselo. Al terminar un trabajo que salió bien, pregúntale si conoce a alguien a quien le pueda servir lo que haces y mándale tu link para que lo reenvíe.</p>
+<p>Si quedó conforme, pídele también un par de líneas sobre cómo le fue, y permiso para compartirlas. Las primeras opiniones son las que más le cuestan a todo el que empieza, y valen más que cualquier descripción que escribas tú.</p>
+
+<h2>Haz un seguimiento simple</h2>
+<p>No necesitas un sistema complicado. Una nota en el celular con el nombre de cada cliente, qué le hiciste y cuándo, te basta para escribirle un tiempo después: preguntarle cómo sigue la rodilla, si su hijo rindió bien la prueba o si la llave sigue sin gotear. Ese mensaje muestra interés real y te recuerda en su cabeza.</p>
+
+<h2>Ordena lo administrativo desde el primer cliente</h2>
+<p>Mientras más clientes tengas, más te van a pedir boleta, sobre todo si te contrata una empresa o si un paciente quiere pedir reembolso. Si todavía no lo tienes claro, revisa cómo funciona la <a href="{% url 'core:guia' 'boleta-de-honorarios' %}">boleta de honorarios</a> y el <a href="{% url 'core:guia' 'inicio-de-actividades-sii' %}">inicio de actividades en el SII</a>. Tener eso resuelto también es parte de verse profesional.</p>
+
+<section class="guia-fuentes">
+<h2>Fuentes</h2>
+<ul>
+<li><a href="https://rnpi.superdesalud.gob.cl/" target="_blank" rel="noopener">Registro Nacional de Prestadores Individuales de Salud (RNPI), Superintendencia de Salud</a></li>
+<li><a href="https://www.chileatiende.gob.cl/fichas/67276-buscador-de-instaladores-electricos-y-de-gas-autorizados-por-la-sec" target="_blank" rel="noopener">Buscador de instaladores eléctricos y de gas autorizados por la SEC (ChileAtiende)</a></li>
+</ul>
+</section>
+{% endblock %}

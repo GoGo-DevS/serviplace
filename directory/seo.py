@@ -122,6 +122,54 @@ def listado(nombre, path, perfiles, total):
     }
 
 
+def preguntas(pares):
+    """FAQPage. Solo con preguntas que SE VEN en la página: schema de algo que
+    no está a la vista es exactamente lo que Google penaliza."""
+    if not pares:
+        return None
+    return {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        'mainEntity': [
+            {'@type': 'Question', 'name': p, 'acceptedAnswer': {'@type': 'Answer', 'text': r}}
+            for p, r in pares
+        ],
+    }
+
+
+def pagina(nombre, path, descripcion):
+    return {
+        '@context': 'https://schema.org',
+        '@type': 'WebPage',
+        'name': nombre,
+        'url': _url(path),
+        'description': descripcion,
+        'inLanguage': 'es-CL',
+        'isPartOf': {'@id': id_sitio()},
+    }
+
+
+def articulo(guia, path):
+    """Article de una guía. Autor y editor: la organización, que no se inventa
+    una persona firmando. Va con nombre además del @id: Google lee cada página
+    por separado y un autor que es solo una referencia queda sin nombre."""
+    organizacion = {'@type': 'Organization', '@id': id_organizacion(), 'name': 'ServiPlace', 'url': _url('/')}
+    return {
+        '@context': 'https://schema.org',
+        '@type': 'Article',
+        'headline': guia['titulo'],
+        'description': guia['meta'],
+        'url': _url(path),
+        'mainEntityOfPage': _url(path),
+        'datePublished': guia['publicada'].isoformat(),
+        'dateModified': guia['actualizada'].isoformat(),
+        'inLanguage': 'es-CL',
+        'author': organizacion,
+        'publisher': dict(organizacion, logo=_url(static('img/marca/serviplace-app-512.png'))),
+        'isPartOf': {'@id': id_sitio()},
+    }
+
+
 def perfil(provider, request):
     datos = {
         '@context': 'https://schema.org',

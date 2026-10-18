@@ -1,0 +1,64 @@
+{% extends "guias/_guia.html" %}
+{% block cuerpo %}
+<p>Para saber si un kinesiólogo, psicólogo, nutricionista, enfermera u otro profesional de la salud está habilitado para ejercer en Chile, se consulta el <strong>Registro Nacional de Prestadores Individuales de Salud (RNPI)</strong> de la Superintendencia de Salud. Es público y gratuito, y cualquier persona puede buscar ahí por nombre o por RUT.</p>
+<p>El registro te dice si esa persona está legalmente autorizada para ejercer su profesión. En el caso de médicos y dentistas, también muestra las especialidades que tienen certificadas. Revisarlo antes de la primera sesión es simple y te saca de encima la duda más importante.</p>
+
+<h2>Por qué vale la pena revisarlo</h2>
+<p>Cuando contratas a alguien de la salud, muchas veces esa persona entra a tu casa o atiende a alguien de tu familia: a tu mamá después de una operación, a tu hijo que necesita apoyo con el habla, a ti con una lesión. Es una relación de confianza, y lo mínimo es saber que tiene el título que dice tener.</p>
+<p>No se trata de desconfiar de todo el mundo. Un profesional serio está acostumbrado a que lo revisen y no se va a molestar. Al contrario: que lo revises le muestra que te tomas en serio tu salud o la de tu familia.</p>
+
+<h2>Cómo buscar en el registro, paso a paso</h2>
+<ol>
+<li><strong>Pídele su nombre completo o su RUT.</strong> Con el RUT la búsqueda es más precisa, porque evita confundirlo con alguien de nombre parecido.</li>
+<li><strong>Entra al registro.</strong> Está en <a href="https://rnpi.superdesalud.gob.cl/" target="_blank" rel="noopener">rnpi.superdesalud.gob.cl</a>, el sitio oficial de la Superintendencia de Salud. La consulta es gratuita.</li>
+<li><strong>Busca por RUT o por nombre.</strong> Si buscas por nombre, prueba con los dos apellidos para acotar el resultado.</li>
+<li><strong>Revisa lo que aparece.</strong> Fíjate en que el nombre calce con el de la persona y que la profesión registrada sea la que te dijo. Si es médico o dentista y se presenta como especialista, comprueba que esa especialidad figure como certificada.</li>
+</ol>
+<p>Si aparece, ya sabes que está habilitado para ejercer esa profesión. Eso no te dice si es bueno en lo suyo ni si te vas a sentir cómodo con su forma de trabajar, pero sí descarta el problema más grave.</p>
+
+<h2>Qué profesiones aparecen en el registro</h2>
+<p>El RNPI incluye a estas profesiones:</p>
+<ul>
+<li>Médicos y dentistas, con sus especialidades certificadas.</li>
+<li>Enfermeras y enfermeros.</li>
+<li>Matronas y matrones.</li>
+<li>Tecnólogos médicos.</li>
+<li>Kinesiólogos.</li>
+<li>Psicólogos.</li>
+</ul>
+<p>Desde julio de 2011 se sumaron también los químicos farmacéuticos, nutricionistas, fonoaudiólogos, terapeutas ocupacionales y técnicos auxiliares paramédicos.</p>
+
+<h2>Si la persona no aparece</h2>
+<p>Que no aparezca en el primer intento no significa automáticamente que algo ande mal. Antes de sacar conclusiones, haz esto:</p>
+<ul>
+<li><strong>Revisa lo que escribiste.</strong> Un dígito mal puesto en el RUT o un apellido escrito de otra forma bastan para que la búsqueda no encuentre nada.</li>
+<li><strong>Pídele su número de registro y su nombre completo tal como aparece en su título.</strong> Hay personas que usan un segundo nombre o un apodo en su perfil o en su tarjeta.</li>
+<li><strong>Pregúntale directamente.</strong> Un profesional titulado puede explicarte sin rodeos por qué no lo encuentras. Si la respuesta es vaga o cambia de tema, toma nota.</li>
+</ul>
+
+<h3>Cuidadoras y otros trabajos de cuidado</h3>
+<p>Hay trabajos de cuidado que no son profesiones de la salud. Una cuidadora de adultos mayores sin título de salud no aparece en el registro, y eso es normal: no tiene por qué estar. En ese caso lo que importa es conocerla, pedir referencias de familias anteriores y acordar bien las tareas.</p>
+<p>Si lo que necesitas incluye curaciones, administrar medicamentos u otros procedimientos de salud, conviene buscar a alguien con título de enfermería o de técnico paramédico, que sí aparezca en el registro.</p>
+
+<h2>Señales de alerta</h2>
+<ul>
+<li>Se presenta como profesional de la salud, pero evita darte su nombre completo o su RUT cuando le cuentas que lo quieres revisar.</li>
+<li>El nombre de su perfil no coincide con el del registro y no hay una explicación clara.</li>
+<li>Aparece en el registro con una profesión distinta a la que te ofreció. Por ejemplo, está registrado como técnico auxiliar paramédico y se presenta como kinesiólogo.</li>
+<li>Es médico o dentista, dice ser especialista y esa especialidad no figura como certificada.</li>
+<li>Te apura para empezar de inmediato o para pagar varias sesiones por adelantado antes de que alcances a revisar nada.</li>
+</ul>
+<p>Ninguna de estas señales prueba por sí sola un engaño. Pero si se juntan dos o más, lo prudente es buscar a otra persona.</p>
+
+<h2>Cómo combinarlo con la búsqueda por internet</h2>
+<p>Si encuentras al profesional en internet, el orden práctico es este: primero miras su perfil, después lo buscas en el registro y recién ahí le escribes para coordinar. En ServiPlace los profesionales de la salud pueden mostrar su número de registro en el perfil, así que puedes comprobarlo antes de escribirles. Puedes partir por el <a href="{% url 'directory:provider_list' %}">buscador de servicios</a> y elegir tu comuna.</p>
+<p>Ese número lo declara el propio profesional, así que la comprobación en el RNPI la sigues haciendo tú. Hay más ideas para contratar con tranquilidad en la página de <a href="{% url 'core:trust_and_safety' %}">seguridad y confianza</a>.</p>
+
+<section class="guia-fuentes">
+<h2>Fuentes</h2>
+<ul>
+<li><a href="https://rnpi.superdesalud.gob.cl/" target="_blank" rel="noopener">Registro Nacional de Prestadores Individuales de Salud (RNPI), Superintendencia de Salud</a></li>
+<li><a href="https://www.superdesalud.gob.cl/" target="_blank" rel="noopener">Superintendencia de Salud</a></li>
+</ul>
+</section>
+{% endblock %}

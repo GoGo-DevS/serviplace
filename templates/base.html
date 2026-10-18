@@ -118,12 +118,14 @@
           <strong>Para vecinos</strong>
           <a href="{% url 'directory:provider_list' %}">Buscar servicios</a>
           <a href="{% url 'core:trust_and_safety' %}">Seguridad y confianza</a>
+          <a href="{% url 'core:guias' %}">Guías para contratar</a>
         </nav>
         <nav class="footer-column" aria-label="Para profesionales">
           <strong>Para profesionales</strong>
           <a href="{% url 'core:para_profesionales' %}">Cómo funciona</a>
           <a href="{% url 'accounts:register' %}">Publicar gratis</a>
           <a href="{% url 'accounts:hazte_verificado' %}">Hazte Verificado</a>
+          <a href="{% url 'core:guia' 'boleta-de-honorarios' %}">Boleta de honorarios 2026</a>
         </nav>
         <nav class="footer-column" aria-label="ServiPlace">
           <strong>ServiPlace</strong>

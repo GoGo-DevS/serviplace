@@ -1,0 +1,69 @@
+{% extends "guias/_guia.html" %}
+{% block cuerpo %}
+<p>La boleta de honorarios electrónica se emite gratis en el sitio del SII, <a href="https://www.sii.cl/" target="_blank" rel="noopener">sii.cl</a>, entrando con tu Clave Tributaria o con tu ClaveÚnica. En 2026 la retención es de <strong>15,25%</strong> del monto bruto de la boleta.</p>
+<p>Quién paga esa retención depende de tu cliente. Si es una empresa, ella te retiene el 15,25% y lo paga al SII. Si es una persona sin actividad comercial, nadie te retiene: tú eliges en el SII que la retención la haces tú, y la declaras y pagas en tu Formulario 29 del mes.</p>
+
+<h2>Qué es la boleta de honorarios</h2>
+<p>Es el documento que emites cuando cobras por un servicio que prestas por tu cuenta, como independiente: una sesión de kinesiología, una clase particular, un diseño, una asesoría. Le sirve a tu cliente como respaldo de lo que pagó y a ti como registro de lo que ganaste.</p>
+<p>Para poder emitirla necesitas tres cosas: haber dado aviso de inicio de actividades en segunda categoría, que tu actividad sea de las gravadas en el artículo 42 N°2 de la Ley sobre Impuesto a la Renta y no tener situaciones pendientes con el SII que te impidan emitir boletas. Si todavía no haces el inicio, parte por la guía de <a href="{% url 'core:guia' 'inicio-de-actividades-sii' %}">inicio de actividades en el SII</a>.</p>
+
+<h2>Cómo emitirla</h2>
+<ol>
+<li>Entra a sii.cl con tu RUT y tu Clave Tributaria, o con tu ClaveÚnica.</li>
+<li>Busca el servicio de boletas de honorarios electrónicas.</li>
+<li>Completa los datos que te pide: a quién se la emites, qué servicio prestaste y el monto.</li>
+<li>Indica quién hace la retención: tu cliente, si es una empresa, o tú, si es una persona. Más abajo está el detalle de cada caso.</li>
+<li>Emítela, guárdala y envíasela a tu cliente.</li>
+</ol>
+<p>Emitirla no tiene costo y no necesitas talonario: todo queda registrado en el SII.</p>
+
+<h2>Cuánto se retiene: 15,25% en 2026</h2>
+<p>La retención sube un poco cada año, según la Ley 21.133. Desde el 1 de enero de 2026 es de 15,25%:</p>
+<table>
+<thead>
+<tr><th>Año</th><th>Retención</th></tr>
+</thead>
+<tbody>
+<tr><td>2025</td><td>14,5%</td></tr>
+<tr><td>2026</td><td>15,25%</td></tr>
+<tr><td>2027</td><td>16%</td></tr>
+<tr><td>2028</td><td>17%</td></tr>
+</tbody>
+</table>
+<p>Esa plata no se pierde. En la Operación Renta se usa para pagar tus cotizaciones previsionales obligatorias y tu impuesto a la renta, y si sobra, te la devuelven.</p>
+
+<h2>Si tu cliente es una empresa</h2>
+<p>Cuando le trabajas a una empresa, o a otra entidad obligada a retener, ella se encarga. Te paga el monto líquido, se queda con el 15,25% y lo paga al SII en su propio Formulario 29. Tú no tienes que pagar esa retención aparte: ya la pagó tu cliente por ti.</p>
+
+<h2>Si tu cliente es una persona</h2>
+<p>Cuando le trabajas a una persona sin actividad comercial, como un vecino que te contrata para una clase o una sesión, ella no está obligada a retener. Entonces no te retiene nadie de forma automática.</p>
+<p>En ese caso, al emitir la boleta eliges que la retención la haces tú, lo que el SII llama retención del contribuyente emisor. Después la declaras y la pagas en tu Formulario 29 mensual. En la práctica, la persona te paga el total de la boleta y tú apartas el 15,25% para pagarlo en tu declaración del mes.</p>
+
+<h2>Qué pasa en la Operación Renta</h2>
+<p>Cada abril, en la Operación Renta, declaras las boletas que emitiste durante el año anterior. Las retenciones de esas boletas, tanto las que hizo tu cliente como las que pagaste tú, se usan para pagar tus cotizaciones previsionales obligatorias y tu impuesto a la renta. Si las retenciones fueron más de lo que correspondía, la diferencia te la devuelven.</p>
+
+<h2>Un ejemplo con números redondos</h2>
+<p>Este ejemplo es solo para mostrar el cálculo, con un monto inventado. Si emites una boleta por $100.000 bruto a una empresa, te retienen $15.250 y recibes $84.750.</p>
+<p>Si emites la misma boleta a una persona, ella te paga $100.000, pero tú declaras y pagas los $15.250 en tu Formulario 29. En los dos casos, lo que te queda es $84.750.</p>
+<p>Y al revés: si quieres que te queden $100.000 líquidos, la boleta tiene que ser de cerca de $118.000 bruto. Se calcula dividiendo el líquido que quieres por 0,8475.</p>
+
+<h2>Errores comunes</h2>
+<ul>
+<li><strong>Cotizar sin decir si el precio es bruto o líquido.</strong> Si le dices a una empresa un valor y después emites la boleta por ese mismo monto, te va a llegar el 84,75%. Aclara siempre si tu precio es "bruto, con boleta de honorarios" o "líquido".</li>
+<li><strong>Gastarte la retención cuando el cliente es una persona.</strong> Esa parte no es tuya todavía: apártala apenas te paguen.</li>
+<li><strong>Elegir mal quién retiene.</strong> Antes de emitir, pregúntale a tu cliente si te contrata como empresa o como persona.</li>
+<li><strong>Olvidar el Formulario 29</strong> en los meses en que la retención la hiciste tú.</li>
+<li><strong>Usar la tasa del año pasado.</strong> En 2026 es 15,25%, no 14,5%.</li>
+</ul>
+
+<h2>Si recién estás partiendo</h2>
+<p>Ordenar la boleta desde el primer cliente te ahorra problemas en abril. Si además quieres que te encuentren en tu comuna, en la página <a href="{% url 'core:para_profesionales' %}">para profesionales</a> contamos cómo funciona ServiPlace para independientes, y puedes <a href="{% url 'accounts:register' %}">crear tu cuenta y publicar tu perfil gratis</a>.</p>
+
+<section class="guia-fuentes">
+<h2>Fuentes</h2>
+<ul>
+<li><a href="https://www.sii.cl/destacados/boletas_honorarios/index.html" target="_blank" rel="noopener">Boletas de honorarios, Servicio de Impuestos Internos</a></li>
+<li><a href="https://www.chileatiende.gob.cl/fichas/3088-boleta-de-honorarios-electronica" target="_blank" rel="noopener">Boleta de honorarios electrónica (ChileAtiende)</a></li>
+</ul>
+</section>
+{% endblock %}

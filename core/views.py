@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.contrib import messages
+from django.http import Http404
 from django.shortcuts import redirect, render
 from django.db.models import Count, Prefetch, Q
 from django.urls import reverse
@@ -10,6 +11,7 @@ from directory.catalogo import categorias_por_grupo
 from directory.models import Category, Commune, Provider, Region
 from leads.models import LeadEvent
 from directory import seo
+from core import guias, profesiones
 from leads.registro import registrar
 
 
@@ -200,3 +202,83 @@ def trust_and_safety(request):
         },
     )
 
+
+
+# ---- Contenido para posicionar (18-10-2026): profesiones y guías ----------
+
+def profesion(request, rubro):
+    """`/profesionales/<rubro>/`: la página de una especialidad para quien
+    OFRECE (contenido en core/profesiones.py)."""
+    contenido = profesiones.para(rubro)
+    categoria = Category.objects.filter(slug=rubro, is_active=True).first()
+    if not contenido or not categoria:
+        raise Http404('Especialidad sin página')
+    n_publicos = Provider.objects.publicos().filter(category=categoria).count()
+    grupo = dict(Category.GROUP_CHOICES).get(categoria.group, '')
+    hermanas = [c for c in Category.objects.filter(is_active=True, group=categoria.group).exclude(pk=categoria.pk)
+                .order_by('display_order', 'name') if profesiones.para(c.slug)]
+    path = request.path
+    registrar(request, LeadEvent.PAGE_VIEW, origen=f'profesion-{rubro}'[:120], category_slug=rubro,
+              group=categoria.group)
+    titulo = f"{contenido['titulo']} | ServiPlace"
+    return render(request, 'core/profesion.html', {
+        'c': contenido,
+        'categoria': categoria,
+        'grupo': grupo,
+        'n_publicos': n_publicos,
+        'hermanas': hermanas,
+        'guias_profesionales': guias.de_profesionales(),
+        'guias_rubro': guias.para_rubro(rubro),
+        'page_title': titulo,
+        'meta_description': contenido['meta'],
+        'jsonld': seo.como_script(
+            seo.miga([('Inicio', '/'), ('Para profesionales', reverse('core:para_profesionales')),
+                      (categoria.name, path)]),
+            seo.pagina(contenido['h1'], path, contenido['meta']),
+            seo.preguntas(contenido['faq']),
+        ),
+    })
+
+
+def guias_indice(request):
+    path = request.path
+    return render(request, 'core/guias.html', {
+        'para_vecinos': [g for g in guias.GUIAS if g['publico'] == 'vecinos'],
+        'para_profesionales': guias.de_profesionales(),
+        'page_title': 'Guías para contratar y para trabajar por tu cuenta | ServiPlace',
+        'meta_description': ('Cómo verificar a un profesional de la salud o a un instalador SEC, qué acordar con '
+                             'un maestro, boleta de honorarios 2026 e inicio de actividades en el SII.'),
+        'jsonld': seo.como_script(seo.miga([('Inicio', '/'), ('Guías', path)])),
+    })
+
+
+def guia(request, slug):
+    datos = guias.POR_SLUG.get(slug)
+    if not datos:
+        raise Http404('Guía inexistente')
+    path = request.path
+    mismas = [g for g in guias.GUIAS if g['slug'] != slug and g['publico'] == datos['publico']]
+    otras = [g for g in guias.GUIAS if g['slug'] != slug and g['publico'] != datos['publico']]
+    # Especialidades de la guía: a su listado si tiene perfiles (si no, ese
+    # listado es 404 a propósito); a la página para profesionales si no.
+    rubros = []
+    if datos['rubros']:
+        con_perfiles = dict(
+            Provider.objects.publicos().filter(category__slug__in=datos['rubros'])
+            .values_list('category__slug').annotate(n=Count('id'))
+        )
+        for categoria in Category.objects.filter(slug__in=datos['rubros'], is_active=True).order_by('name'):
+            rubros.append({'categoria': categoria, 'n': con_perfiles.get(categoria.slug, 0)})
+    registrar(request, LeadEvent.PAGE_VIEW, origen=f'guia-{slug}'[:120])
+    return render(request, f'guias/{slug}.html', {
+        'guia': datos,
+        'relacionadas': (mismas + otras)[:4],
+        'rubros': rubros,
+        'page_title': f"{datos['title']} | ServiPlace",
+        'meta_description': datos['meta'],
+        'og_type': 'article',
+        'jsonld': seo.como_script(
+            seo.miga([('Inicio', '/'), ('Guías', reverse('core:guias')), (datos['titulo'], path)]),
+            seo.articulo(datos, path),
+        ),
+    })

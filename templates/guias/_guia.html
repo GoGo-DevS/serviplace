@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% comment %}
+Plantilla de cada guía (18-10-2026). El cuerpo vive en guias/<slug>.html y
+los datos (título, resumen, fechas, público) en core/guias.py.
+{% endcomment %}
+<article>
+  <header class="page-header">
+    <div class="container py-4">
+      <nav class="miga" aria-label="Estás en">
+        <ol>
+          <li><a href="{% url 'core:home' %}">Inicio</a></li>
+          <li><a href="{% url 'core:guias' %}">Guías</a></li>
+          <li><span aria-current="page">{{ guia.titulo }}</span></li>
+        </ol>
+      </nav>
+      <span class="eyebrow mt-3">{% if guia.publico == 'vecinos' %}Si vas a contratar{% else %}Si trabajas por tu cuenta{% endif %}</span>
+      <h1 class="h2 mt-2 mb-2 guia-h1">{{ guia.titulo }}</h1>
+      <p class="guia-resumen">{{ guia.resumen }}</p>
+      <p class="guia-fecha mb-0">Actualizada el <time datetime="{{ guia.actualizada|date:'Y-m-d' }}">{{ guia.actualizada|date:'j \d\e F \d\e Y' }}</time> · Equipo de ServiPlace</p>
+    </div>
+  </header>
+
+  <div class="container py-5">
+    <div class="row g-5">
+      <div class="col-lg-8 guia-cuerpo">
+        {% block cuerpo %}{% endblock %}
+      </div>
+      <aside class="col-lg-4">
+        <div class="guia-lateral">
+          {% if guia.publico == 'vecinos' %}
+          <p class="guia-lateral-titulo">Busca a alguien en tu comuna</p>
+          <p>Perfiles de maestros y profesionales con su formación a la vista. Les escribes directo por WhatsApp.</p>
+          <a class="btn btn-primary w-100" href="{% url 'directory:provider_list' %}">Buscar servicios</a>
+          {% if rubros %}
+          <ul class="guia-rubros">
+            {% for r in rubros %}{% if r.n %}<li><a href="{{ r.categoria.get_absolute_url }}">{{ r.categoria.name }}</a> <span>{{ r.n }}</span></li>{% endif %}{% endfor %}
+          </ul>
+          {% endif %}
+          {% else %}
+          <p class="guia-lateral-titulo">Que te encuentren en tu comuna</p>
+          <p>Crea tu perfil profesional gratis y recibe consultas directo en tu WhatsApp. Sin comisión.</p>
+          <a class="btn btn-primary w-100" href="{% url 'accounts:register' %}?desde=guia-{{ guia.slug }}">Crear mi perfil gratis</a>
+          {% endif %}
+        </div>
+      </aside>
+    </div>
+  </div>
+</article>
+
+<section class="container pb-5">
+  <div class="relacionados">
+    <div>
+      <h2>Otras guías</h2>
+      <ul>
+        {% for g in relacionadas %}<li><a href="{% url 'core:guia' g.slug %}">{{ g.titulo }}</a></li>{% endfor %}
+      </ul>
+    </div>
+    {% if guia.publico == 'profesionales' or not rubros %}
+    <div>
+      <h2>Especialidades</h2>
+      <ul>
+        <li><a href="{% url 'core:profesion' 'kinesiologia' %}">Kinesiólogo independiente</a></li>
+        <li><a href="{% url 'core:profesion' 'psicologia' %}">Psicólogo independiente</a></li>
+        <li><a href="{% url 'core:profesion' 'clases-particulares' %}">Profesor particular</a></li>
+        <li><a href="{% url 'core:profesion' 'gasfiteria' %}">Gásfiter independiente</a></li>
+      </ul>
+    </div>
+    {% else %}
+    <div>
+      <h2>Para quienes ofrecen estos servicios</h2>
+      <ul>
+        {% for r in rubros %}<li><a href="{% url 'core:profesion' r.categoria.slug %}">{{ r.categoria.name }}</a></li>{% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

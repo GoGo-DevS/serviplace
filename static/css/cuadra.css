@@ -397,3 +397,39 @@ input[type="file"].form-control::file-selector-button { border: 0; border-radius
 .contacto-motivo span { color: var(--sp-slate); font-size: .92rem; }
 .contacto-motivo:hover, .contacto-motivo:focus-visible { color: var(--sp-ink); transform: translateY(-1px); }
 .contacto-notas { max-width: 68ch; margin-top: 2rem; color: var(--sp-slate); }
+
+/* ---- Profesiones y guías (18-10-2026) ---- */
+.profesion h2, .guia-cuerpo h2 { font-size: 1.35rem; margin: 2rem 0 .75rem; letter-spacing: -.02em; }
+.profesion h2:first-child, .guia-cuerpo > h2:first-child { margin-top: 0; }
+.profesion-h1, .guia-h1 { max-width: 30ch; text-wrap: balance; }
+.profesion-lista { padding-left: 1.1rem; margin-bottom: 1rem; }
+.profesion-lista li { margin-bottom: .45rem; }
+.profesion-lista li::marker { color: var(--sp-brand); }
+.profesion-nota { padding: .75rem 1rem; border-left: 4px solid var(--sp-brand); border-radius: 0 12px 12px 0; background: #ecfeff; font-size: .95rem; }
+.profesion-pasos { padding-left: 1.2rem; }
+.profesion-pasos li { margin-bottom: .6rem; }
+.profesion-ejemplo { font-size: .92rem; line-height: 1.55; }
+.guia-resumen { max-width: 68ch; font-size: 1.08rem; color: var(--sp-slate); margin-bottom: .5rem; }
+.guia-fecha { font-size: .85rem; color: var(--sp-muted); }
+.guia-cuerpo { max-width: 72ch; font-size: 1.03rem; line-height: 1.65; }
+.guia-cuerpo h3 { font-size: 1.08rem; margin: 1.4rem 0 .5rem; }
+.guia-cuerpo li { margin-bottom: .4rem; }
+.guia-cuerpo table { width: 100%; margin: 1rem 0 1.25rem; border-collapse: collapse; font-size: .95rem; }
+.guia-cuerpo th, .guia-cuerpo td { padding: .55rem .7rem; border-bottom: 1px solid var(--sp-line); text-align: left; vertical-align: top; }
+.guia-cuerpo th { font-family: var(--font-head); background: var(--sp-bg); }
+.guia-fuentes { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--sp-line); font-size: .9rem; }
+.guia-fuentes h2 { font-size: 1rem !important; margin-top: 0 !important; }
+.guia-lateral { position: sticky; top: 90px; padding: 1.2rem; border-radius: 18px; background: #fff; box-shadow: var(--sp-sh-md); }
+.guia-lateral-titulo { font-family: var(--font-head); font-weight: 700; font-size: 1.1rem; margin-bottom: .35rem; color: var(--sp-ink); }
+.guia-lateral p { font-size: .93rem; color: var(--sp-slate); }
+.guia-rubros { list-style: none; padding: 0; margin: 1rem 0 0; display: grid; gap: .35rem; font-size: .92rem; }
+.guia-rubros li { display: flex; justify-content: space-between; }
+.guia-rubros span { font-family: var(--font-mono); color: var(--sp-muted); }
+.guias-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: 1rem; }
+.guia-tarjeta { display: grid; gap: .4rem; padding: 1.2rem; border-radius: 18px; background: #fff; box-shadow: var(--sp-sh-md); color: var(--sp-ink); text-decoration: none; border-top: 4px solid var(--sp-brand); }
+.guia-tarjeta strong { font-family: var(--font-head); font-size: 1.08rem; line-height: 1.25; }
+.guia-tarjeta span { color: var(--sp-slate); font-size: .92rem; }
+.guia-tarjeta:hover, .guia-tarjeta:focus-visible { color: var(--sp-ink); transform: translateY(-1px); }
+@media (max-width: 991.98px) { .guia-lateral { position: static; } }
+/* En la tarjeta de ejemplo el texto largo ES el contenido: sin el recorte a 3 líneas de .ficha-desc */
+.ficha-desc.profesion-ejemplo { display: block; -webkit-line-clamp: unset; overflow: visible; }

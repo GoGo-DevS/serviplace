@@ -53,6 +53,7 @@
           {% endif %}
         </dl>
         <p class="safety-note mt-3 mb-0">Estos datos los declara el profesional. {% if provider.health_registry %}El registro de salud lo puedes comprobar tú mismo en el sitio de la Superintendencia.{% else %}Si es un servicio de salud, pídele su número de registro antes de atenderte.{% endif %}</p>
+        {% for g in guias_rubro %}<p class="small mt-2 mb-0"><a href="{% url 'core:guia' g.slug %}">{{ g.titulo }} →</a></p>{% endfor %}
       </div>
       {% endif %}
 

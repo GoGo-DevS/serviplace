@@ -10,6 +10,8 @@ from django.urls import reverse
 from leads.models import LeadEvent
 from leads.registro import es_bot, registrar, sanear_busqueda
 
+from core import guias
+
 from . import seo
 from .catalogo import categorias_por_grupo
 from .models import Category, Commune, Provider, Region
@@ -239,6 +241,8 @@ def _listado(request, *, categoria=None, grupo=None, comuna=None, query=''):
         'url_comuna_todo': url_listado(comuna=comuna) if comuna else reverse('directory:provider_list'),
         'relacionados_comunas': relacionados_comunas,
         'relacionados_categorias': relacionados_categorias,
+        # Guías de confianza del rubro (verificar registro de salud, licencia SEC)
+        'guias_rubro': guias.para_rubro(categoria.slug) if categoria else [],
         'page_title': titulo,
         'meta_description': meta,
         'ga4_busqueda': ga4_busqueda,
@@ -286,6 +290,7 @@ def provider_detail(request, slug):
         'pasos': pasos,
         'jsonld': seo.como_script(seo.miga(pasos), seo.perfil(provider, request)),
         'cover_image': provider.images.filter(is_cover=True).first(),
+        'guias_rubro': guias.para_rubro(provider.category.slug),
         'page_title': f'{titulo} | ServiPlace',
         'meta_description': (provider.short_description + f' Atiende en {provider.commune.name}. Contacto directo por WhatsApp.')[:158],
         'og_title': f'{provider.business_name} en SERVIPLACE',

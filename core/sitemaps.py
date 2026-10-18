@@ -71,3 +71,39 @@ class ProviderSitemap(Sitemap):
 
     def lastmod(self, obj):
         return obj.updated_at
+
+
+class GuiasSitemap(Sitemap):
+    """/guias/ y cada guía, con su fecha real de actualización (core/guias.py)."""
+    changefreq = 'monthly'
+    protocol = 'https'
+
+    def items(self):
+        from core.guias import GUIAS
+        return [None] + [g['slug'] for g in GUIAS]
+
+    def location(self, item):
+        return reverse('core:guias') if item is None else reverse('core:guia', args=[item])
+
+    def lastmod(self, item):
+        from core.guias import GUIAS, POR_SLUG
+        return max(g['actualizada'] for g in GUIAS) if item is None else POR_SLUG[item]['actualizada']
+
+    def priority(self, item):
+        return 0.6 if item is None else 0.7
+
+
+class ProfesionesSitemap(Sitemap):
+    """/profesionales/<rubro>/: solo especialidades activas CON contenido (las
+    demás responden 404 y un sitemap no publica URLs muertas)."""
+    changefreq = 'monthly'
+    priority = 0.7
+    protocol = 'https'
+
+    def items(self):
+        from core.profesiones import PROFESIONES
+        return list(Category.objects.filter(is_active=True, slug__in=list(PROFESIONES))
+                    .order_by('slug').values_list('slug', flat=True))
+
+    def location(self, item):
+        return reverse('core:profesion', args=[item])

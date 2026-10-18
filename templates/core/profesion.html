@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% comment %}
+/profesionales/<rubro>/ (18-10-2026). Contenido en core/profesiones.py: cada
+texto es propio de la especialidad. Títulos: un h1 y h2 por sección; el
+nombre del perfil de ejemplo es un <p> (no rompe el orden de títulos).
+{% endcomment %}
+<section class="page-header">
+  <div class="container py-4">
+    <nav class="miga" aria-label="Estás en">
+      <ol>
+        <li><a href="{% url 'core:home' %}">Inicio</a></li>
+        <li><a href="{% url 'core:para_profesionales' %}">Para profesionales</a></li>
+        <li><span aria-current="page">{{ categoria.name }}</span></li>
+      </ol>
+    </nav>
+    <span class="eyebrow mt-3">{{ grupo }} · {{ categoria.name }}</span>
+    <h1 class="h2 mt-2 mb-2 profesion-h1">{{ c.h1 }}</h1>
+    <p class="lead listado-intro mb-3">{{ c.intro }}</p>
+    <div class="d-flex flex-wrap gap-2">
+      <a class="btn btn-primary btn-lg" href="{% url 'accounts:register' %}?desde=profesion-{{ categoria.slug }}">Crear mi perfil gratis</a>
+      {% if n_publicos %}
+      <a class="btn btn-outline-primary btn-lg" href="{{ categoria.get_absolute_url }}">Ver {{ n_publicos }} perfil{{ n_publicos|pluralize:"es" }} de {{ categoria.name|lower }}</a>
+      {% endif %}
+    </div>
+    <p class="hero-cv mt-2 mb-0">¿Tienes tu CV? Adjúntalo al crear tu cuenta y llenamos tu perfil por ti.</p>
+  </div>
+</section>
+
+<section class="container py-5 profesion">
+  <div class="row g-5">
+    <div class="col-lg-7">
+      <h2>Lo que buscan tus {{ c.clientes }}</h2>
+      <ul class="profesion-lista">
+        {% for item in c.buscan %}<li>{{ item }}</li>{% endfor %}
+      </ul>
+
+      <h2>Lo que te van a revisar antes de escribirte</h2>
+      <p>{{ c.credencial_texto }}</p>
+      {% if c.credencial == 'rnpi' %}
+      <p class="profesion-nota">Tus {{ c.clientes }} pueden comprobarlo en el <a href="https://rnpi.superdesalud.gob.cl/" target="_blank" rel="noopener">Registro Nacional de Prestadores Individuales de Salud</a>. En tu perfil de ServiPlace el número de registro queda a la vista. <a href="{% url 'core:guia' 'verificar-registro-profesional-de-salud' %}">Cómo se verifica, paso a paso</a>.</p>
+      {% elif c.credencial == 'sec' %}
+      <p class="profesion-nota">La SEC tiene un <a href="https://www.chileatiende.gob.cl/fichas/67276-buscador-de-instaladores-electricos-y-de-gas-autorizados-por-la-sec" target="_blank" rel="noopener">buscador público de instaladores autorizados</a>. <a href="{% url 'core:guia' 'verificar-instalador-sec' %}">Qué clase de licencia corresponde a cada trabajo</a>.</p>
+      {% endif %}
+
+      <h2>Qué poner en tu perfil</h2>
+      <ul class="profesion-lista">
+        {% for tip in c.tips %}<li>{{ tip }}</li>{% endfor %}
+      </ul>
+
+      <h2>Cómo empezar</h2>
+      <ol class="profesion-pasos">
+        <li><strong>Crea tu cuenta.</strong> Un usuario, tu correo y una contraseña. Si adjuntas tu CV, llenamos el formulario por ti.</li>
+        <li><strong>Completa tu perfil.</strong> Especialidad, comuna, cómo atiendes y tu formación. Lo publicas al instante.</li>
+        <li><strong>Compártelo.</strong> Tu perfil es un link profesional para tu Instagram, tu estado de WhatsApp y tus conocidos. Te escriben directo, sin comisión.</li>
+      </ol>
+    </div>
+
+    <aside class="col-lg-5">
+      <div class="ejemplo-wrap">
+        <span class="ejemplo-label">Así puede verse tu perfil</span>
+        <article class="ficha" aria-label="Ejemplo de perfil de {{ categoria.name|lower }}">
+          <div class="ficha-top"><b>{{ categoria.name }}</b></div>
+          <p class="ficha-desc mb-2"><strong>{{ c.ejemplo_corta }}</strong></p>
+          <p class="ficha-desc profesion-ejemplo">{{ c.ejemplo_larga }}</p>
+        </article>
+        <p class="form-text mt-2">Es un ejemplo para inspirarte: escribe el tuyo con tus datos reales.</p>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<section class="container pb-4">
+  <div class="section-heading"><h2>Preguntas frecuentes</h2></div>
+  <div class="faq-list">
+    {% for pregunta, respuesta in c.faq %}
+    <details>
+      <summary>{{ pregunta }}</summary>
+      <p>{{ respuesta }}</p>
+    </details>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="container pb-4">
+  <div class="relacionados">
+    <div>
+      <h2>Guías para trabajar por tu cuenta</h2>
+      <ul>
+        {% for g in guias_profesionales %}<li><a href="{% url 'core:guia' g.slug %}">{{ g.titulo }}</a></li>{% endfor %}
+      </ul>
+    </div>
+    {% if hermanas %}
+    <div>
+      <h2>Otras especialidades de {{ grupo|lower }}</h2>
+      <ul>
+        {% for h in hermanas %}<li><a href="{% url 'core:profesion' h.slug %}">{{ h.name }}</a></li>{% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<section class="container pb-5">
+  <div class="join-band">
+    <div style="position:relative;z-index:1">
+      <h2>Tu perfil de {{ categoria.name|lower }} queda listo hoy</h2>
+      <p>Gratis, sin comisión y en cinco minutos.</p>
+    </div>
+    <a class="btn btn-light btn-lg" href="{% url 'accounts:register' %}?desde=profesion-{{ categoria.slug }}" style="position:relative;z-index:1;flex-shrink:0">Crear mi perfil gratis →</a>
+  </div>
+</section>
+{% endblock %}

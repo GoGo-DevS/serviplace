@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="page-header">
+  <div class="container py-4">
+    <nav class="miga" aria-label="Estás en">
+      <ol>
+        <li><a href="{% url 'core:home' %}">Inicio</a></li>
+        <li><span aria-current="page">Guías</span></li>
+      </ol>
+    </nav>
+    <span class="eyebrow mt-3">Guías</span>
+    <h1 class="h2 mt-2 mb-1">Guías para contratar bien y para trabajar por tu cuenta</h1>
+    <p class="text-muted mb-0 listado-intro">Respuestas concretas a lo que se pregunta antes de contratar a alguien o al empezar a trabajar de forma independiente, con las fuentes oficiales citadas.</p>
+  </div>
+</section>
+
+<section class="container py-5">
+  <h2 class="h4 mb-3">Si vas a contratar</h2>
+  <div class="guias-grid mb-5">
+    {% for g in para_vecinos %}
+    <a class="guia-tarjeta" href="{% url 'core:guia' g.slug %}">
+      <strong>{{ g.titulo }}</strong>
+      <span>{{ g.resumen }}</span>
+    </a>
+    {% endfor %}
+  </div>
+
+  <h2 class="h4 mb-3">Si trabajas por tu cuenta</h2>
+  <div class="guias-grid">
+    {% for g in para_profesionales %}
+    <a class="guia-tarjeta" href="{% url 'core:guia' g.slug %}">
+      <strong>{{ g.titulo }}</strong>
+      <span>{{ g.resumen }}</span>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

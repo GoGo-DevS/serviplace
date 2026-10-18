@@ -1,0 +1,70 @@
+{% extends "guias/_guia.html" %}
+{% block cuerpo %}
+<p>Antes de contratar a un maestro conviene acordar, idealmente por escrito, cinco cosas: un presupuesto con detalle, qué incluye y qué no (sobre todo los materiales), el plazo, cómo se paga y qué garantía da. Si el trabajo es de gas o eléctrico, suma una sexta: revisar que sea un instalador autorizado por la SEC.</p>
+<p>No hace falta un contrato con abogado. Un mensaje de WhatsApp donde quede todo claro, y que el maestro responda que está de acuerdo, ya sirve para que los dos sepan a qué se comprometieron. Esta es la lista completa, más o menos en el orden en que aparece cada tema.</p>
+
+<h2>Presupuesto por escrito y con detalle</h2>
+<p>Pide que el presupuesto diga qué se va a hacer, en qué parte de la casa y con qué. "Arreglar el baño" no es un presupuesto; "cambiar la llave del lavamanos y sellar el borde de la tina" sí lo es.</p>
+<p>Si puedes, pide que separe la mano de obra de los materiales. Así, cuando compares dos presupuestos, vas a saber si de verdad están cotizando lo mismo.</p>
+
+<h2>Qué incluye y qué no</h2>
+<p>Aquí es donde suelen aparecer los malentendidos. Antes de partir, aclara:</p>
+<ul>
+<li><strong>Materiales:</strong> quién los compra y de qué calidad o marca. Si los compra el maestro, pídele que te diga cuánto cuestan antes de comprarlos y que te guarde las boletas.</li>
+<li><strong>Retiro de escombros:</strong> si se los lleva él o quedan en tu casa.</li>
+<li><strong>Limpieza final:</strong> si deja el lugar limpio o solo terminado.</li>
+<li><strong>Terminaciones:</strong> si el trabajo incluye pintar, sellar o reponer lo que haya que romper.</li>
+</ul>
+
+<h2>Plazo y horarios</h2>
+<p>Acuerden la fecha de inicio, cuántos días debería durar y en qué horario va a trabajar. Si vives en un edificio o un condominio, revisa el reglamento antes: puede haber horarios para trabajos con ruido o reglas para entrar materiales.</p>
+<p>Pregunta también qué pasa si un día no puede venir. Basta con que avise con tiempo por WhatsApp, pero conviene decirlo desde el principio.</p>
+
+<h2>Forma de pago y etapas</h2>
+<p>Conviene no pagar todo por adelantado. Una forma razonable es pagar una parte al inicio para los materiales y el resto según el avance o al terminar, después de revisar el trabajo.</p>
+<p>Si pagas por transferencia, guarda el comprobante. Si pagas en efectivo, pide un recibo, aunque sea un mensaje que diga cuánto recibió y por qué.</p>
+
+<h2>Boleta</h2>
+<p>Pregúntale antes si te puede entregar boleta. Si trabaja con boleta de honorarios y tú eres una persona, no una empresa, no te toca retener nada: la retención la declara y paga él. Si te interesa el detalle, está en la guía de <a href="{% url 'core:guia' 'boleta-de-honorarios' %}">boleta de honorarios</a>.</p>
+
+<h2>Garantía</h2>
+<p>Acuerden cuánto tiempo responde por el trabajo y qué cubre. Por ejemplo, si una filtración vuelve a aparecer a las pocas semanas, ¿viene de nuevo sin cobrar? Que quede escrito en el mismo mensaje del presupuesto.</p>
+
+<h2>Permisos municipales</h2>
+<p>Algunas ampliaciones y obras necesitan permiso de la Dirección de Obras Municipales (DOM) de tu municipalidad. Si no sabes si tu caso lo necesita, consulta en la DOM de tu comuna antes de partir. Pregúntale también al maestro si ha hecho trabajos parecidos con permiso y cómo lo manejaron.</p>
+
+<h2>Licencia SEC para gas y electricidad</h2>
+<p>Los trabajos de gas, como un calefont o la red de gas, los debe hacer un instalador de gas autorizado por la SEC. Las instalaciones eléctricas también van con un instalador autorizado, con la clase de licencia que corresponde. Cómo revisarlo paso a paso está en <a href="{% url 'core:guia' 'verificar-instalador-sec' %}">cómo saber si un electricista o un gásfiter está autorizado por la SEC</a>.</p>
+
+<h2>Qué pasa si aparece algo imprevisto</h2>
+<p>En los trabajos de la casa es común encontrar algo que no se veía: una cañería en mal estado detrás del cerámico, un cable viejo dentro de la pared. Acuerden desde el inicio que cualquier trabajo extra se cotiza aparte y se aprueba antes de hacerlo, por escrito. Así evitas una cuenta sorpresa al final.</p>
+
+<h2>Fotos de antes, durante y después</h2>
+<p>Saca fotos del lugar antes de empezar, durante el trabajo y al terminar. Las de durante son las más útiles: muestran lo que va a quedar tapado, como cañerías o cables dentro de un muro. Te sirven si tienes que pedir la garantía y si algún día otro maestro necesita saber qué hay detrás.</p>
+
+<h2>Referencias</h2>
+<p>Pide fotos de trabajos anteriores parecidos al tuyo y, si se puede, el contacto de algún cliente anterior. Un maestro con trabajo constante suele tener a quién pedirle que te cuente cómo le fue. Si lo encontraste por internet, revisa que el nombre y el teléfono sean los mismos en todas partes.</p>
+<p>En el <a href="{% url 'directory:provider_list' %}">buscador de servicios</a> puedes ver maestros por comuna y escribirles directo por WhatsApp. Esta lista te sirve para la primera conversación.</p>
+
+<h2>Un mensaje para dejarlo todo por escrito</h2>
+<p>Cuando ya conversaron, mándale un resumen y pídele que te confirme. Algo así:</p>
+<ul>
+<li>Trabajo: qué se va a hacer y dónde.</li>
+<li>Materiales: quién los compra y cuáles.</li>
+<li>Inicio y duración: desde qué día y cuántos días.</li>
+<li>Valor total y forma de pago: cuánto al inicio y cuánto al terminar.</li>
+<li>Boleta: si la entrega y de qué tipo.</li>
+<li>Garantía: cuánto tiempo y qué cubre.</li>
+<li>Extras: se cotizan y se aprueban antes de hacerlos.</li>
+</ul>
+<p>Si el maestro responde "de acuerdo", los dos tienen el mismo trato a la vista. Si se molesta porque quieres dejarlo por escrito, ya sabes algo importante antes de empezar.</p>
+
+<section class="guia-fuentes">
+<h2>Fuentes</h2>
+<ul>
+<li><a href="https://www.chileatiende.gob.cl/fichas/67276-buscador-de-instaladores-electricos-y-de-gas-autorizados-por-la-sec" target="_blank" rel="noopener">Buscador de instaladores eléctricos y de gas autorizados por la SEC (ChileAtiende)</a></li>
+<li><a href="https://www.chileatiende.gob.cl/fichas/2641-licencia-de-instalador-de-gas" target="_blank" rel="noopener">Licencia de instalador de gas (ChileAtiende)</a></li>
+<li><a href="https://www.chileatiende.gob.cl/fichas/3088-boleta-de-honorarios-electronica" target="_blank" rel="noopener">Boleta de honorarios electrónica (ChileAtiende)</a></li>
+</ul>
+</section>
+{% endblock %}

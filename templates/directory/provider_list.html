@@ -115,7 +115,7 @@
   </nav>
   {% endif %}
 
-  {% if relacionados_comunas or relacionados_categorias %}
+  {% if relacionados_comunas or relacionados_categorias or guias_rubro %}
   <div class="relacionados">
     {% if relacionados_comunas %}
     <div>
@@ -127,6 +127,12 @@
     <div>
       <h2 class="h6">Otros servicios en {{ selected_commune.name }}</h2>
       <ul>{% for f in relacionados_categorias %}<li><a href="{{ f.url }}">{% firstof f.category__seo_nombre f.category__name %} en {{ selected_commune.name }}</a> <span>{{ f.n }}</span></li>{% endfor %}</ul>
+    </div>
+    {% endif %}
+    {% if guias_rubro %}
+    <div>
+      <h2 class="h6">Antes de contratar</h2>
+      <ul>{% for g in guias_rubro %}<li><a href="{% url 'core:guia' g.slug %}">{{ g.titulo }}</a></li>{% endfor %}</ul>
     </div>
     {% endif %}
   </div>

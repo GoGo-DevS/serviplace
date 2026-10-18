@@ -1,0 +1,67 @@
+{% extends "guias/_guia.html" %}
+{% block cuerpo %}
+<p>El inicio de actividades es el aviso que le das al Servicio de Impuestos Internos (SII) de que empiezas a trabajar en algo por lo que vas a recibir ingresos. Si trabajas como independiente y quieres emitir boletas de honorarios electrónicas, necesitas haberlo hecho en <strong>segunda categoría</strong>.</p>
+<p>El trámite se hace en línea en <a href="https://www.sii.cl/" target="_blank" rel="noopener">sii.cl</a>, entrando con tu Clave Tributaria o con tu ClaveÚnica, y no tiene costo. Es el primero de los tres requisitos para emitir tus propias boletas; los otros dos están explicados más abajo.</p>
+
+<h2>Por qué lo necesitas</h2>
+<p>Para emitir boletas de honorarios electrónicas, el SII pide tres condiciones:</p>
+<ul>
+<li>Haber dado aviso de inicio de actividades en segunda categoría.</li>
+<li>Que tu actividad sea de las gravadas en el artículo 42 N°2 de la Ley sobre Impuesto a la Renta.</li>
+<li>No tener situaciones pendientes con el SII que restrinjan la emisión de boletas.</li>
+</ul>
+<p>Sin el inicio de actividades no puedes emitir tus propias boletas de honorarios. Con él hecho, y cumpliendo las otras dos condiciones, puedes darle boleta a una empresa o a una persona cada vez que te paguen, sin depender de nadie.</p>
+
+<h2>Qué significa segunda categoría</h2>
+<p>La Ley sobre Impuesto a la Renta ordena los ingresos en categorías. La segunda categoría es la de los ingresos que vienen del trabajo de las personas, y dentro de ella el artículo 42 N°2 es el que corresponde a quienes trabajan de forma independiente y cobran con boleta de honorarios.</p>
+<p>Por eso, cuando hagas el trámite, lo importante es que tu actividad quede en segunda categoría. Si no sabes si lo que haces calza ahí, pregúntalo en el SII antes de enviar el aviso.</p>
+<p>Si además vendes productos o tienes un negocio con local, tu situación puede ser distinta. En ese caso conviene consultar en el SII o con un contador antes del trámite, para que tu actividad quede bien declarada desde el principio.</p>
+
+<h2>Cómo hacerlo en línea</h2>
+<p>Antes de empezar, ten a mano:</p>
+<ul>
+<li>Tu RUT.</li>
+<li>Tu Clave Tributaria del SII o tu ClaveÚnica.</li>
+<li>Una descripción clara de lo que haces, en una o dos frases. Por ejemplo: "atención de kinesiología a domicilio" o "clases particulares de matemáticas".</li>
+</ul>
+<p>Después:</p>
+<ol>
+<li>Entra a sii.cl con tu Clave Tributaria o tu ClaveÚnica.</li>
+<li>Busca el trámite de inicio de actividades.</li>
+<li>Completa la información que te pide sobre tu actividad, cuidando que quede como actividad de segunda categoría.</li>
+<li>Revisa todo antes de enviar.</li>
+</ol>
+<p>No tienes que pagarle a nadie para hacerlo. Si te complica, un contador te puede acompañar, pero el trámite en sí es gratis.</p>
+
+<h2>Si te paga una empresa y aún no tienes inicio de actividades</h2>
+<p>Puede pasar que te salga un trabajo antes de hacer el trámite. Si quien te paga es una empresa, ella puede emitir una <strong>boleta de prestación de servicios de terceros</strong>. La diferencia es que esa boleta la emite quien paga, no tú, y es la empresa la que hace la retención.</p>
+<p>Sirve para salir del paso, pero depende de que la empresa quiera hacerla. Y si tus clientes son vecinos o personas particulares, lo práctico es tener tu propio inicio de actividades. Si vas a trabajar por tu cuenta de forma regular, mejor hacerlo desde el principio.</p>
+
+<h2>Después del inicio: emitir tus boletas</h2>
+<p>Con el inicio hecho, ya puedes emitir boletas de honorarios electrónicas en sii.cl, también gratis y con la misma clave. En 2026 la retención es de 15,25%, y quién la paga depende de si tu cliente es una empresa o una persona. Está todo explicado, con un ejemplo de cálculo, en la guía de <a href="{% url 'core:guia' 'boleta-de-honorarios' %}">boleta de honorarios</a>.</p>
+
+<h2>Preguntas que suelen aparecer</h2>
+
+<h3>¿Tiene costo?</h3>
+<p>No. El aviso de inicio de actividades en el SII no tiene costo.</p>
+
+<h3>¿Tengo que ir a una oficina del SII?</h3>
+<p>El trámite se hace en línea, desde sii.cl, con tu Clave Tributaria o tu ClaveÚnica.</p>
+
+<h3>¿Qué pasa si tengo algo pendiente con el SII?</h3>
+<p>Una de las condiciones para emitir boletas es no tener situaciones pendientes que lo restrinjan. Si al intentar emitir te aparece un problema, revisa tu situación en el SII o pregunta ahí antes de seguir.</p>
+
+<h3>¿Sirve para cualquier oficio?</h3>
+<p>Para emitir boletas de honorarios, tu actividad tiene que estar entre las gravadas por el artículo 42 N°2. Si tienes dudas sobre la tuya, consúltalo en el SII antes de hacer el trámite.</p>
+
+<h2>Lo que viene después</h2>
+<p>Con el inicio hecho y la boleta resuelta, lo que falta es que te encuentren. En la página <a href="{% url 'core:para_profesionales' %}">para profesionales</a> contamos cómo funciona ServiPlace para independientes: publicas tu perfil gratis y los clientes de tu comuna te escriben directo a tu WhatsApp, sin comisión.</p>
+
+<section class="guia-fuentes">
+<h2>Fuentes</h2>
+<ul>
+<li><a href="https://www.sii.cl/" target="_blank" rel="noopener">Servicio de Impuestos Internos (SII)</a></li>
+<li><a href="https://www.chileatiende.gob.cl/fichas/3088-boleta-de-honorarios-electronica" target="_blank" rel="noopener">Boleta de honorarios electrónica (ChileAtiende)</a></li>
+</ul>
+</section>
+{% endblock %}

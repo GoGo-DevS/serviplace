@@ -1,0 +1,71 @@
+{% extends "guias/_guia.html" %}
+{% block cuerpo %}
+<p>Para saber si un electricista o un gásfiter está autorizado por la SEC (Superintendencia de Electricidad y Combustibles), usa el <strong>buscador de instaladores eléctricos y de gas autorizados</strong>. Es público y gratuito: eliges si buscas gas o electricidad, el tipo de trabajo, la región y la comuna, y te muestra a los instaladores autorizados y vigentes.</p>
+<p>Si el trabajo es de gas, como instalar un calefont o intervenir la red de gas de la casa, lo debe hacer un instalador de gas autorizado por la SEC. En electricidad pasa algo parecido: el instalador tiene que estar autorizado y, además, tener la clase de licencia que corresponde al tamaño de tu instalación.</p>
+
+<h2>Cuándo necesitas un instalador autorizado</h2>
+<p>Hay dos casos que conviene tener claros:</p>
+<ul>
+<li><strong>Gas, siempre.</strong> El calefont, la red de gas y cualquier otra instalación de gas van con un instalador de gas autorizado por la SEC. Un trabajo de gas mal hecho es peligroso para toda la casa, así que aquí no vale la pena ahorrarse la revisión.</li>
+<li><strong>Instalaciones eléctricas.</strong> Las hace un instalador eléctrico autorizado, con la clase de licencia que corresponde a la potencia de la instalación.</li>
+</ul>
+<p>Si no tienes claro si lo tuyo es una instalación o un arreglo chico, pregúntale al electricista cómo lo ve. Igual conviene preferir a alguien autorizado: para tener la licencia tuvo que acreditar un título o una certificación en electricidad.</p>
+
+<h2>Las clases de licencia, explicadas simple</h2>
+
+<h3>Electricidad: clases A, B, C y D</h3>
+<table>
+<thead>
+<tr><th>Clase</th><th>Quién la obtiene</th></tr>
+</thead>
+<tbody>
+<tr><td>A</td><td>Ingenieros civiles electricistas o ingenieros de ejecución electricistas</td></tr>
+<tr><td>B</td><td>Técnicos electricistas</td></tr>
+<tr><td>C</td><td>Técnicos electricistas</td></tr>
+<tr><td>D</td><td>Personas con título en electricidad de un centro aceptado por la SEC, o con certificado de competencias laborales de ChileValora</td></tr>
+</tbody>
+</table>
+<p>La clase A permite hacer instalaciones de cualquier potencia, en baja y alta tensión. La clase B permite instalaciones de baja tensión de hasta 500 kW. Para un trabajo en tu casa no necesitas memorizar la tabla: basta con preguntarle al instalador qué clase tiene y si le alcanza para lo que vas a hacer.</p>
+<p>Las licencias eléctricas son indefinidas, salvo las que se obtienen por certificación de competencias laborales, que se renuevan cada cinco años. Por eso conviene revisar en el buscador que la licencia siga vigente, y no solo que alguna vez la haya tenido.</p>
+
+<h3>Gas: clases 1, 2 y 3</h3>
+<p>Los instaladores de gas tienen licencia de clase 1, 2 o 3. La clase 1 exige ser ingeniero civil o ingeniero de ejecución en especialidades mecánicas o químicas. Igual que en electricidad, pregúntale al gásfiter qué clase tiene y si cubre el trabajo que necesitas.</p>
+
+<h2>Cómo usar el buscador de la SEC</h2>
+<ol>
+<li>Entra al buscador desde su ficha en ChileAtiende: <a href="https://www.chileatiende.gob.cl/fichas/67276-buscador-de-instaladores-electricos-y-de-gas-autorizados-por-la-sec" target="_blank" rel="noopener">buscador de instaladores eléctricos y de gas autorizados por la SEC</a>.</li>
+<li>Elige si buscas un instalador eléctrico o de gas.</li>
+<li>Elige el tipo de trabajo que necesitas.</li>
+<li>Elige tu región y tu comuna.</li>
+<li>Revisa la lista, que muestra a los instaladores autorizados y vigentes para esa búsqueda, y busca el nombre de la persona que te va a hacer el trabajo.</li>
+</ol>
+<p>Si no lo encuentras, prueba con comunas cercanas antes de descartarlo y pregúntale con qué nombre está registrado. Si tienes dudas sobre el trámite, puedes pedir orientación llamando al 101.</p>
+
+<h3>Si te dice que la licencia está en trámite</h3>
+<p>La licencia se pide en línea a la SEC, con el RUT y la ClaveÚnica, y la respuesta llega en unos 15 días. Mientras no la tenga, no está autorizado. Si tu trabajo es de gas, lo prudente es esperar o buscar a otra persona.</p>
+
+<h2>Qué preguntarle al instalador antes de contratarlo</h2>
+<ul>
+<li><strong>¿Tienes licencia SEC? ¿De qué clase?</strong> En electricidad será A, B, C o D; en gas, 1, 2 o 3.</li>
+<li><strong>¿Tu clase alcanza para este trabajo?</strong> Un instalador serio sabe responder esto sin rodeos.</li>
+<li><strong>¿Cuál es tu nombre completo?</strong> Lo necesitas para reconocerlo en la lista del buscador.</li>
+<li><strong>Si tu licencia es por competencias laborales, ¿está al día?</strong> Esas se renuevan cada cinco años.</li>
+<li><strong>¿Qué incluye el trabajo y qué garantía das?</strong> Esto conviene dejarlo por escrito.</li>
+</ul>
+
+<h2>Quién responde por el trabajo</h2>
+<p>La SEC autoriza a los instaladores, pero el trabajo que hace cada uno es responsabilidad del propio instalador, no de la SEC. Por eso, además de revisar la licencia, conviene acordar bien el presupuesto, el plazo y la garantía. Lo explicamos en <a href="{% url 'core:guia' 'antes-de-contratar-un-maestro' %}">antes de contratar a un maestro: lo que conviene acordar</a>.</p>
+
+<h2>Un instalador autorizado te muestra su licencia</h2>
+<p>Quien tiene su licencia al día no tiene problema en mostrártela ni en darte su nombre para que lo busques. Si alguien se incomoda porque quieres revisarlo, o te dice que para un trabajo de gas "no hace falta", es motivo suficiente para buscar a otra persona.</p>
+<p>Puedes encontrar electricistas y gásfiteres de tu comuna en el <a href="{% url 'directory:provider_list' %}">buscador de ServiPlace</a> y, antes de coordinar con ellos por WhatsApp, comprobar su licencia en el buscador de la SEC.</p>
+
+<section class="guia-fuentes">
+<h2>Fuentes</h2>
+<ul>
+<li><a href="https://www.chileatiende.gob.cl/fichas/67276-buscador-de-instaladores-electricos-y-de-gas-autorizados-por-la-sec" target="_blank" rel="noopener">Buscador de instaladores eléctricos y de gas autorizados por la SEC (ChileAtiende)</a></li>
+<li><a href="https://www.chileatiende.gob.cl/fichas/2662-licencia-de-instalador-electrico" target="_blank" rel="noopener">Licencia de instalador eléctrico (ChileAtiende)</a></li>
+<li><a href="https://www.chileatiende.gob.cl/fichas/2641-licencia-de-instalador-de-gas" target="_blank" rel="noopener">Licencia de instalador de gas (ChileAtiende)</a></li>
+</ul>
+</section>
+{% endblock %}
