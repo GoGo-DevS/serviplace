@@ -50,6 +50,7 @@ class Category(models.Model):
     # 18-10-2026: para que entren los clientes de GoGoDevS que venden (repuestos,
     # uniformes, repostería, vehículos). No tienen página "para profesionales".
     TIENDAS = 'tiendas'
+    TRANSPORTE = 'transporte'
 
     GRUPOS = [
         (HOGAR, 'Hogar y oficios', 'Maestros y técnicos para tu casa.'),
@@ -57,6 +58,7 @@ class Category(models.Model):
         (EDUCACION, 'Clases y educación', 'Profes particulares, idiomas, música y apoyo escolar.'),
         (BELLEZA, 'Belleza y cuidado personal', 'Peluquería, manicure y estética, también a domicilio.'),
         (PROFESIONAL, 'Servicios profesionales', 'Contabilidad, diseño, fotografía, informática y desarrollo web.'),
+        (TRANSPORTE, 'Transporte y traslados', 'Fletes, mudanzas, logística y traslado de pasajeros.'),
         (TIENDAS, 'Tiendas y emprendimientos', 'Emprendimientos y tiendas con local o despacho: repostería, repuestos, uniformes y más.'),
     ]
     GROUP_CHOICES = [(clave, nombre) for clave, nombre, _ in GRUPOS]
@@ -68,6 +70,7 @@ class Category(models.Model):
         EDUCACION: 'clases-y-educacion',
         BELLEZA: 'belleza-y-cuidado-personal',
         PROFESIONAL: 'servicios-profesionales',
+        TRANSPORTE: 'transporte-y-traslados',
         TIENDAS: 'tiendas-y-emprendimientos',
     }
     GROUP_POR_SLUG = {slug: clave for clave, slug in GROUP_SLUGS.items()}

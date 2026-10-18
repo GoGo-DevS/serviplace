@@ -571,6 +571,62 @@ PROFESIONES = {
         ],
     },
 
+    # -------------------------------------------------------------- TRANSPORTE
+    'fletes-y-logistica': {
+        'clientes': 'clientes',
+        'titulo': 'Fletes y mudanzas: consigue clientes',
+        'h1': 'Fletes y mudanzas: clientes de tu comuna que necesitan mover algo',
+        'meta': 'Perfil de fletes gratis: mudanzas, fletes y transporte de carga, con tu vehículo y tus zonas a la vista. Los clientes te escriben directo por WhatsApp.',
+        'intro': 'La mayoría de los fletes se contratan con poca anticipación: una mudanza que se adelantó, un mueble comprado en la feria, una empresa que necesita mover carga mañana. Gana el que contesta rápido y dice desde el primer mensaje qué vehículo tiene y cuánta carga lleva.',
+        'buscan': [
+            'Mudanzas de casa o departamento, con o sin ayudantes.',
+            'Fletes cortos: muebles, electrodomésticos, compras grandes.',
+            'Retiro de escombros y cachureos.',
+            'Transporte de carga y distribución para empresas.',
+        ],
+        'credencial': None,
+        'credencial_texto': 'Lo que más tranquiliza a tus clientes es saber qué vehículo llevas, cuánta carga cabe y cómo cuidas lo que transportas. Si tienes seguro de carga o trabajas con factura, dilo en tu perfil.',
+        'tips': [
+            'Di qué vehículo tienes y cuánta carga lleva: camioneta, camión 3/4, camión de mudanza.',
+            'Aclara si vas con ayudantes y si suben y bajan pisos.',
+            'Cuenta a qué comunas vas y si haces viajes a regiones.',
+            'Explica cómo cotizas: por viaje, por hora o según la carga.',
+        ],
+        'ejemplo_corta': 'Fletes y mudanzas en Puente Alto con camión 3/4 y ayudantes, también viajes a regiones.',
+        'ejemplo_larga': 'Hago fletes y mudanzas con camión 3/4 cerrado. Voy con uno o dos ayudantes, subimos y bajamos pisos, y protegemos los muebles con frazadas. Atiendo Puente Alto, La Florida y comunas cercanas, y hago viajes a regiones coordinando con anticipación. Cotizo según la carga y la distancia; para empresas emito factura.',
+        'faq': [
+            ('¿Puedo publicar si tengo solo una camioneta?', 'Sí. Di qué cabe en tu camioneta: muchos fletes son de un mueble o una lavadora.'),
+            ('¿ServiPlace cobra comisión por flete?', 'No. Publicar es gratis y el valor lo acuerdas directo con tu cliente.'),
+        ],
+    },
+    'traslados-y-turismo': {
+        'clientes': 'pasajeros',
+        'titulo': 'Transporte de pasajeros: consigue clientes',
+        'h1': 'Traslados y turismo: pasajeros de tu zona que buscan quien los lleve',
+        'meta': 'Perfil de transporte de pasajeros gratis: traslados al aeropuerto, tours, matrimonios y empresas, con tu flota a la vista. Contacto directo, sin comisión.',
+        'intro': 'Quien busca un traslado quiere tres certezas: que vas a llegar a la hora, que el vehículo es adecuado para cuántos son y que el conductor tiene sus papeles al día. Si tu perfil lo responde, la reserva se cierra en una conversación.',
+        'buscan': [
+            'Traslados desde y hacia el aeropuerto.',
+            'Transporte para matrimonios, eventos y empresas.',
+            'Tours por el día a la costa, la cordillera o los valles.',
+            'Traslado de grupos y delegaciones.',
+        ],
+        'credencial': None,
+        'credencial_texto': 'Tus pasajeros van a querer saber que tienes los permisos y los seguros del vehículo al día. Dilo en tu perfil, junto con cuántos pasajeros lleva cada vehículo.',
+        'tips': [
+            'Detalla tu flota: tipo de vehículo y cuántos pasajeros lleva cada uno.',
+            'Di qué servicios haces: aeropuerto, eventos, tours, empresas.',
+            'Aclara si trabajas con reserva previa y con cuánta anticipación.',
+            'Cuenta si emites factura para empresas.',
+        ],
+        'ejemplo_corta': 'Traslados al aeropuerto y tours en van para hasta 10 pasajeros, desde Santiago.',
+        'ejemplo_larga': 'Hago traslados desde y hacia el aeropuerto y tours por el día a Valparaíso, Viña del Mar y el Cajón del Maipo, en una van para hasta 10 pasajeros. También transporte para matrimonios y empresas. Trabajo con reserva previa, tengo los permisos y el seguro del vehículo al día, y emito factura.',
+        'faq': [
+            ('¿Puedo publicar si tengo un solo vehículo?', 'Sí. Di qué vehículo es y cuántos pasajeros lleva.'),
+            ('¿Cobran comisión por viaje?', 'No. El acuerdo y el pago son directos con tu pasajero.'),
+        ],
+    },
+
     # ------------------------------------------------------------------ HOGAR
     'gasfiteria': {
         'clientes': 'clientes',

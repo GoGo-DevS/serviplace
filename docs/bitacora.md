@@ -321,3 +321,19 @@ Tarea completada: PERFILES DE LOS CLIENTES DE GOGODEVS ("con todo: logo, nombre"
 Pruebas: 207 (directory/tests_clientes.py, 8). Mutación detectada: duplicado
   por WhatsApp.
 ---
+
+---
+[18-10-2026, mediodía] — Diego: "voa es todo chile, travesía también; fco dale
+nomás; saferoom déjalo anotado en el CRM".
+  · Grupo nuevo "Transporte y traslados" (migración 0015, choices) con Fletes y
+    logística (Travesía) y Traslados y turismo (VOA), cada una con su página
+    /profesionales/. Comuna base Santiago, "Atención en todo Chile".
+  · Logos: el favicon de VOA corta su marca (se usó "VOA" del logo horizontal);
+    el de Travesía solo existe en SVG (rasterizado con Chrome headless).
+  · SafeRoom: ticket de soporte en el CRM (proyecto 11, Bug, alta) por el correo
+    roto contacto@saferoomchile.cl. El proyecto ya tenía la tarea "Email contacto
+    real reemplaza placeholder" por hacer.
+  Quedan 12 clientes. Fuera: Max Services (sin WhatsApp), Vizo Glow (número no es
+  WhatsApp en su sitio), Punto Parcelas (sin comuna), AZA (organización).
+Pruebas: 207.
+---

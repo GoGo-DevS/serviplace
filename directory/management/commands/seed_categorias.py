@@ -48,10 +48,13 @@ SEO_NOMBRES = {
     'automotoras': 'Automotora',
     'uniformes-y-ropa-de-trabajo': 'Tienda de uniformes',
     'reposteria-y-dulces': 'Repostería',
+    'fletes-y-logistica': 'Fletes',
+    'traslados-y-turismo': 'Transporte de pasajeros',
 }
 
 H, S, E, B, P, T = (Category.HOGAR, Category.SALUD, Category.EDUCACION,
                     Category.BELLEZA, Category.PROFESIONAL, Category.TIENDAS)
+TR = Category.TRANSPORTE
 
 # (slug, nombre, descripción, icono, grupo, pide_registro_salud)
 CATEGORIAS = [
@@ -90,6 +93,9 @@ CATEGORIAS = [
     ('fotografia-y-video', 'Fotografía y video', 'Eventos, productos, retratos y contenido para redes.', '📷', P, False),
     ('soporte-computacional', 'Soporte computacional', 'Reparación de computadores, redes, respaldos y formateo.', '💻', P, False),
     ('desarrollo-web', 'Desarrollo web y apps', 'Sitios web, tiendas online, apps y sistemas a medida para negocios.', '🌐', P, False),
+
+    ('fletes-y-logistica', 'Fletes y logística', 'Fletes, mudanzas, transporte de carga y logística para empresas.', '🚚', TR, False),
+    ('traslados-y-turismo', 'Traslados y turismo', 'Traslados al aeropuerto, tours y transporte de pasajeros para eventos y empresas.', '🚐', TR, False),
 
     ('repuestos-automotrices', 'Repuestos automotrices', 'Repuestos y accesorios para autos, camionetas y 4x4, con local o despacho.', '🔩', T, False),
     ('automotoras', 'Automotoras', 'Venta de vehículos, con financiamiento y recepción en parte de pago.', '🚙', T, False),

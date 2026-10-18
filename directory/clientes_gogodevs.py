@@ -9,10 +9,12 @@ La carga la hace `manage.py cargar_clientes` (build.sh): crea los que faltan y
 NUNCA pisa un perfil existente. Para corregir un dato después de cargado, se
 edita en el admin o en el panel; cambiarlo aquí no actualiza nada.
 
+VOA Chile y Travesía atienden todo Chile (lo confirmó Diego): comuna base
+Santiago y "Atención en todo Chile".
+
 Quedaron fuera por falta de un dato verificable en su sitio (18-10-2026):
-VOA Chile y Travesía (sin comuna), Max Services (sin WhatsApp), Vizo Glow (el
-número no es WhatsApp en su sitio), Punto Parcelas (sin comuna) y AZA (es una
-organización, no un servicio).
+Max Services (sin WhatsApp), Vizo Glow (el número no es WhatsApp en su sitio),
+Punto Parcelas (sin comuna) y AZA (es una organización, no un servicio).
 """
 
 FUENTE = 'cliente-gogodevs'
@@ -230,5 +232,45 @@ CLIENTES = [
                   'producto (en "Arma tu box", desde 3) y salen 48 horas después de confirmados. Despacho a todo '
                   'Chile. Atención de lunes a sábado de 9:00 a 19:00.'),
         'fuentes': ['https://dulcecita.cl'],
+    },
+    {
+        'slug': 'voa-chile',
+        'nombre': 'VOA Chile',
+        'rubro': 'traslados-y-turismo',
+        'comuna': 'santiago',
+        'sector': 'Atención en todo Chile',
+        'atiende': 'Todo Chile; tours por la zona central',
+        'whatsapp': '56945300943',
+        'telefono': '+56 9 4530 0943',
+        'email': 'reservas@voachile.cl',
+        'web': 'https://voachile.cl',
+        'instagram': 'voachile',
+        'a_domicilio': True,
+        'corta': 'Transporte privado y turismo en sedán, van, minibús y bus: traslados al aeropuerto, tours, matrimonios, empresas y eventos.',
+        'larga': ('VOA Chile hace transporte privado y turismo con una flota de sedán (1 a 3 pasajeros), van (hasta '
+                  '10), minibús (hasta 17) y bus (hasta 46). Hace traslados desde y hacia el aeropuerto, tours por la '
+                  'zona central (centros de ski, Valparaíso y Viña del Mar, viñas del Maipo, Casablanca y Colchagua, '
+                  'Isla Negra, Cajón del Maipo) y transporte para matrimonios, empresas, delegaciones, eventos y '
+                  'producciones. Trabaja con conductores profesionales y con permisos y seguros vigentes.'),
+        'fuentes': ['https://voachile.cl'],
+    },
+    {
+        'slug': 'travesia-logistica',
+        'nombre': 'Travesía Logística',
+        'rubro': 'fletes-y-logistica',
+        'comuna': 'santiago',
+        'sector': 'Atención en todo Chile',
+        'atiende': 'De Arica a Punta Arenas, con rutas a Argentina, Brasil y Paraguay',
+        'whatsapp': '56923763329',
+        'telefono': '+56 9 2376 3329',
+        'web': 'https://travesialogistica.cl',
+        'corta': 'Transporte y logística para empresas, nacional e internacional: logística minera, cargas especiales y arriendo de equipos para faenas.',
+        'larga': ('Travesía Logística hace transporte nacional e internacional para empresas, logística minera y '
+                  'soporte logístico para obras y faenas. Mueve cargas especiales, refrigeradas, peligrosas y de '
+                  'sobredimensión, asesora en comercio exterior y proyectos logísticos, y arrienda equipos con o sin '
+                  'operador: camionetas, camión 3/4, camión de combustible, aljibes, tolvas, camión pluma, '
+                  'retroexcavadora, excavadora y tracto camión con rampla y cama baja. Cubre de Arica a Punta Arenas, '
+                  'con rutas a Argentina, Brasil y Paraguay.'),
+        'fuentes': ['https://travesialogistica.cl', 'https://travesialogistica.cl/contacto/'],
     },
 ]
