@@ -512,3 +512,34 @@ body:has(.galeria-visor[open]) { overflow: hidden; }
 .galeria-visor-btn.is-prev { left: .75rem; top: 50%; transform: translateY(-50%); }
 .galeria-visor-btn.is-next { right: .75rem; top: 50%; transform: translateY(-50%); }
 @media (prefers-reduced-motion: reduce) { .galeria-ficha-foto img { transition: none; } }
+
+/* ---- /links/: la bio de Instagram (18-10-2026) ---- */
+.tree { max-width: 480px; margin: 0 auto; padding: 2.25rem 1rem 2rem; display: grid; gap: 1.6rem; }
+.tree-cabecera { text-align: center; display: grid; gap: .55rem; justify-items: center; }
+.tree-marca { display: inline-flex; align-items: center; gap: .5rem; color: var(--sp-ink); font-family: var(--font-head); font-weight: 800; font-size: 1.55rem; letter-spacing: -.04em; text-decoration: none; }
+.tree-marca .brand-icono { width: 34px; height: 34px; }
+.tree-titulo { margin: .35rem 0 0; font-size: clamp(1.45rem, 6vw, 1.85rem); line-height: 1.12; letter-spacing: -.035em; text-wrap: balance; }
+.tree-bajada { margin: 0; color: var(--sp-slate); font-size: 1rem; max-width: 34ch; text-wrap: pretty; }
+.tree-dato { margin: 0; font-family: var(--font-mono); font-size: .74rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--sp-accent); }
+.tree-botones, .tree-lista { display: grid; gap: .7rem; }
+.tree-btn { display: flex; align-items: center; justify-content: center; gap: .6rem; min-height: 58px; padding: .8rem 1.1rem; border-radius: 16px; font-weight: 800; font-size: 1.05rem; text-decoration: none; transition: transform .15s ease, box-shadow .15s ease, background .15s ease; }
+.tree-btn:active { transform: scale(.98); }
+.tree-btn-principal { background: var(--sp-ink); color: #fff; box-shadow: var(--sp-sh-md); }
+.tree-btn-principal:hover { color: #fff; background: #000; }
+.tree-btn-publicar { background: var(--sp-accent); color: #fff; box-shadow: var(--sp-sh-md); }
+.tree-btn-publicar:hover { color: #fff; background: var(--sp-blue-dark); }
+.tree-btn-claro { justify-content: space-between; background: #fff; color: var(--sp-ink); box-shadow: var(--sp-sh-sm); font-weight: 700; font-size: 1rem; min-height: 54px; }
+.tree-btn-claro:hover { color: var(--sp-ink); box-shadow: var(--sp-sh-md); }
+.tree-btn-claro i { font-style: normal; color: var(--sp-accent); }
+.tree-seccion { display: grid; gap: .65rem; }
+.tree-rotulo { margin: 0; font-family: var(--font-mono); font-size: .7rem; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--sp-muted); }
+/* Una columna: en dos, «Tiendas y emprendimientos» no cabía y se montaba sobre su conteo. */
+.tree-rubros { display: grid; gap: .5rem; }
+.tree-rubro { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: .55rem; min-height: 54px; padding: .55rem .7rem; border-radius: 14px; background: #fff; box-shadow: var(--sp-sh-sm); color: var(--sp-ink); font-weight: 700; font-size: .9rem; line-height: 1.2; text-decoration: none; }
+.tree-rubro:hover { color: var(--sp-ink); box-shadow: var(--sp-sh-md); }
+.tree-rubro b { font-family: var(--font-mono); font-size: .74rem; color: var(--sp-muted); font-weight: 600; }
+.tree-rubro .grupo-icono { width: 30px; height: 30px; }
+.tree-pie { display: grid; justify-items: center; gap: .6rem; padding-top: .4rem; }
+.tree-ig { display: inline-flex; align-items: center; gap: .45rem; min-height: 44px; padding: 0 1rem; border-radius: 999px; background: #fff; box-shadow: var(--sp-sh-sm); color: var(--sp-ink); font-weight: 700; text-decoration: none; }
+.tree-pie p { margin: 0; font-size: .82rem; color: var(--sp-muted); }
+@media (prefers-reduced-motion: reduce) { .tree-btn { transition: none; } }

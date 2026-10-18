@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% comment %}
+/links/ — el enlace de la bio de Instagram (18-10-2026, pedido de Diego).
+Mismo criterio que el Tree de los clientes de GoGoDevS: una columna, botones
+grandes para el pulgar, sin menú ni pie (quien llega desde Instagram viene a
+UNA cosa), y cada botón medido con `tree_click` (destino + texto_boton,
+dimensiones registradas en GA4 el 18-10). noindex: es una página de paso, no
+tiene que competir con la portada en Google.
+{% endcomment %}
+
+{% block navegacion %}{% endblock %}
+{% block pie %}{% endblock %}
+{% block flotante %}{% endblock %}
+
+{% block content %}
+<div class="tree">
+  <header class="tree-cabecera">
+    <a class="tree-marca" href="{% url 'core:home' %}" data-tree>
+      <svg class="brand-icono" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 3C19.3 3 9 13.1 9 25.7 9 42.2 32 61 32 61s23-18.8 23-35.3C55 13.1 44.7 3 32 3z" fill="#06B6D4"/><circle cx="32" cy="25.5" r="15.5" fill="#fff"/><path d="M20 17h14v-4.5L44 20l-10 7.5V23H20zM44 34H30v4.5L20 31l10-7.5V28h14z" fill="#06B6D4"/></svg>
+      <span>serviplace</span>
+    </a>
+    <h1 class="tree-titulo">Maestros y profesionales independientes en tu comuna</h1>
+    <p class="tree-bajada">Les escribes directo por WhatsApp. Sin intermediarios y sin comisiones.</p>
+    {% if total_perfiles %}<p class="tree-dato">{{ total_perfiles }} perfil{{ total_perfiles|pluralize:"es" }} publicado{{ total_perfiles|pluralize }} por sus dueños</p>{% endif %}
+  </header>
+
+  <nav class="tree-botones" aria-label="Enlaces principales">
+    <a class="tree-btn tree-btn-principal" href="{% url 'directory:provider_list' %}" data-tree>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      <span>Buscar un maestro o profesional</span>
+    </a>
+    <a class="tree-btn tree-btn-publicar" href="{% url 'core:para_profesionales' %}" data-tree>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+      <span>Publicar mi servicio gratis</span>
+    </a>
+  </nav>
+
+  {% if grupos %}
+  <section class="tree-seccion" aria-labelledby="tree-rubros">
+    <h2 class="tree-rotulo" id="tree-rubros">Busca por rubro</h2>
+    <div class="tree-rubros">
+      {% for grupo in grupos %}
+      <a class="tree-rubro" href="{% url 'directory:listado_rubro' grupo.slug %}" data-tree data-texto="{{ grupo.nombre }}">
+        {% include "_icono_grupo.html" with grupo=grupo.clave %}
+        <span>{{ grupo.nombre }}</span>
+        <b>{{ grupo.total }}</b>
+      </a>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  <section class="tree-seccion" aria-labelledby="tree-mas">
+    <h2 class="tree-rotulo" id="tree-mas">Antes de contratar</h2>
+    <div class="tree-lista">
+      <a class="tree-btn tree-btn-claro" href="{% url 'core:guias' %}" data-tree><span>Guías para contratar bien</span><i aria-hidden="true">→</i></a>
+      <a class="tree-btn tree-btn-claro" href="{% url 'core:trust_and_safety' %}" data-tree><span>Cómo cuidarte al contratar</span><i aria-hidden="true">→</i></a>
+      {% if whatsapp_url %}
+      <a class="tree-btn tree-btn-claro" href="{{ whatsapp_url }}" target="_blank" rel="noopener" data-tree><span>Escríbenos por WhatsApp</span><i aria-hidden="true">→</i></a>
+      {% endif %}
+    </div>
+  </section>
+
+  <footer class="tree-pie">
+    <a class="tree-ig" href="https://www.instagram.com/serviplace.cl/" target="_blank" rel="me noopener" data-tree aria-label="Instagram de ServiPlace">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+      <span>@serviplace.cl</span>
+    </a>
+    <p>Hecho en Chile por <a href="https://gogodevs.cl/?utm_source=serviplace&amp;utm_medium=referral&amp;utm_campaign=links" target="_blank" rel="noopener" data-tree>GoGoDevS</a></p>
+  </footer>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // tree_click, igual que en el Tree de los clientes: destino = whatsapp /
+  // instagram / interno:/ruta/ / externo, y el texto del botón apretado.
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest('a[data-tree]');
+    if (!a || !window.gtag) return;
+    var url = new URL(a.href, window.location.href);
+    var destino = 'externo';
+    if (url.hostname === 'wa.me' || url.hostname.indexOf('whatsapp.com') !== -1) destino = 'whatsapp';
+    else if (url.hostname.indexOf('instagram.com') !== -1) destino = 'instagram';
+    else if (url.hostname === window.location.hostname) destino = 'interno:' + url.pathname;
+    // data-texto fija el nombre cuando el botón trae un número que cambia (los
+    // rubros muestran su conteo): si no, cada perfil nuevo abre otro valor en GA4.
+    var texto = (a.dataset.texto || a.textContent || a.getAttribute('aria-label') || '').replace(/\s+/g, ' ').trim();
+    gtag('event', 'tree_click', {destino: destino, texto_boton: texto.slice(0, 100), transport_type: 'beacon'});
+  });
+</script>
+{% endblock %}

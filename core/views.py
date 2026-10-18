@@ -170,6 +170,26 @@ def contact(request):
     )
 
 
+def links(request):
+    """El enlace de la bio de Instagram. Solo los rubros con perfiles: un botón
+    que lleva a un listado vacío es lo primero que ve alguien que llega de IG."""
+    registrar(request, LeadEvent.PAGE_VIEW, origen='links')
+    numero = settings.DEFAULT_CONTACT_WHATSAPP
+    texto = 'Hola, vengo del Instagram de ServiPlace.'
+    return render(
+        request,
+        'core/links.html',
+        {
+            'grupos': [g for g in categorias_por_grupo() if g['total']],
+            'total_perfiles': Provider.objects.publicos().count(),
+            'whatsapp_url': f'https://wa.me/{numero}?{urlencode({"text": texto})}' if numero else '',
+            'page_title': 'ServiPlace: todos los enlaces',
+            'meta_description': 'Busca maestros y profesionales independientes por comuna o publica tu servicio gratis en ServiPlace.',
+            'robots': 'noindex, follow',
+        },
+    )
+
+
 def privacy(request):
     return render(
         request,

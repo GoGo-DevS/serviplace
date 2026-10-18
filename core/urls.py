@@ -17,4 +17,5 @@ urlpatterns = [
     path('seguridad-y-confianza/', views.trust_and_safety, name='trust_and_safety'),
     path('terminos-de-uso/', views.terms, name='terms'),
     path('privacidad/', views.privacy, name='privacy'),
+    path('links/', views.links, name='links'),
 ]

@@ -414,3 +414,28 @@ Púas 84 → 100 (LCP 1,7 s). Una sola corrida de cada una.
     errores JS ni scroll horizontal.
 Pruebas: 233.
 ---
+
+---
+[18-10-2026, tarde] — Diego: "agrégalo con la ext de diegodinamarca.a: SEO y Google
+Analytics; falta un /links".
+  · Search Console (diegodinamarca.a, NO la main: el navegador abrió en
+    diegotenxd y se cambió antes de tocar nada): propiedad de dominio
+    sc-domain:serviplace.cl VERIFICADA por TXT en Cloudflare (registro agregado
+    a mano; no se dio la autorización OAuth a Cloudflare que ofrecía Google).
+    Sitemap enviado (93 URLs; el primer estado fue "No se ha podido obtener",
+    pero responde 200 a Googlebot: revisar en unos días). reportes-crm agregado
+    como Restringido.
+  · GA4 559460692 (cuenta GoGoDevS): reportes-crm como Lector. Dimensiones de
+    evento registradas: categoria, comuna, origen, destino, texto_boton (cuentan
+    desde hoy). Eventos clave: contacto_whatsapp, sign_up y publicar_perfil aún
+    no aparecen en la lista (GA4 los muestra cuando llegan); marcarlos con la
+    estrella cuando aparezcan. No se dispararon a mano: un clic de prueba en
+    WhatsApp le suma un contacto falso a un profesional.
+  · /links/ para la bio de Instagram: sin menú ni pie (bloques navegacion y pie
+    nuevos en base.html), buscar / publicar, rubros con perfiles (una columna:
+    en dos «Tiendas y emprendimientos» se montaba sobre su conteo), guías,
+    seguridad, WhatsApp de contacto e Instagram. tree_click con destino y
+    texto_boton (data-texto fija el nombre del rubro sin el conteo). noindex,
+    fuera del sitemap. La visita queda en LeadEvent (source_page='links').
+Pruebas: 240.
+---

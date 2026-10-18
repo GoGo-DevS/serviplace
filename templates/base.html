@@ -73,6 +73,8 @@
 <body>
   <a class="skip-link" href="#contenido">Saltar al contenido</a>
 
+  {% comment %}navegacion y pie son bloques para que /links/ (la bio de Instagram) pueda ir sin ellos.{% endcomment %}
+  {% block navegacion %}
   <!-- NAV -->
   <nav class="navbar navbar-expand-lg site-navbar sticky-top">
     <div class="container">
@@ -105,6 +107,7 @@
       </div>
     </div>
   </nav>
+  {% endblock %}
 
   <!-- MESSAGES -->
   {% if messages %}
@@ -127,6 +130,7 @@
     {% block content %}{% endblock %}
   </main>
 
+  {% block pie %}
   <footer class="site-footer mt-5">
     <div class="container py-5">
       <div class="footer-grid">
@@ -163,6 +167,7 @@
       </div>
     </div>
   </footer>
+  {% endblock %}
 
   {% comment %}
   Instagram flotante (18-10-2026, pedido de Diego): en las fichas es el del
