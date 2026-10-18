@@ -1,0 +1,11 @@
+Fuentes servidas desde el propio sitio (18-10-2026), subconjunto latin, bajadas
+de Google Fonts. Las tres tienen licencia SIL Open Font License 1.1, que permite
+usarlas, incrustarlas y redistribuirlas:
+
+- Bricolage Grotesque (variable, pesos 500-800) - Ateliertriay
+- Atkinson Hyperlegible (400, 400 itálica, 700) - Braille Institute
+- IBM Plex Mono (500, 600) - IBM
+
+Texto de la licencia: https://openfontlicense.org
+Para regenerarlas: pedir el CSS de fonts.googleapis.com con un navegador
+moderno y bajar los bloques /* latin */ (ver docs/bitacora.md, 18-10-2026).

@@ -1,10 +1,38 @@
 {% extends "base.html" %}
 
 {% block content %}
+<section class="page-header">
+  <div class="container py-4">
+    <span class="eyebrow">Contacto</span>
+    <h1 class="h2 mt-2 mb-1">Contacto</h1>
+    <p class="text-muted mb-0">Respondemos por WhatsApp. Elige el motivo y el mensaje se arma solo.</p>
+  </div>
+</section>
+
 <section class="container py-5">
-  <span class="eyebrow">Contacto</span>
-  <h1 class="display-6 fw-bold mt-2">Hablemos de SERVIPLACE</h1>
-  <p class="lead text-muted">Si quieres sumar un servicio o conversar sobre el proyecto, puedes partir desde la postulación inicial.</p>
-  <a class="btn btn-primary btn-lg" href="{{ join_url }}">Ir a Súmate gratis</a>
+  {% comment %}
+  18-10-2026 — Antes esta página decía "respondemos por WhatsApp o correo" y no
+  tenía ni WhatsApp ni correo: solo un botón a "Súmate". El correo
+  contacto@serviplace.cl todavía no recibe; cuando reciba, se agrega aquí.
+  data-ga NO es contacto_whatsapp: ese nombre lo cuenta el reporte del CRM como
+  contacto a un profesional.
+  {% endcomment %}
+  {% if motivos %}
+  <div class="contacto-grid">
+    {% for motivo in motivos %}
+    <a class="contacto-motivo" href="{{ motivo.url }}" target="_blank" rel="noopener" data-ga="contacto_serviplace" data-ga-origen="{{ motivo.clave }}">
+      <strong>{{ motivo.titulo }}</strong>
+      <span>{{ motivo.detalle }}</span>
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p>Escríbenos desde <a href="{% url 'core:para_profesionales' %}">la página para profesionales</a>.</p>
+  {% endif %}
+
+  <div class="contacto-notas">
+    <p><strong>¿Buscas a un profesional?</strong> Escríbele directo desde su perfil: nosotros no intermediamos ni cobramos comisión. <a href="{% url 'directory:provider_list' %}">Buscar servicios</a>.</p>
+    <p><strong>¿Tu negocio aparece y no lo publicaste tú?</strong> Puedes reclamarlo desde su perfil o pedirnos que lo borremos. Ver la <a href="{% url 'core:privacy' %}">política de privacidad</a>.</p>
+  </div>
 </section>
 {% endblock %}

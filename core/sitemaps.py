@@ -21,7 +21,7 @@ class StaticViewSitemap(Sitemap):
 
     def items(self):
         return ['core:home', 'directory:provider_list', 'core:para_profesionales', 'core:about',
-                'core:trust_and_safety', 'core:contact', 'core:terms']
+                'core:trust_and_safety', 'core:contact', 'core:terms', 'core:privacy']
 
     def location(self, item):
         return reverse(item)

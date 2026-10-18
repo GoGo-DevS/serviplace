@@ -3,6 +3,7 @@ from django.contrib import messages
 from django.shortcuts import redirect, render
 from django.db.models import Count, Prefetch, Q
 from django.urls import reverse
+from urllib.parse import urlencode
 from django.utils import timezone
 
 from directory.catalogo import categorias_por_grupo
@@ -135,14 +136,43 @@ def about(request):
     )
 
 
+MOTIVOS_CONTACTO = [
+    ('publicar', 'Quiero publicar mi perfil', 'Te ayudamos a dejarlo listo.',
+     'Hola, quiero publicar mi perfil en ServiPlace y tengo una duda.'),
+    ('corregir', 'Corregir o reclamar un perfil', 'Si tu negocio aparece con datos que no son.',
+     'Hola, quiero corregir o reclamar un perfil en ServiPlace.'),
+    ('datos', 'Mis datos o borrar mi perfil', 'Ver, corregir o borrar lo que tenemos de ti.',
+     'Hola, escribo por mis datos personales en ServiPlace.'),
+    ('otro', 'Otra consulta', 'Ideas, prensa o reportar un problema.',
+     'Hola, tengo una consulta sobre ServiPlace.'),
+]
+
+
 def contact(request):
+    numero = settings.DEFAULT_CONTACT_WHATSAPP
+    motivos = [
+        {'clave': clave, 'titulo': titulo, 'detalle': detalle,
+         'url': f'https://wa.me/{numero}?{urlencode({"text": texto})}'}
+        for clave, titulo, detalle, texto in MOTIVOS_CONTACTO
+    ] if numero else []
     return render(
         request,
         'core/contact.html',
         {
+            'motivos': motivos,
             'page_title': 'Contacto | ServiPlace',
-            'meta_description': 'Escríbenos para publicar tu perfil, reclamar uno que ya aparece, corregir datos o pedir la baja. Respondemos por WhatsApp o correo.',
-            'join_url': reverse('core:join'),
+            'meta_description': 'Escríbenos por WhatsApp para publicar tu perfil, reclamar o corregir uno que ya aparece, o pedir que borremos tus datos.',
+        },
+    )
+
+
+def privacy(request):
+    return render(
+        request,
+        'core/privacy.html',
+        {
+            'page_title': 'Política de privacidad | ServiPlace',
+            'meta_description': 'Qué datos usa ServiPlace, para qué, con quién se comparten y cómo pedir que los corrijamos o borremos. Incluye Google Analytics y el CV.',
         },
     )
 

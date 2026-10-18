@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="page-header">
+  <div class="container py-4">
+    <span class="eyebrow">Privacidad</span>
+    <h1 class="h2 mt-2 mb-1">Política de privacidad</h1>
+    <p class="text-muted mb-0">Qué datos usa ServiPlace, para qué y cómo pedir que los corrijamos o borremos. Última actualización: 18 de octubre de 2026.</p>
+  </div>
+</section>
+
+<section class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="detail-block terms-body">
+      <h2>1. Quién es responsable</h2>
+      <p>ServiPlace es un proyecto de <a href="https://gogodevs.cl/?utm_source=serviplace&amp;utm_medium=referral&amp;utm_campaign=privacidad" target="_blank" rel="noopener">GoGoDevS</a>, un estudio chileno de desarrollo web. Para cualquier consulta sobre tus datos, escríbenos desde la <a href="{% url 'core:contact' %}">página de contacto</a>.</p>
+
+      <h2>2. Si buscas un servicio</h2>
+      <p>No te pedimos ningún dato para buscar ni para escribirle a un profesional: el contacto es directo entre tú y esa persona por WhatsApp.</p>
+      <p>Para saber qué se busca y qué no se encuentra, contamos visitas de forma agregada. Cada visita se cuenta con un código que cambia todos los días y que no permite saber quién eres ni seguirte de un día a otro. No guardamos tu dirección IP para esto.</p>
+
+      <h2>3. Google Analytics</h2>
+      <p>Usamos Google Analytics 4 para medir cuántas personas visitan el sitio, desde dónde llegan y qué páginas sirven. Google usa cookies para eso (<code>_ga</code> y <code>_ga_*</code>) y procesa los datos en sus servidores. No le enviamos las páginas privadas: el panel de tu cuenta, la edición de tu perfil ni el inicio de sesión.</p>
+      <p>Si no quieres que te midan, puedes bloquear las cookies de terceros en tu navegador o instalar el <a href="https://tools.google.com/dlpage/gaoptout" target="_blank" rel="noopener">complemento de inhabilitación de Google Analytics</a>. El sitio funciona igual.</p>
+
+      <h2>4. Si publicas tu perfil</h2>
+      <ul>
+        <li><strong>Tu cuenta:</strong> nombre de usuario, correo y, si lo das, tu WhatsApp. La contraseña se guarda cifrada: nadie la puede leer, tampoco nosotros.</li>
+        <li><strong>Tu perfil público:</strong> lo que tú escribes en el formulario (nombre, rubro, comuna, teléfono, WhatsApp, descripción, formación y foto). Es público porque esa es su función: que te encuentren. Lo puedes editar cuando quieras desde tu cuenta.</li>
+        <li><strong>Tu foto:</strong> la achicamos y le quitamos los datos ocultos que agrega el celular, como la ubicación donde se tomó.</li>
+        <li><strong>Tu CV, si lo subes:</strong> lo leemos una vez en nuestro servidor para proponerte los datos del formulario, sin enviarlo a terceros, y no guardamos el archivo. No copiamos tu dirección, RUT, correo ni fecha de nacimiento.</li>
+      </ul>
+
+      <h2>5. Seguridad y abuso</h2>
+      <p>Guardamos la dirección IP desde la que se crea una cuenta o se publica un perfil, para frenar cuentas falsas y spam. Si alguien falla al iniciar sesión, guardamos la IP y el usuario intentado (nunca la contraseña) para bloquear ataques de fuerza bruta; esos registros se borran a los 30 días.</p>
+
+      <h2>6. Perfiles creados con información pública</h2>
+      <p>Algunos perfiles de negocios se crearon con información que ellos mismos publican, como su ficha en Google Maps. Hoy no se muestran hasta que su dueño los reclama. Si uno es tuyo y quieres que lo borremos, escríbenos.</p>
+
+      <h2>7. Con quién se comparten</h2>
+      <p>No vendemos ni arrendamos datos. Para funcionar usamos estos proveedores, que procesan datos por cuenta nuestra:</p>
+      <ul>
+        <li><strong>Render</strong> (servidor del sitio) y <strong>Neon</strong> (base de datos), en Estados Unidos.</li>
+        <li><strong>Cloudflare</strong> (dominio, seguridad y almacenamiento de las fotos de los perfiles).</li>
+        <li><strong>Google</strong> (Google Analytics, ver punto 3).</li>
+      </ul>
+
+      <h2>8. Cookies</h2>
+      <p>Además de las de Google Analytics, el sitio usa dos cookies propias que son necesarias para que funcione: una para mantener tu sesión iniciada (<code>sessionid</code>) y otra que protege los formularios contra envíos falsificados (<code>csrftoken</code>).</p>
+
+      <h2>9. Tus derechos</h2>
+      <p>Puedes pedirnos ver los datos que tenemos de ti, corregirlos, que dejemos de usarlos o que los borremos, junto con tu cuenta y tu perfil. Escríbenos desde la <a href="{% url 'core:contact' %}">página de contacto</a> y te respondemos en un plazo razonable. Tu perfil también lo puedes corregir tú mismo desde tu cuenta.</p>
+
+      <h2>10. Cambios</h2>
+      <p>Si cambiamos esta política, actualizamos la fecha de arriba. Los <a href="{% url 'core:terms' %}">términos de uso</a> explican cómo funciona el directorio.</p>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

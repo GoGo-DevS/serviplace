@@ -21,6 +21,7 @@
         <div class="mb-3">{% include "accounts/_campo.html" with campo=field %}</div>
       {% endif %}{% endfor %}
       <button type="submit" class="btn btn-primary w-100 btn-lg mt-2" data-enviando="Creando tu cuenta…">Crear cuenta gratis</button>
+      <p class="form-text text-center mt-2 mb-0">Al crear tu cuenta aceptas los <a href="{% url 'core:terms' %}">términos de uso</a> y la <a href="{% url 'core:privacy' %}">política de privacidad</a>.</p>
     </form>
     <p class="text-center text-muted mt-3" style="font-size:.88rem">
       ¿Ya tienes cuenta? <a href="{% url 'accounts:login' %}">Iniciar sesión</a>

@@ -20,10 +20,16 @@
   <meta property="og:url" content="{% firstof canonical canonical_por_defecto %}">
   <meta property="og:image" content="{% if og_image %}{{ og_image }}{% else %}{{ SITE_URL }}{% static 'img/og-serviplace.png' %}{% endif %}">
   <meta name="twitter:card" content="summary_large_image">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  {% comment %}
+  Todo desde el propio dominio (18-10-2026): Bootstrap desde jsdelivr y el CSS
+  de Google Fonts eran tres conexiones a terceros que bloqueaban el primer
+  pintado ~2,2 s en móvil (Lighthouse 71). Las dos fuentes del primer pintado
+  van precargadas.
+  {% endcomment %}
+  <link rel="preload" href="{% static 'fonts/bricolage-grotesque-variable-latin.woff2' %}" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="{% static 'fonts/atkinson-hyperlegible-400-latin.woff2' %}" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="{% static 'css/fuentes.css' %}">
+  <link rel="stylesheet" href="{% static 'vendor/bootstrap/bootstrap.min.css' %}">
   <link rel="stylesheet" href="{% static 'css/site.css' %}">
   <link rel="stylesheet" href="{% static 'css/cuadra.css' %}">
   <link rel="icon" type="image/png" sizes="32x32" href="{% static 'img/marca/favicon-32.png' %}">
@@ -118,22 +124,23 @@
           <a href="{% url 'core:para_profesionales' %}">Cómo funciona</a>
           <a href="{% url 'accounts:register' %}">Publicar gratis</a>
           <a href="{% url 'accounts:hazte_verificado' %}">Hazte Verificado</a>
-          <a href="{% url 'core:contact' %}">Contacto</a>
         </nav>
         <nav class="footer-column" aria-label="ServiPlace">
           <strong>ServiPlace</strong>
           <a href="{% url 'core:about' %}">Sobre el proyecto</a>
+          <a href="{% url 'core:contact' %}">Contacto</a>
           <a href="{% url 'core:terms' %}">Términos de uso</a>
+          <a href="{% url 'core:privacy' %}">Privacidad</a>
         </nav>
       </div>
       <div class="footer-bottom">
         <span>© 2026 ServiPlace · Hecho en Chile por <a class="firma-gogodevs" href="https://gogodevs.cl/?utm_source=serviplace&amp;utm_medium=referral&amp;utm_campaign=footer" target="_blank" rel="noopener">GoGoDevS</a>, desarrollo web, apps y sistemas.</span>
-        <a href="{% url 'core:terms' %}">Términos de uso</a>
+        <span><a href="{% url 'core:terms' %}">Términos de uso</a> · <a href="{% url 'core:privacy' %}">Privacidad</a></span>
       </div>
     </div>
   </footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="{% static 'vendor/bootstrap/bootstrap.bundle.min.js' %}" defer></script>
   <script>
     // Un envío por formulario: un doble clic en "Publicar" creaba dos perfiles.
     document.addEventListener('submit', function (e) {

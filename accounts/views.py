@@ -45,6 +45,9 @@ class LoginThrottledView(LoginView):
         ip = ip_cliente(self.request)
         if ip:
             LoginAttempt.objects.create(ip=ip, username=(form.data.get('username') or '')[:150])
+            # Una IP solo sirve mientras dura la ventana del freno: a los 30
+            # días se borra (lo dice la política de privacidad).
+            LoginAttempt.objects.filter(created_at__lt=timezone.now() - timezone.timedelta(days=30)).delete()
         return super().form_invalid(form)
 
     def get_context_data(self, **kwargs):
