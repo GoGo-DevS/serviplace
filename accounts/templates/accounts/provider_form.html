@@ -84,7 +84,7 @@
             <div class="col-md-6">{% include "accounts/_campo.html" with campo=form.profession_title %}</div>
             <div class="col-md-6">{% include "accounts/_campo.html" with campo=form.institution %}</div>
             <div class="col-md-4">{% include "accounts/_campo.html" with campo=form.graduation_year %}</div>
-            <div class="col-md-8">{% include "accounts/_campo.html" with campo=form.health_registry %}</div>
+            <div class="col-md-8" data-solo-salud>{% include "accounts/_campo.html" with campo=form.health_registry %}</div>
           </div>
 
           <h3 class="form-section-title">Contacto y ubicación</h3>
@@ -109,4 +109,37 @@
     </div>
   </div>
 </section>
+{% endblock %}
+
+{% block extra_js %}
+{{ form.categorias_info|json_script:"categorias-info" }}
+<script>
+  // El formulario se adapta al rubro: el registro de salud solo para salud, y
+  // ejemplos de título e institución que calcen con lo que hace la persona.
+  (function () {
+    var select = document.getElementById('id_category');
+    if (!select) return;
+    var info = JSON.parse(document.getElementById('categorias-info').textContent);
+    var salud = document.querySelector('[data-solo-salud]');
+    var titulo = document.getElementById('id_profession_title');
+    var institucion = document.getElementById('id_institution');
+    var EJEMPLOS = {
+      salud: ['Ej: Kinesióloga', 'Ej: Universidad de Concepción'],
+      educacion: ['Ej: Profesora de matemáticas', 'Ej: Universidad de Chile'],
+      belleza: ['Ej: Cosmetóloga, estilista', 'Ej: Academia o instituto donde estudiaste'],
+      profesional: ['Ej: Ingeniero en informática, diseñadora gráfica', 'Ej: Duoc UC, INACAP, USACH'],
+      transporte: ['Ej: Conductor profesional', 'Ej: Escuela de conductores'],
+      hogar: ['Ej: Instalador SEC, técnico electricista', 'Ej: INACAP, liceo técnico, curso SEC'],
+      tiendas: ['Opcional', 'Opcional']
+    };
+    function ajustar() {
+      var c = info[select.value];
+      if (salud) salud.hidden = !(c && c.salud);
+      var ej = EJEMPLOS[c ? c.grupo : ''];
+      if (ej) { titulo.placeholder = ej[0]; institucion.placeholder = ej[1]; }
+    }
+    select.addEventListener('change', ajustar);
+    ajustar();
+  })();
+</script>
 {% endblock %}

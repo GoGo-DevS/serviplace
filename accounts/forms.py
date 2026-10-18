@@ -179,7 +179,7 @@ class ProviderForm(AntispamFormMixin, forms.ModelForm):
             'service_area': 'Ej: Maipú, Cerrillos y Pudahuel',
             'instagram': 'Tu usuario, con o sin @. Sirve como portafolio.',
             'foto': 'JPG, PNG o WebP. La achicamos y le quitamos los datos de ubicación del celular.',
-            'profession_title': 'Ej: Kinesióloga, Psicólogo, Profesora de inglés.',
+            'profession_title': 'Tu título, oficio o certificación.',
             'business_name': 'Tu negocio o tu nombre profesional. Ej: Camila Rojas Kinesiología, Gasfitería Pérez.',
             'institution': 'Ej: Universidad de Concepción, INACAP, Duoc UC.',
             'graduation_year': 'Si todavía estudias, el año en que te titulas.',
@@ -220,6 +220,10 @@ class ProviderForm(AntispamFormMixin, forms.ModelForm):
         # 27 rubros en una lista plana no se leen: se agrupan como en la
         # portada. La validación sigue siendo la del queryset (por pk).
         categorias = list(self.fields['category'].queryset)
+        # Para que el formulario se adapte al rubro elegido (18-10-2026: a un
+        # ingeniero en informática le pedía el registro de la Superintendencia
+        # de Salud y le daba "Kinesióloga" de ejemplo).
+        self.categorias_info = {str(c.pk): {'salud': c.pide_registro_salud, 'grupo': c.group} for c in categorias}
         nombres = dict(Category.GROUP_CHOICES)
         self.fields['category'].choices = [('', 'Elige un rubro')] + [
             (nombres[clave], [(c.pk, c.name) for c in categorias if c.group == clave])
@@ -328,6 +332,10 @@ class ProviderForm(AntispamFormMixin, forms.ModelForm):
         datos = super().clean()
         categoria = datos.get('category')
         anio = datos.get('graduation_year')
+        # El registro de la Superintendencia es solo de salud: en otro rubro no
+        # se guarda (no tendría cómo comprobarse y confunde en la ficha).
+        if categoria and not categoria.pide_registro_salud:
+            datos['health_registry'] = ''
         # Ofrecer atención de salud sin título es ejercicio ilegal de la
         # profesión. Quien está en práctica puede publicar igual, pero en lo
         # que ya puede hacer (clases, apoyo), no como kinesiólogo.

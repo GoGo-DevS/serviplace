@@ -203,6 +203,17 @@ PROFESIONES = [
     ('diseno-grafico', r'disenador[a]? grafic[oa]', r'diseno grafico'),
     ('fotografia-y-video', r'fotograf[oa]|realizador[a]? audiovisual|camarograf[oa]',
      r'fotografia|comunicacion audiovisual'),
+    # 18-10-2026: rubros nuevos. Desarrollo va ANTES que soporte: "ingeniero en
+    # informática" y "desarrollador full stack" en el mismo CV es desarrollo.
+    ('desarrollo-web', r'desarrollador[a]? (?:web|full ?stack|front ?end|back ?end|de software|de aplicaciones)|'
+                       r'programador[a]?|ingenier[oa] de software|analista programador[a]?',
+     r'desarrollo web|desarrollo de software|desarrollo de aplicaciones'),
+    ('tatuajes', r'tatuador[a]?|tatuajista|perforador[a]?', r'tatuajes?|piercing'),
+    ('seguridad-hogar', r'instalador[a]? de (?:alarmas|camaras|cctv|sistemas de seguridad)', r'cctv|sistemas de seguridad'),
+    ('fletes-y-logistica', r'fletero|conductor[a]? de camion|camioner[oa]|operador[a]? logistic[oa]',
+     r'fletes|mudanzas|logistica'),
+    ('traslados-y-turismo', r'conductor[a]? (?:de )?(?:transporte de pasajeros|turismo|van|minibus)|chofer de turismo',
+     r'transporte de pasajeros|traslados al aeropuerto'),
     ('soporte-computacional', r'tecnic[oa] (?:en )?(?:informatica|computacion|redes|soporte)|analista programador[a]?|'
                               r'ingenier[oa] (?:de ejecucion )?(?:en )?(?:informatica|computacion)',
      r'soporte tecnico|soporte computacional'),

@@ -369,3 +369,17 @@ class ElCVAlRegistrarse(TestCase):
         respuesta = self.registrar()
         self.assertRedirects(respuesta, reverse('accounts:provider_create'))
         self.assertNotIn('cv_borrador', self.client.session)
+
+
+class RubrosNuevosEnElCV(TestCase):
+    def setUp(self):
+        base_comun()
+
+    def test_un_desarrollador_queda_en_desarrollo_web_no_en_soporte(self):
+        datos = proponer_perfil('Diego Pérez Soto\nIngeniero en Informática\nPerfil\n'
+                                'Desarrollador full stack con experiencia en sitios web y sistemas a medida.\n')
+        self.assertEqual(datos['category'], Category.objects.get(slug='desarrollo-web').pk)
+
+    def test_un_tecnico_en_computacion_sigue_en_soporte(self):
+        datos = proponer_perfil('Pedro Soto Lagos\nTécnico en computación\nFormateo y redes para hogares.\n')
+        self.assertEqual(datos['category'], Category.objects.get(slug='soporte-computacional').pk)
