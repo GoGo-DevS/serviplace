@@ -391,3 +391,9 @@ la única foto es el logo" y "siento que hay mucho espacio vacío en la web".
     cambio de portada, la ficha mostró las 3. Usuario de prueba borrado.
 Pruebas: 230.
 ---
+
+[18-10-2026, 14:21] Push de Diego (3effdf9..5612d2a) desplegado: el CSS nuevo
+(cuadra.d931735bd3fa.css con .form-aside) y el gtag diferido ya están en vivo.
+Lighthouse móvil en vivo: portada 62 → 99 (TBT 610 → 0 ms, LCP 1,9 s); ficha de
+Púas 84 → 100 (LCP 1,7 s). Una sola corrida de cada una.
+---
