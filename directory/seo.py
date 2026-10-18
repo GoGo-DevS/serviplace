@@ -198,6 +198,9 @@ def perfil(provider, request):
         datos['image'] = request.build_absolute_uri(url) if url.startswith('/') else url
     if provider.profession_title:
         datos['knowsAbout'] = provider.profession_title
+    mismos = [u for u in (provider.website, provider.instagram_url) if u]
+    if mismos:
+        datos['sameAs'] = mismos
     persona = _persona(provider)
     if persona:
         datos['founder'] = persona

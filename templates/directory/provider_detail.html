@@ -127,6 +127,9 @@
             <dt>Sector</dt><dd>{{ provider.sector }}, {{ provider.commune.name }}</dd>
             <dt>Teléfono</dt><dd>{{ provider.phone }}</dd>
             {% if provider.email %}<dt>Email</dt><dd>{{ provider.email }}</dd>{% endif %}
+            {% comment %}rel="ugc": el enlace lo escribe quien publica, no ServiPlace.{% endcomment %}
+            {% if provider.website %}<dt>Sitio web</dt><dd><a href="{{ provider.website }}" target="_blank" rel="ugc noopener" data-ga="clic_sitio_web" data-ga-categoria="{{ provider.category.slug }}">{{ provider.website_corto }}</a></dd>{% endif %}
+            {% if provider.instagram %}<dt>Instagram</dt><dd><a href="https://www.instagram.com/{{ provider.instagram }}/" target="_blank" rel="ugc noopener" data-ga="clic_instagram" data-ga-categoria="{{ provider.category.slug }}">@{{ provider.instagram }}</a></dd>{% endif %}
             {% if provider.address %}<dt>Dirección</dt><dd>{{ provider.address }}</dd>{% endif %}
             <dt>Atención</dt><dd>{% if provider.service_area %}{{ provider.service_area }}{% else %}{{ provider.commune.name }}{% endif %}</dd>
           </dl>

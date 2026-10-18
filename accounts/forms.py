@@ -137,6 +137,8 @@ class ProviderForm(AntispamFormMixin, forms.ModelForm):
             'phone',
             'whatsapp_number',
             'email',
+            'website',
+            'instagram',
             'address',
             'service_area',
             'attends_home',
@@ -158,6 +160,8 @@ class ProviderForm(AntispamFormMixin, forms.ModelForm):
             'phone': 'Teléfono',
             'whatsapp_number': 'WhatsApp',
             'email': 'Correo (opcional)',
+            'website': 'Sitio web (opcional)',
+            'instagram': 'Instagram (opcional)',
             'address': 'Dirección (opcional)',
             'service_area': 'Dónde atiendes (opcional)',
             'foto': 'Tu logo o una foto tuya',
@@ -173,6 +177,7 @@ class ProviderForm(AntispamFormMixin, forms.ModelForm):
             'short_description': 'Máximo 220 caracteres. Es lo que se ve en la tarjeta.',
             'whatsapp_number': 'Celular chileno. Es el botón principal de tu perfil.',
             'service_area': 'Ej: Maipú, Cerrillos y Pudahuel',
+            'instagram': 'Tu usuario, con o sin @. Sirve como portafolio.',
             'foto': 'JPG, PNG o WebP. La achicamos y le quitamos los datos de ubicación del celular.',
             'profession_title': 'Ej: Kinesióloga, Psicólogo, Profesora de inglés.',
             'business_name': 'Tu negocio o tu nombre profesional. Ej: Camila Rojas Kinesiología, Gasfitería Pérez.',
@@ -193,6 +198,8 @@ class ProviderForm(AntispamFormMixin, forms.ModelForm):
             'health_registry': forms.TextInput(attrs={'placeholder': 'Ej: 654321', 'inputmode': 'numeric'}),
             'sector': forms.TextInput(attrs={'placeholder': 'Ej: Ciudad Satélite'}),
             'phone': forms.TextInput(attrs={'placeholder': '+56 9 1234 5678', 'inputmode': 'tel'}),
+            'website': forms.URLInput(attrs={'placeholder': 'https://tusitio.cl', 'inputmode': 'url'}),
+            'instagram': forms.TextInput(attrs={'placeholder': 'tu.usuario', 'autocapitalize': 'none', 'spellcheck': 'false'}),
             'whatsapp_number': forms.TextInput(attrs={'placeholder': '+56 9 1234 5678', 'inputmode': 'tel'}),
         }
 
@@ -200,6 +207,12 @@ class ProviderForm(AntispamFormMixin, forms.ModelForm):
         super().__init__(*args, **kwargs)
         # Para borrar la foto anterior si la reemplaza o la quita.
         self._foto_anterior = self.instance.foto.name if self.instance.pk and self.instance.foto else ''
+        self.fields['website'].assume_scheme = 'https'  # "tusitio.cl" -> https://, no http://
+        # Se puede pegar el enlace completo de Instagram: el tope de 30 es del
+        # usuario que se guarda (lo valida el modelo), no de lo que se escribe.
+        instagram = self.fields['instagram']
+        instagram.max_length, instagram.validators = 200, []
+        instagram.widget.attrs['maxlength'] = 200
         self.fields['category'].queryset = Category.objects.filter(is_active=True)
         self.fields['commune'].queryset = Commune.objects.filter(is_active=True).select_related('region').order_by('name')
         self.fields['category'].empty_label = 'Elige un rubro'
@@ -272,6 +285,23 @@ class ProviderForm(AntispamFormMixin, forms.ModelForm):
         if commit and self._foto_anterior and self._foto_anterior != (provider.foto.name or ''):
             provider.foto.storage.delete(self._foto_anterior)
         return provider
+
+    def clean_website(self):
+        valor = (self.cleaned_data.get('website') or '').strip()
+        if valor and not re.match(r'https?://', valor, re.I):
+            raise forms.ValidationError('Escribe la dirección completa, con https://')
+        return valor
+
+    def clean_instagram(self):
+        """Acepta @usuario, usuario o el enlace completo; guarda solo el usuario."""
+        valor = (self.cleaned_data.get('instagram') or '').strip()
+        enlace = re.match(r'(?:https?://)?(?:www\.)?instagram\.com/([^/?#]+)', valor, re.I)
+        if enlace:
+            valor = enlace.group(1)
+        valor = valor.lstrip('@').strip('/')
+        if valor and not re.fullmatch(r'[A-Za-z0-9._]{1,30}', valor):
+            raise forms.ValidationError('Escribe solo tu usuario de Instagram, por ejemplo: camila.kine')
+        return valor
 
     def clean_profession_title(self):
         return limpiar_texto(self.cleaned_data.get('profession_title', ''))

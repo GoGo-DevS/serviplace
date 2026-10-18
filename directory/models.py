@@ -180,6 +180,11 @@ class Provider(models.Model):
     # menos de 100 KB, sin EXIF (una foto de celular puede traer el GPS de la
     # casa). Ver directory/imagenes.py. En producción va a R2.
     foto = models.ImageField('logo o foto', upload_to='perfiles/%Y/%m/', blank=True)
+    # Web e Instagram propios (18-10-2026): para muchos independientes son su
+    # portafolio, y para Google la señal de que el perfil y la marca son la
+    # misma entidad (van al schema como sameAs).
+    website = models.URLField('sitio web', max_length=200, blank=True)
+    instagram = models.CharField('Instagram', max_length=30, blank=True, help_text='Solo el usuario, sin @.')
     attends_home = models.BooleanField('atiende a domicilio', default=False)
     attends_office = models.BooleanField('atiende en consulta o local', default=False)
     attends_online = models.BooleanField('atiende online', default=False)
@@ -250,6 +255,16 @@ class Provider(models.Model):
         """Solo un móvil chileno (569 + 8 dígitos) recibe WhatsApp. Un fijo no."""
         digits = self.clean_whatsapp_number
         return len(digits) == 11 and digits.startswith('569')
+
+    @property
+    def instagram_url(self):
+        return f'https://www.instagram.com/{self.instagram}/' if self.instagram else ''
+
+    @property
+    def website_corto(self):
+        """'https://www.medina4x4.cl/' -> 'medina4x4.cl', para mostrar."""
+        corto = self.website.split('://', 1)[-1].rstrip('/')
+        return corto[4:] if corto.startswith('www.') else corto
 
     @property
     def is_claimed(self):
