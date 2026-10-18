@@ -175,3 +175,21 @@ Pruebas: 123 (directory/tests_seo.py: el sitemap se prueba pidiendo cada loc,
 NO HECHO / PENDIENTE: Search Console (Diego); PageSpeed medido en vivo;
   contenido por keyword (eso es lo de Jorge, no del sitio).
 ---
+
+---
+[18-10-2026, noche] — Modo: colaborativo
+Tarea completada: MARCA SERVIPLACE (logo + paleta turquesa).
+  Diego eligió de ChatGPT las variantes A (pin con dos flechas: busca y
+  ofrece) y B ("sp"), con la paleta de la opción 3 (turquesa), y después
+  mandó su "Guía de marca serviplace en turquesa.png" (Descargas), que
+  manda: logo = pin con flechas; ícono de app y favicon = el mismo pin.
+  · Dibujado en vectores propios (docs/generar_marca.py regenera todo):
+    static/img/marca/ -> serviplace-icono.svg, -blanco.svg, favicon-32,
+    apple-touch-icon, serviplace-app-512 (logo del schema), icono-512,
+    perfil-1080 (redes), logos horizontales claro/oscuro, y "sp" como
+    alternativa. og-serviplace.png regenerada.
+  · Paleta: --sp-brand #06B6D4 (logo, pines, botón principal CON TEXTO TINTA,
+    6,8:1) y --sp-accent #0E7490 (enlaces, 5,4:1). Blanco sobre #06B6D4 da
+    2,4:1: nunca. #9CA3AF de la guía solo para íconos (2,5:1 no sirve para texto).
+Pruebas: 123. Auditoría visual: 0 problemas reales.
+---

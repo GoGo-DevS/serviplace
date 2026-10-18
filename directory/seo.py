@@ -66,7 +66,7 @@ def organizacion_y_sitio():
                 '@id': id_organizacion(),
                 'name': 'ServiPlace',
                 'url': _url('/'),
-                'logo': _url(static('img/serviplace-logo.png')),
+                'logo': _url(static('img/marca/serviplace-app-512.png')),
                 'description': settings.SITE_DESCRIPTION,
                 'areaServed': {'@type': 'Country', 'name': 'Chile'},
                 'parentOrganization': {
