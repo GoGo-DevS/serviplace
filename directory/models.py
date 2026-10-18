@@ -47,13 +47,17 @@ class Category(models.Model):
     EDUCACION = 'educacion'
     BELLEZA = 'belleza'
     PROFESIONAL = 'profesional'
+    # 18-10-2026: para que entren los clientes de GoGoDevS que venden (repuestos,
+    # uniformes, repostería, vehículos). No tienen página "para profesionales".
+    TIENDAS = 'tiendas'
 
     GRUPOS = [
         (HOGAR, 'Hogar y oficios', 'Maestros y técnicos para tu casa.'),
         (SALUD, 'Salud y bienestar', 'Kinesiólogos, psicólogos, nutricionistas y más.'),
         (EDUCACION, 'Clases y educación', 'Profes particulares, idiomas, música y apoyo escolar.'),
         (BELLEZA, 'Belleza y cuidado personal', 'Peluquería, manicure y estética, también a domicilio.'),
-        (PROFESIONAL, 'Servicios profesionales', 'Contabilidad, diseño, fotografía e informática.'),
+        (PROFESIONAL, 'Servicios profesionales', 'Contabilidad, diseño, fotografía, informática y desarrollo web.'),
+        (TIENDAS, 'Tiendas y emprendimientos', 'Emprendimientos y tiendas con local o despacho: repostería, repuestos, uniformes y más.'),
     ]
     GROUP_CHOICES = [(clave, nombre) for clave, nombre, _ in GRUPOS]
     # Slug público de cada grupo en la URL (/servicios/salud-y-bienestar/).
@@ -64,6 +68,7 @@ class Category(models.Model):
         EDUCACION: 'clases-y-educacion',
         BELLEZA: 'belleza-y-cuidado-personal',
         PROFESIONAL: 'servicios-profesionales',
+        TIENDAS: 'tiendas-y-emprendimientos',
     }
     GROUP_POR_SLUG = {slug: clave for clave, slug in GROUP_SLUGS.items()}
 
@@ -255,6 +260,13 @@ class Provider(models.Model):
         """Solo un móvil chileno (569 + 8 dígitos) recibe WhatsApp. Un fijo no."""
         digits = self.clean_whatsapp_number
         return len(digits) == 11 and digits.startswith('569')
+
+    @property
+    def de_sitio_oficial(self):
+        """Perfil cargado por GoGoDevS con los datos del sitio del cliente
+        (directory/clientes_gogodevs.py): no lo publicó el dueño en persona, y
+        la tarjeta no puede decir que sí."""
+        return self.source_name == 'cliente-gogodevs'
 
     @property
     def instagram_url(self):

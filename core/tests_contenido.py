@@ -45,7 +45,8 @@ class PaginasDeProfesion(Base):
     def test_cada_especialidad_sembrada_tiene_su_pagina(self):
         """Los chips de /profesionales/ apuntan a estas páginas: una sin
         contenido sería un 404 desde la página de captación."""
-        slugs = set(Category.objects.filter(is_active=True).values_list('slug', flat=True))
+        slugs = set(Category.objects.filter(is_active=True).exclude(group=Category.TIENDAS)
+                    .values_list('slug', flat=True))
         self.assertEqual(slugs - set(PROFESIONES), set())
         for slug in slugs:
             self.assertEqual(self.client.get(reverse('core:profesion', args=[slug])).status_code, 200, slug)

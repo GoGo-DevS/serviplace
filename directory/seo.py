@@ -31,6 +31,12 @@ TIPO_SCHEMA = {
     'peluqueria': 'HairSalon',
     'manicure-y-estetica': 'NailSalon',
     'contabilidad': 'AccountingService',
+    'tatuajes': 'TattooParlor',
+    'seguridad-hogar': 'HomeAndConstructionBusiness',
+    'repuestos-automotrices': 'AutoPartsStore',
+    'automotoras': 'AutoDealer',
+    'uniformes-y-ropa-de-trabajo': 'ClothingStore',
+    'reposteria-y-dulces': 'Bakery',
 }
 
 

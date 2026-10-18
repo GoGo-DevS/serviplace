@@ -82,7 +82,7 @@ llevan a cada puerta antes de cualquier scroll.
     </div>
     <div class="category-grid">
       {% for category in grupo.categorias %}
-        <a class="category-tile{% if not category.n_activos %} is-empty{% endif %}" href="{% if category.n_activos %}{{ category.get_absolute_url }}{% else %}{% url 'core:profesion' category.slug %}{% endif %}">
+        <a class="category-tile{% if not category.n_activos %} is-empty{% endif %}" href="{% if category.n_activos %}{{ category.get_absolute_url }}{% elif category.group == 'tiendas' %}{% url 'accounts:register' %}?desde=especialidad-{{ category.slug }}{% else %}{% url 'core:profesion' category.slug %}{% endif %}">
           <span class="tile-name">{{ category.name }}</span>
           {% if category.description %}<small>{{ category.description }}</small>{% endif %}
           {% if category.n_activos %}

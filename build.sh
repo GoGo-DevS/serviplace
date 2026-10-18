@@ -8,3 +8,4 @@ python manage.py cargar_directorio_inicial   # solo en base vacía: nunca pisa d
 python manage.py seed_categorias             # idempotente: suma las categorías que falten, no pisa las editadas
 python manage.py seed_regiones_chile         # idempotente: 16 regiones + 346 comunas
 python manage.py asegurar_admin              # crea el admin desde variables, solo si no existe
+python manage.py cargar_clientes             # perfiles de clientes de GoGoDevS que falten; nunca pisa (va después del admin: es su dueño)

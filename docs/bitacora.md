@@ -241,3 +241,83 @@ Pruebas: 30 nuevas (accounts/tests_cv.py; PDF y Word armados a mano).
   4 mutaciones detectadas (copiar el correo, guardar el archivo, año de la
   entrada siguiente, comuna del empleador).
 ---
+
+---
+[18-10-2026, noche] — Modo: AUTÓNOMO ("aplícale SEO profesional, trabaja toda la noche")
+Tarea completada: SEO PROFESIONAL (técnico + contenido + confianza).
+  Diagnóstico: el cuello no es técnico sino de inventario. Con los importados
+  ocultos hay 0 perfiles públicos, así que los listados son 404 a propósito y
+  del lado de quien busca no hay qué posicionar. Lo posicionable hoy: la
+  captación de oferta (profesionales) y la confianza (quien contrata).
+  · Rendimiento (Lighthouse móvil en vivo: 71-72, LCP 5,2 s): Bootstrap 5.3.3
+    (SRI oficial verificado) y fuentes latin servidos desde el sitio, precarga
+    de las 2 fuentes del primer pintado, JS con defer. Antes: ~2,2 s de bloqueo
+    por jsdelivr + Google Fonts. Medir de nuevo después del push.
+  · serviplace-60so.onrender.com respondía 200 (copia del sitio): ahora 301.
+  · /privacidad/ (las condiciones de GA4 la exigen) y /contacto/ con WhatsApp
+    por motivo (prometía WhatsApp y correo sin tener ninguno; contacto@ todavía
+    no recibe). Intentos de login se borran a los 30 días.
+  · 27 páginas /profesionales/<rubro>/ (core/profesiones.py): contenido propio
+    por especialidad, credencial RNPI o SEC con enlace oficial, FAQ visible =
+    FAQPage, sin precios. 6 guías /guias/ (core/guias.py + templates/guias/,
+    redactadas por un agente con datos verificados y revisadas): registro de
+    salud, licencia SEC, qué acordar con un maestro, boleta 2026 (15,25%),
+    inicio de actividades, primeros clientes. Article con autor con nombre.
+  · Schema del perfil: founder con título, institución y registro de salud
+    como credenciales; sameAs con web e Instagram. Organización: sameAs
+    @serviplace.cl.
+  · Perfil: campos sitio web e Instagram (migración 0013 aditiva, rel ugc).
+  · core/tests_rastreo.py recorre todo lo público como Screaming Frog. Encontró
+    8 enlaces internos a 404: los chips de grupo sin perfiles en la comuna.
+    Corregido (chip apagado sin enlace).
+  Datos verificados (fuentes): retención 15,25% 2026 (sii.cl, ChileAtiende);
+  RNPI en rnpi.superdesalud.gob.cl; licencias SEC A-D / 1-3 y buscador de
+  instaladores (ChileAtiende fichas 2662, 2641, 67276).
+Pruebas: 199. Mutaciones detectadas: orden de títulos, dominio, FAQ visible.
+ERROR PROPIO: el commit 8ba2de2 se hizo con una prueba en rojo por
+  `grep ... && git commit` (la lección L8096). Corregido en 6868de2; desde ahí
+  el commit depende del código de salida de la suite.
+NOTA: el venv local tiene Django 6.0.5 y requirements.txt fija 5.2 (Render).
+
+Instagram @serviplace.cl (pedido de Diego, kit en Descargas):
+  6 publicaciones subidas con sus textos (4:5; la 01 corregida: el círculo
+  tapaba media línea del texto). Seguidos: gogodevs.cl, colkine, colpsichile,
+  colegio_de_nutricionistas, superdesaludchile, sec_chile, sii_chile,
+  chileatiende, sercotec_metropolitana, muni_maipu.
+  PENDIENTE (Diego, desde el celular): fijar 1-2-3 (la web no tiene "fijar"),
+  las 12 historias y las 6 destacadas (Instagram web no sube historias). Las
+  historias están revisadas: ninguna tiene texto tapado.
+---
+
+---
+[18-10-2026, mañana] — Modo: autónomo
+Tarea completada: PERFILES DE LOS CLIENTES DE GOGODEVS ("con todo: logo, nombre").
+  · Un agente armó la ficha de 16 clientes SOLO desde su sitio público (los
+    WhatsApp/teléfonos/IG/correos comparados contra el HTML en vivo; MX de los
+    correos revisados). Nada de las notas internas.
+  · Entran 10: GoGoDevS, Púas Tatuajes, Salón Amanda, FCO Climatización,
+    SafeRoom, Medina4x4, Comercial Villarreal, Popi, Ruta Motors y Dulcecita.
+    Fuera por falta de dato verificable: VOA y Travesía (sin comuna), Max
+    Services (sin WhatsApp), Vizo Glow (su número no es WhatsApp en el sitio),
+    Punto Parcelas (sin comuna) y AZA (organización).
+  · Categorías nuevas: Desarrollo web y apps, Tatuajes y piercing, Seguridad
+    para el hogar, y el grupo "Tiendas y emprendimientos" (repuestos,
+    automotoras, uniformes, repostería) sin página "para profesionales".
+    Migración 0014 (solo choices). Dulcecita se estaba inscribiendo y no había
+    categoría de repostería: ahora existe.
+  · directory/clientes_gogodevs.py + cargar_clientes en build.sh: crea los que
+    faltan, nunca pisa, no resucita uno desactivado y se salta a quien ya se
+    inscribió solo (mismo WhatsApp o web). Dueño: el admin de Diego. Logos en
+    directory/clientes_logos/ (WebP <100 KB, cuadrados, revisados a ojo).
+  · La tarjeta dice "Datos de su sitio web oficial", no "Publicado por su
+    dueño": no lo publicaron ellos.
+  DATOS A CONFIRMAR CON LOS CLIENTES: comuna de Dulcecita, GoGoDevS y SafeRoom
+  (sus sitios solo dicen "Santiago"); Medina publica dos WhatsApp (se usó el de
+  la barra superior); Villarreal: el dominio sigue en el WordPress viejo.
+  DEFECTOS EN SITIOS DE CLIENTES (vistos al pasar): SafeRoom publica
+  contacto@saferoomchile.cl y ese dominio NO existe (cualquiera puede
+  registrarlo y recibir sus correos); el ícono de FCO corta "CLIMATIZACIÓN";
+  rutamotors.cl no apunta a ningún servidor y su og:image es un placeholder.
+Pruebas: 207 (directory/tests_clientes.py, 8). Mutación detectada: duplicado
+  por WhatsApp.
+---

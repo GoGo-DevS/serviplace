@@ -96,10 +96,16 @@ def _textos(categoria, grupo, comuna, query, total):
     if categoria and comuna:
         h1 = f'{categoria.nombre_busqueda} en {comuna.name}'
         verbo = 'atiende' if total == 1 else 'atienden'
-        intro = (f'{total} {plural} de {categoria.name.lower()} que {verbo} en {comuna.name}. '
-                 f'Revisa qué hace cada uno, cómo atiende y su formación, y escríbele directo por WhatsApp.')
-        meta = (f'{total} {plural} de {categoria.nombre_busqueda.lower()} en {comuna.name}. '
-                f'Mira su formación y zona de atención y escríbeles directo por WhatsApp, sin comisión.')
+        if categoria.group == Category.TIENDAS:  # una tienda no tiene "formación"
+            intro = (f'{total} {plural} de {categoria.name.lower()} en {comuna.name}. '
+                     f'Revisa qué ofrece cada una, si despacha o tiene local, y escríbele directo por WhatsApp.')
+            meta = (f'{total} {plural} de {categoria.nombre_busqueda.lower()} en {comuna.name}. '
+                    f'Mira qué ofrece cada una y escríbeles directo por WhatsApp, sin comisión.')
+        else:
+            intro = (f'{total} {plural} de {categoria.name.lower()} que {verbo} en {comuna.name}. '
+                     f'Revisa qué hace cada uno, cómo atiende y su formación, y escríbele directo por WhatsApp.')
+            meta = (f'{total} {plural} de {categoria.nombre_busqueda.lower()} en {comuna.name}. '
+                    f'Mira su formación y zona de atención y escríbeles directo por WhatsApp, sin comisión.')
         return h1, f'{h1} | ServiPlace', meta[:158], intro
     if categoria:
         h1 = f'{categoria.nombre_busqueda}: perfiles por comuna'

@@ -77,8 +77,11 @@ class Base(TestCase):
 class CatalogoDeCategorias(Base):
 
     def test_suma_las_profesiones_y_deja_los_oficios_en_hogar(self):
-        self.assertEqual(Category.objects.count(), 27)
-        self.assertEqual(Category.objects.filter(group=Category.HOGAR).count(), 9)
+        # El total sale de la lista del seed (18-10-2026: 27 + 7 para los clientes de GoGoDevS)
+        from directory.management.commands.seed_categorias import CATEGORIAS
+        self.assertEqual(Category.objects.count(), len(CATEGORIAS))
+        self.assertEqual(Category.objects.filter(group=Category.HOGAR).count(),
+                         sum(1 for c in CATEGORIAS if c[4] == Category.HOGAR))
         self.assertTrue(self.kine.pide_registro_salud)
         self.assertFalse(self.clases.pide_registro_salud)
 
@@ -91,7 +94,7 @@ class CatalogoDeCategorias(Base):
         self.assertIn('0 creadas', salida.getvalue())
         self.assertEqual(Category.objects.get(slug='kinesiologia').name, 'Kinesiología (editada)')
 
-    def test_la_base_de_produccion_queda_con_las_27_y_los_oficios_en_hogar(self):
+    def test_la_base_de_produccion_queda_con_todas_y_los_oficios_en_hogar(self):
         """El orden real de build.sh sobre una base vacía: fixture y después seed."""
         Provider.objects.all().delete()
         Category.objects.all().delete()
@@ -99,7 +102,8 @@ class CatalogoDeCategorias(Base):
         Region.objects.all().delete()
         call_command('cargar_directorio_inicial', stdout=StringIO())
         call_command('seed_categorias', stdout=StringIO())
-        self.assertEqual(Category.objects.count(), 27)
+        from directory.management.commands.seed_categorias import CATEGORIAS
+        self.assertEqual(Category.objects.count(), len(CATEGORIAS))
         self.assertEqual(Category.objects.get(slug='gasfiteria').group, Category.HOGAR)
         self.assertEqual(Provider.objects.count(), 361)
 

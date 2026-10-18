@@ -38,6 +38,7 @@ class RastreoCompleto(TestCase):
             ('gasfiteria', maipu, {}),
             ('gasfiteria', cerrillos, {}),
             ('clases-particulares', cerrillos, dict(profession_title='Profesor de matemáticas')),
+            ('repuestos-automotrices', maipu, dict(website='https://repuestos.example.cl', instagram='repuestos')),
         ]):
             dueno = User.objects.create_user(f'dueno{i}', password='clave-larga-de-verdad-99')
             Provider.objects.create(

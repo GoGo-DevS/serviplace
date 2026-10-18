@@ -211,7 +211,7 @@ def profesion(request, rubro):
     """`/profesionales/<rubro>/`: la página de una especialidad para quien
     OFRECE (contenido en core/profesiones.py)."""
     contenido = profesiones.para(rubro)
-    categoria = Category.objects.filter(slug=rubro, is_active=True).first()
+    categoria = Category.objects.filter(slug=rubro, is_active=True).exclude(group=Category.TIENDAS).first()
     if not contenido or not categoria:
         raise Http404('Especialidad sin página')
     n_publicos = Provider.objects.publicos().filter(category=categoria).count()

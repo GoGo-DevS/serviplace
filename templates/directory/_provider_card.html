@@ -40,6 +40,6 @@ incompleto. El nombre es el enlace a la ficha; WhatsApp es el botón.
         WhatsApp
       </a>
     </div>
-    <p class="ficha-estado{% if provider.verificado_publico %} is-ok{% endif %}">{% if provider.verificado_publico %}Verificado por ServiPlace{% elif provider.owner_id %}Publicado por su dueño{% else %}Información de fuentes públicas, sin revisar{% endif %}</p>
+    <p class="ficha-estado{% if provider.verificado_publico %} is-ok{% endif %}">{% if provider.verificado_publico %}Verificado por ServiPlace{% elif provider.de_sitio_oficial %}Datos de su sitio web oficial{% elif provider.owner_id %}Publicado por su dueño{% else %}Información de fuentes públicas, sin revisar{% endif %}</p>
   </article>
 </div>

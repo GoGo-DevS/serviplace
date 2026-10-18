@@ -405,6 +405,34 @@ PROFESIONES = {
         ],
     },
 
+    'tatuajes': {
+        'clientes': 'clientes',
+        'titulo': 'Tatuador independiente: consigue clientes',
+        'h1': 'Tatuador o tatuadora: clientes de tu zona que buscan tu estilo',
+        'meta': 'Perfil de tatuador gratis: tu estilo, tu estudio, cómo agendar y tu Instagram como portafolio. Los clientes te escriben directo por WhatsApp.',
+        'intro': 'Nadie elige tatuador por cercanía nada más: lo elige por su estilo. Pero entre dos estilos que le gustan, gana el que está más cerca y el que contesta claro cómo se agenda, cuánto se abona y cómo es el cuidado después.',
+        'buscan': [
+            'Un estilo concreto: fine line, realismo, blackwork, tradicional, lettering.',
+            'Diseños personalizados a partir de una idea.',
+            'Cover de un tatuaje antiguo y retoques.',
+            'Piercing con material adecuado y buena higiene.',
+        ],
+        'credencial': None,
+        'credencial_texto': 'Lo que más revisan tus clientes es tu portafolio y la higiene de tu estudio. Pon tu Instagram en el perfil y cuenta cómo trabajas: material desechable, esterilización y cuidados posteriores.',
+        'tips': [
+            'Nombra tus estilos con las palabras que usa la gente para buscarlos.',
+            'Agrega tu Instagram: es tu portafolio.',
+            'Explica cómo se agenda: diseño previo, abono, duración de la sesión.',
+            'Cuenta cómo cuidas la higiene y qué indicaciones das después.',
+        ],
+        'ejemplo_corta': 'Tatuadora en Valparaíso: fine line, botánica y diseños personalizados, con hora agendada.',
+        'ejemplo_larga': 'Tatúo hace ocho años en mi estudio en Valparaíso. Me especializo en fine line y botánica, y hago diseños personalizados a partir de tu idea: te muestro el boceto antes de la sesión. Trabajo con agujas y material desechable y te entrego por escrito los cuidados para las primeras semanas. Mi trabajo está en mi Instagram.',
+        'faq': [
+            ('¿Puedo publicar si trabajo en un estudio con otros tatuadores?', 'Sí. Publica tu propio perfil con tu estilo y aclara en qué estudio atiendes.'),
+            ('¿ServiPlace cobra por cada cliente?', 'No. Publicar es gratis y no cobramos comisión.'),
+        ],
+    },
+
     # -------------------------------------------------- SERVICIOS PROFESIONALES
     'contabilidad': {
         'clientes': 'clientes',
@@ -515,6 +543,34 @@ PROFESIONES = {
         ],
     },
 
+    'desarrollo-web': {
+        'clientes': 'clientes',
+        'titulo': 'Desarrollador web freelance: consigue clientes',
+        'h1': 'Desarrollador web freelance: negocios de tu zona que necesitan sitio, tienda o sistema',
+        'meta': 'Perfil de desarrollador web gratis: sitios, tiendas online, apps y sistemas a medida, con tu portafolio a la vista. Contacto directo, sin comisión.',
+        'intro': 'La pyme que busca a alguien para su web casi nunca sabe qué tecnología necesita: sabe que quiere vender por internet, que la encuentren en Google o dejar de anotar pedidos en un cuaderno. Te elige el que entiende ese problema y muestra proyectos parecidos ya funcionando.',
+        'buscan': [
+            'Un sitio web para que su negocio aparezca en Google.',
+            'Una tienda online con pagos y despacho.',
+            'Un sistema a medida: reservas, inventario, pedidos.',
+            'Mejorar o rescatar un sitio que ya tienen.',
+        ],
+        'credencial': None,
+        'credencial_texto': 'En desarrollo lo que pesa es el portafolio: enlaza tu sitio y nombra proyectos reales que se puedan visitar. Si tienes título, ponlo, pero un cliente pyme confía más en ver un sitio funcionando que en un diploma.',
+        'tips': [
+            'Agrega tu sitio web y nombra dos o tres proyectos que se puedan visitar.',
+            'Di qué tipo de proyectos haces: sitios, tiendas, sistemas, apps.',
+            'Explica cómo trabajas: reunión, propuesta, etapas, entrega y mantención.',
+            'Aclara si incluyes dominio, hosting y soporte después de la entrega.',
+        ],
+        'ejemplo_corta': 'Desarrollo web en Concepción: sitios para pymes, tiendas online y sistemas a medida.',
+        'ejemplo_larga': 'Hago sitios web para pymes, tiendas online con pago y despacho, y sistemas a medida como reservas o control de pedidos. Parto con una reunión para entender el negocio, te mando una propuesta por etapas y, al entregar, te enseño a administrarlo. Ofrezco mantención mensual. En mi sitio están los proyectos que tengo funcionando.',
+        'faq': [
+            ('¿Puedo publicar como agencia o estudio?', 'Sí. Usa el nombre de tu estudio como nombre profesional.'),
+            ('¿Me sirve si atiendo clientes de todo Chile?', 'Sí. Publica en tu comuna base y aclara en la descripción que trabajas en línea.'),
+        ],
+    },
+
     # ------------------------------------------------------------------ HOGAR
     'gasfiteria': {
         'clientes': 'clientes',
@@ -568,6 +624,33 @@ PROFESIONES = {
         'faq': [
             ('¿Qué pasa si no tengo licencia SEC?', 'Puedes publicar, pero tu perfil va a competir con electricistas que la muestran. Ver la guía de la SEC para saber cómo obtenerla.'),
             ('¿ServiPlace verifica mi licencia?', 'El dato lo escribes tú y es tu responsabilidad. Tus clientes pueden comprobarlo en el buscador de la SEC.'),
+        ],
+    },
+    'seguridad-hogar': {
+        'clientes': 'clientes',
+        'titulo': 'Instalador de alarmas y cámaras: consigue clientes',
+        'h1': 'Instalador de seguridad para el hogar: vecinos de tu comuna que quieren estar tranquilos',
+        'meta': 'Perfil de instalador de seguridad gratis: alarmas, cámaras, cercos y salas de resguardo para casas. Los vecinos te escriben directo por WhatsApp.',
+        'intro': 'Casi siempre alguien busca seguridad después de un susto: un robo en la cuadra, un portonazo cerca o una casa que queda sola en vacaciones. Quiere a alguien que le explique sin asustarlo más, que le muestre opciones y que responda si algo falla después.',
+        'buscan': [
+            'Instalación de alarmas con aviso al celular.',
+            'Cámaras que se puedan ver desde el teléfono.',
+            'Cercos y protecciones para el perímetro de la casa.',
+            'Salas de resguardo o puertas de seguridad.',
+        ],
+        'credencial': None,
+        'credencial_texto': 'Tus clientes te van a dejar entrar a su casa y ver sus puntos débiles: lo que da confianza es tu experiencia, tu discreción y el soporte después de instalar. Si alguna parte del trabajo es eléctrica, conviene que la haga o la firme un instalador eléctrico autorizado por la SEC.',
+        'tips': [
+            'Haz una lista de lo que instalas: alarmas, cámaras, cercos, puertas o salas de resguardo.',
+            'Explica cómo es la visita: evaluación de la casa y propuesta por escrito.',
+            'Cuenta qué soporte das después de instalar y en qué plazo respondes.',
+            'Di cómo cuidas la información de tus clientes: planos, claves y horarios.',
+        ],
+        'ejemplo_corta': 'Instalación de alarmas y cámaras en La Florida, con evaluación de la casa y soporte posterior.',
+        'ejemplo_larga': 'Instalo alarmas con aviso al celular, cámaras que se ven desde el teléfono y cercos para el perímetro. Primero visito la casa, reviso los puntos débiles y te mando una propuesta por escrito con opciones. Después de instalar te enseño a usar todo y respondo dentro del día si algo falla. Trabajo en La Florida, Puente Alto y Peñalolén.',
+        'faq': [
+            ('¿Puedo publicar si trabajo para una empresa de seguridad?', 'Puedes publicar tus trabajos particulares con tu propio WhatsApp, o el perfil de tu empresa.'),
+            ('¿Cuánto cuesta publicar?', 'Nada. No cobramos por publicar ni comisión por trabajo.'),
         ],
     },
     'cerrajeria': {
