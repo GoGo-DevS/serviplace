@@ -37,12 +37,33 @@
   <meta name="theme-color" content="#1b1f24">
   {{ jsonld }}
   {% if ga4_id %}
-  <script async src="https://www.googletagmanager.com/gtag/js?id={{ ga4_id }}"></script>
+  {% comment %}
+  GA4 diferido (18-10-2026): gtag.js son 176 KB y Lighthouse le atribuía 600 de
+  los 610 ms de bloqueo en móvil (rendimiento 62). La cola dataLayer se arma
+  altiro, así que la visita y los eventos se anotan desde el primer momento;
+  el script se carga con la primera interacción o a los 3,5 s, y ahí manda lo
+  que había en la cola.
+  {% endcomment %}
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
     gtag('config', '{{ ga4_id }}');
+    (function () {
+      var cargado = false;
+      function cargar() {
+        if (cargado) return;
+        cargado = true;
+        var s = document.createElement('script');
+        s.async = true;
+        s.src = 'https://www.googletagmanager.com/gtag/js?id={{ ga4_id }}';
+        document.head.appendChild(s);
+      }
+      ['pointerdown', 'keydown', 'scroll', 'touchstart'].forEach(function (e) {
+        window.addEventListener(e, cargar, { once: true, passive: true });
+      });
+      window.addEventListener('load', function () { setTimeout(cargar, 3500); });
+    })();
   </script>
   {% for evento in ga4_eventos %}<script>gtag('event', '{{ evento|escapejs }}');</script>{% endfor %}
   {% if ga4_busqueda %}{{ ga4_busqueda|json_script:"ga4-busqueda" }}<script>gtag('event', 'search', JSON.parse(document.getElementById('ga4-busqueda').textContent));</script>{% endif %}

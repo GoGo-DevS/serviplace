@@ -82,3 +82,11 @@ class ConIdentificador(Base):
         segunda = self.client.get(reverse('accounts:provider_create')).content.decode()
         self.assertIn("gtag('event', 'sign_up')", primera)
         self.assertNotIn("gtag('event', 'sign_up')", segunda, 'un registro contado dos veces')
+
+    def test_gtag_se_carga_diferido_y_la_cola_altiro(self):
+        """gtag.js bloqueaba 600 ms en móvil: se carga tras la primera interacción
+        o a los 3,5 s. La cola (config y eventos) se arma desde el primer momento."""
+        html = self.client.get('/').content.decode()
+        self.assertNotIn('<script async src="https://www.googletagmanager.com', html)
+        self.assertIn(f"s.src = 'https://www.googletagmanager.com/gtag/js?id={GA}'", html)
+        self.assertIn(f"gtag('config', '{GA}')", html)
