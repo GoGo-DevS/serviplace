@@ -148,7 +148,8 @@ class Guias(Base):
             for a in re.findall(r'<a [^>]*href="https?://[^"]+"[^>]*>', h):
                 if 'gogodevs.cl' in a:
                     continue
-                self.assertIn('rel="noopener"', a, f"{g['slug']}: {a}")
+                rel = re.search(r'rel="([^"]*)"', a)
+                self.assertTrue(rel and 'noopener' in rel.group(1).split(), f"{g['slug']}: {a}")
 
     def test_ningun_titulo_salta_un_nivel(self):
         for g in GUIAS:
