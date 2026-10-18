@@ -370,3 +370,19 @@ input[type="file"].form-control::file-selector-button { border: 0; border-radius
 .metricas-diagnostico { border-left-color: var(--sp-brand); }
 .puerta-lista li::before { background: var(--sp-brand); }
 .firma-gogodevs { border-bottom-color: var(--sp-brand); }
+
+/* ---- CV que llena el perfil (18-10-2026) ---- */
+.cv-box { margin: 0 0 1.75rem; padding: 1rem 1.15rem; border: 1.5px dashed var(--sp-brand); border-radius: 16px; background: #ecfeff; }
+.cv-box-hecho { border-style: solid; }
+.cv-box-titulo { margin: 0 0 .3rem; font-family: var(--font-head); font-size: 1.05rem; font-weight: 700; color: var(--sp-ink); }
+.cv-box p { color: var(--sp-slate); font-size: .93rem; }
+.cv-box-fila { display: flex; flex-wrap: wrap; gap: .5rem; }
+.cv-box-fila .form-control { flex: 1 1 240px; background: #fff; }
+.cv-box-fila .btn { flex: 0 0 auto; }
+.cv-box-privacidad { margin: .65rem 0 0; font-size: .82rem !important; }
+.cv-box-error { margin: 0 0 .6rem; padding: .55rem .75rem; border-radius: 10px; background: #fff1f2; color: #9f1239 !important; font-weight: 700; }
+.desde-cv { border-color: var(--sp-brand) !important; background-color: #f0fdff; }
+.modality-option:has(.desde-cv) { border-color: var(--sp-brand); background: #f0fdff; }
+.hero-cv { font-size: .9rem; font-weight: 700; color: var(--sp-accent); }
+.cv-box-cuales summary { cursor: pointer; font-size: .88rem; font-weight: 700; color: var(--sp-accent); }
+.cv-box-cuales p { margin-top: .3rem; font-size: .86rem !important; }

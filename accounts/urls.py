@@ -11,6 +11,7 @@ urlpatterns = [
     path('cuenta/logout/', auth_views.LogoutView.as_view(next_page='core:home'), name='logout'),
     path('cuenta/dashboard/', views.dashboard, name='dashboard'),
     path('cuenta/publicar/', views.provider_create, name='provider_create'),
+    path('cuenta/publicar/leer-cv/', views.leer_cv, name='leer_cv'),
     path('cuenta/mi-perfil/<slug:slug>/editar/', views.provider_edit, name='provider_edit'),
     path('prestadores/<slug:slug>/reclamar/', views.claim_profile, name='claim_profile'),
     path('perfil-verificado/', views.hazte_verificado, name='hazte_verificado'),

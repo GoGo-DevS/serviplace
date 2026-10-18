@@ -6,6 +6,7 @@ from django.contrib.auth.views import LoginView
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.utils.http import url_has_allowed_host_and_scheme
+from django.views.decorators.http import require_POST
 
 from core.antispam import excede_limite_ip, ip_cliente
 from directory.forms import ProviderReportForm
@@ -13,7 +14,8 @@ from directory.models import Provider, ProviderReport
 from leads.models import LeadEvent
 from leads.registro import registrar
 
-from .forms import LoginForm, ProviderForm, RegisterForm
+from .cv import ACEPTA, CVIlegible, extraer_texto, proponer_perfil
+from .forms import LoginForm, ProviderForm, RegisterForm, formatear_telefono
 from .models import LoginAttempt, UserProfile
 
 
@@ -60,7 +62,7 @@ def register(request):
         return redirect('accounts:dashboard')
 
     if request.method == 'POST':
-        form = RegisterForm(request.POST)
+        form = RegisterForm(request.POST, request.FILES)
         ip = ip_cliente(request)
         limite, minutos = settings.LIMITE_REGISTROS_POR_IP
         if excede_limite_ip(UserProfile, ip, limite, minutos):
@@ -81,6 +83,10 @@ def register(request):
             login(request, user)
             registrar(request, LeadEvent.SIGNUP_DONE, origen='register')
             request.session['ga4_eventos'] = request.session.get('ga4_eventos', []) + ['sign_up']
+            if form.cv_texto:
+                _guardar_borrador_cv(request, form.cv_texto)
+            elif form.cv_error:
+                request.session['cv_error'] = f'Tu cuenta quedó creada, pero no pudimos leer tu CV. {form.cv_error}'
             messages.success(request, f'Bienvenido/a a ServiPlace, {user.username}. Ya puedes publicar tu servicio.')
             next_url = request.GET.get('next') or request.POST.get('next')
             # `startswith('/')` dejaba pasar `//sitio-ajeno.com`, que el
@@ -126,9 +132,41 @@ def dashboard(request):
     })
 
 
+# ---- CV que llena el perfil (18-10-2026; ver accounts/cv.py) -------------
+
+def _guardar_borrador_cv(request, texto):
+    """Lo que se leyó del CV queda en la sesión hasta que publica. El texto
+    completo del CV no se guarda: solo los campos que se le proponen."""
+    request.session['cv_borrador'] = proponer_perfil(texto)
+    request.session.pop('cv_error', None)
+    request.session['ga4_eventos'] = request.session.get('ga4_eventos', []) + ['cv_leido']
+
+
+def _marcar_desde_cv(form, borrador):
+    """Los campos que llenó el CV se ven distintos, para revisarlos."""
+    for nombre in borrador:
+        if nombre in form.fields:
+            widget = form.fields[nombre].widget
+            widget.attrs['class'] = f"{widget.attrs.get('class', '')} desde-cv".strip()
+
+
+@login_required
+@require_POST
+def leer_cv(request):
+    archivo = request.FILES.get('cv')
+    try:
+        if not archivo:
+            raise CVIlegible('Elige el archivo de tu CV (PDF o Word).')
+        _guardar_borrador_cv(request, extraer_texto(archivo))
+    except CVIlegible as error:
+        request.session['cv_error'] = str(error)
+    return redirect('accounts:provider_create')
+
+
 @login_required
 def provider_create(request):
     profile, _ = UserProfile.objects.get_or_create(user=request.user)
+    borrador = request.session.get('cv_borrador') or {}
     if request.method == 'POST':
         form = ProviderForm(request.POST, request.FILES)
         ip = ip_cliente(request)
@@ -151,6 +189,7 @@ def provider_create(request):
                 provider.hidden_at = timezone.now()
                 provider.moderation_note = 'Retenido por el filtro antispam al publicar.'
             provider.save()
+            request.session.pop('cv_borrador', None)
             if provider.is_active:
                 request.session['ga4_eventos'] = request.session.get('ga4_eventos', []) + ['publicar_perfil']
                 registrar(request, LeadEvent.PROFILE_PUBLISHED, origen='provider_create', provider=provider,
@@ -162,11 +201,20 @@ def provider_create(request):
                 messages.success(request, f'Listo: "{provider.business_name}" ya está publicado.')
             return redirect(provider.get_absolute_url() if provider.is_active else 'accounts:dashboard')
     else:
-        form = ProviderForm()
+        inicial = dict(borrador)
+        # El WhatsApp que dio al registrarse, si el CV no traía uno.
+        if profile.whatsapp and 'whatsapp_number' not in inicial:
+            inicial['whatsapp_number'] = formatear_telefono(profile.whatsapp)
+            inicial.setdefault('phone', inicial['whatsapp_number'])
+        form = ProviderForm(initial=inicial)
+    _marcar_desde_cv(form, borrador)
 
     return render(request, 'accounts/provider_form.html', {
         'form': form,
         'is_create': True,
+        'cv_campos': [form.fields[n].label for n in form.fields if n in borrador],
+        'cv_error': request.session.pop('cv_error', ''),
+        'cv_acepta': ACEPTA,
         'page_title': 'Publicar mi servicio gratis | ServiPlace',
         'robots': 'noindex',
     })

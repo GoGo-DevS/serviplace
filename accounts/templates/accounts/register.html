@@ -13,7 +13,7 @@
   <div class="auth-card">
     <p class="form-microcopy">Sin moderación previa. Publicas y queda visible de inmediato.</p>
     {% include "_errores_form.html" %}
-    <form method="post" novalidate data-un-envio>
+    <form method="post" enctype="multipart/form-data" novalidate data-un-envio>
       {% csrf_token %}
       {% if ref_code %}<input type="hidden" name="ref" value="{{ ref_code }}">{% endif %}
       {% include "_antispam.html" %}

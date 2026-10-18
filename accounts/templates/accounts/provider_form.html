@@ -15,6 +15,31 @@
       <div class="application-card">
         {% if is_create %}
         <p class="form-microcopy">Tu perfil es tu responsabilidad. SERVIPLACE es una vitrina: asegúrate de que tus datos de contacto sean correctos y tu descripción, veraz. <a href="{% url 'core:terms' %}">Ver términos →</a></p>
+
+        {% comment %}
+        El CV es un formulario aparte, ANTES del principal: un form no puede ir
+        dentro de otro, y leer el CV no debe validar ni enviar el perfil.
+        {% endcomment %}
+        <section class="cv-box{% if cv_campos %} cv-box-hecho{% endif %}" aria-labelledby="cv-titulo">
+          {% if cv_campos %}
+            <h2 class="cv-box-titulo" id="cv-titulo">Llenamos {{ cv_campos|length }} campo{{ cv_campos|length|pluralize }} con tu CV</h2>
+            <p class="mb-1">Quedaron marcados en turquesa: revísalos antes de publicar. Tu CV le habla a un empleador y aquí le hablas a quien necesita tu servicio, así que ajusta la descripción a eso.</p>
+            <details class="cv-box-cuales mb-2"><summary>Ver cuáles</summary><p class="mb-0">{{ cv_campos|join:" · " }}</p></details>
+          {% else %}
+            <h2 class="cv-box-titulo" id="cv-titulo">¿Tienes tu CV a mano?</h2>
+            <p class="mb-2">Súbelo y llenamos lo que podamos: tu nombre, profesión, dónde estudiaste, tu comuna y tu WhatsApp. Después lo revisas.</p>
+          {% endif %}
+          {% if cv_error %}<p class="cv-box-error" role="alert">{{ cv_error }}</p>{% endif %}
+          <form method="post" action="{% url 'accounts:leer_cv' %}" enctype="multipart/form-data" class="cv-box-form" data-un-envio>
+            {% csrf_token %}
+            <label class="form-label" for="id_cv">Tu CV en PDF o Word (máximo 5 MB)</label>
+            <div class="cv-box-fila">
+              <input type="file" name="cv" id="id_cv" class="form-control" accept="{{ cv_acepta }}" required>
+              <button type="submit" class="btn btn-outline-primary" data-enviando="Leyendo tu CV…">{% if cv_campos %}Leer otro CV{% else %}Leer mi CV{% endif %}</button>
+            </div>
+          </form>
+          <p class="cv-box-privacidad">No guardamos el archivo. Tampoco copiamos tu dirección, tu RUT ni tu correo: el perfil es público.</p>
+        </section>
         {% endif %}
 
         {% include "_errores_form.html" %}

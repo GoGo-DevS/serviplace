@@ -8,6 +8,7 @@ from django.utils.html import strip_tags
 
 from django.core.files.uploadedfile import UploadedFile
 
+from accounts.cv import ACEPTA, CVIlegible, extraer_texto
 from core.antispam import AntispamFormMixin
 from directory.imagenes import procesar_foto
 from directory.models import Category, Commune, Provider
@@ -67,6 +68,12 @@ class RegisterForm(AntispamFormMixin, UserCreationForm):
         label='WhatsApp (opcional)',
         help_text='Ej: +56 9 1234 5678',
     )
+    cv = forms.FileField(
+        required=False,
+        label='Tu CV (opcional)',
+        help_text='PDF o Word. Lo leemos para llenarte el perfil y no lo guardamos.',
+        widget=forms.FileInput(attrs={'accept': ACEPTA}),
+    )
 
     class Meta:
         model = User
@@ -80,6 +87,10 @@ class RegisterForm(AntispamFormMixin, UserCreationForm):
         self.fields['password1'].help_text = 'Mínimo 8 caracteres. No uses solo números.'
         self.fields['password2'].label = 'Confirmar contraseña'
         self.fields['password2'].help_text = ''
+        # Lo que se leyó del CV, o por qué no se pudo. Un CV ilegible NO
+        # impide crear la cuenta: es opcional, y el navegador obligaría a
+        # reescribir las contraseñas por un archivo que no hacía falta.
+        self.cv_texto, self.cv_error = '', ''
         for name, field in self.fields.items():
             if name.startswith('sitio_web') or name.startswith('sello_'):
                 continue
@@ -91,6 +102,15 @@ class RegisterForm(AntispamFormMixin, UserCreationForm):
         if valor and not normalizar_movil(valor):
             raise forms.ValidationError('Escribe un celular chileno: +56 9 XXXX XXXX.')
         return normalizar_movil(valor)
+
+    def clean_cv(self):
+        archivo = self.cleaned_data.get('cv')
+        if archivo:
+            try:
+                self.cv_texto = extraer_texto(archivo)
+            except CVIlegible as error:
+                self.cv_error = str(error)
+        return None  # el archivo no sigue viaje: ni al usuario ni a la sesión
 
     def clean_email(self):
         email = (self.cleaned_data.get('email') or '').strip().lower()

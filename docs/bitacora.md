@@ -217,3 +217,27 @@ PENDIENTE (Diego, el clasificador / la extensión lo bloquean):
   3. Cuando lleguen datos (~24 h): marcar contacto_whatsapp, sign_up y
      publicar_perfil como eventos clave (GA4 no deja marcarlos antes).
 ---
+
+---
+[18-10-2026] — Modo: colaborativo
+Tarea completada: CV QUE LLENA EL PERFIL.
+  Diego: "en /profesionales/ que al registrarse les dé la opción de adjuntar
+  CV, y ojalá que el CV llene los datos del formulario".
+  · Se adjunta al registrarse (opcional; un CV ilegible NO impide crear la
+    cuenta) o arriba de "Publicar mi perfil" (formulario aparte, /cuenta/
+    publicar/leer-cv/). PDF (pypdf 6.19.0) o Word (.docx leído a mano, con su
+    encabezado); máximo 5 MB, 6 páginas, tope al descomprimir.
+  · accounts/cv.py lee POR REGLAS, sin IA: no viaja a terceros ni gasta
+    cuota. Propone nombre, nombre profesional, rubro (27, por quién ejerce:
+    "kinesióloga" vale más que "kinesiología"), título, institución (la de
+    la carrera, no el diplomado), año (el de término; en curso = en blanco),
+    registro de salud, comuna (solo de una línea de dirección o la cabecera:
+    ni la universidad, ni el empleador, ni el apellido), celular, descripción
+    (sección Perfil/Resumen) y modalidades.
+  · NO copia dirección, RUT, correo ni fecha de nacimiento; el archivo no se
+    guarda; lo propuesto vive en la sesión hasta publicar. Campos llenados
+    marcados en turquesa. Términos (sección 4) y FAQ de /profesionales/.
+Pruebas: 30 nuevas (accounts/tests_cv.py; PDF y Word armados a mano).
+  4 mutaciones detectadas (copiar el correo, guardar el archivo, año de la
+  entrada siguiente, comuna del empleador).
+---

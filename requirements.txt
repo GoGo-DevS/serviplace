@@ -7,3 +7,4 @@ whitenoise[brotli]==6.8.2
 django-storages==1.14.6
 boto3==1.40.11
 python-dotenv>=1.0
+pypdf==6.19.0          # leer el CV que sube un profesional (accounts/cv.py)
