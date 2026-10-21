@@ -24,6 +24,8 @@ TIPO_SCHEMA = {
     'climatizacion': 'HVACBusiness',
     'construccion': 'GeneralContractor',
     'soldadura': 'HomeAndConstructionBusiness',
+    'mecanica-automotriz': 'AutoRepair',
+    'asesoria-legal': 'LegalService',
     'pintura': 'HousePainter',
     'carpinteria': 'HomeAndConstructionBusiness',
     'jardineria': 'HomeAndConstructionBusiness',

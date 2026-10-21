@@ -13,6 +13,7 @@ from leads.registro import es_bot, registrar, sanear_busqueda
 from core import guias
 
 from . import seo
+from .busqueda import rubros_de_la_busqueda
 from .catalogo import categorias_por_grupo, grupos_de, perfiles_por_rubro
 from .models import Category, Commune, Provider, ProviderImage, Region
 
@@ -139,7 +140,7 @@ def _listado(request, *, categoria=None, grupo=None, comuna=None, query=''):
         Prefetch('images', queryset=ProviderImage.objects.filter(is_cover=True), to_attr='portadas'),
         'otras_categorias')
     if query:
-        providers = providers.filter(
+        filtro = (
             Q(business_name__icontains=query)
             | Q(contact_name__icontains=query)
             | Q(short_description__icontains=query)
@@ -151,6 +152,12 @@ def _listado(request, *, categoria=None, grupo=None, comuna=None, query=''):
             | Q(profession_title__icontains=query)
             | Q(institution__icontains=query)
         )
+        # "fotógrafo" encuentra Fotografía y video: rubro principal u otro rubro.
+        rubros = rubros_de_la_busqueda(query)
+        if rubros:
+            filtro |= Q(category__in=rubros) | Q(
+                pk__in=Provider.otras_categorias.through.objects.filter(category__in=rubros).values('provider_id'))
+        providers = providers.filter(filtro)
     # Principal u otro rubro: el maestro que también es gásfiter sale en Gasfitería.
     if categoria:
         providers = providers.del_rubro(categoria)

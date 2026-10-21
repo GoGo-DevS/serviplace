@@ -488,3 +488,21 @@ la tilde aparte y ANTES de la vocal, y quedó pegada a la consonante.
     patrón (que en español no existe). Lógica copiada en la migración.
 Pruebas: 257.
 ---
+
+[20-10-2026] — Diego: "faltan profesiones: diseñadores gráficos, informáticos,
+fotógrafo, editor de videos, gestor de eventos, relaciones públicas/marketing, etc".
+  · Diseño gráfico, Fotografía y video, Soporte computacional y Desarrollo web
+    YA existían. El problema era la búsqueda: comparaba la palabra con el
+    NOMBRE del rubro y con tildes exactas ("fotógrafo" ≠ "Fotografía y
+    video", "gasfiter" ≠ "Gásfiter"): daba cero aunque hubiera perfiles.
+    directory/busqueda.py: nombre + nombre de búsqueda + sinónimos por rubro,
+    sin tildes y con plurales; busca por rubro principal u otro rubro.
+  · Rubros nuevos: Edición de video, Producción de eventos, Marketing y
+    relaciones públicas, Asesoría legal (abogados), Arquitectura y planos,
+    Traducción (Servicios profesionales); Mecánica automotriz (Hogar);
+    Entrenamiento personal (Salud y bienestar, sin registro de salud). Cada
+    uno con su página /profesionales/<rubro>/ (contenido propio, sin precios),
+    nombre de búsqueda, sinónimos y patrón en el lector de CV ("arquitecto de
+    software" NO cae en Arquitectura).
+Pruebas: 262.
+---

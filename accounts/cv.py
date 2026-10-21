@@ -254,6 +254,18 @@ PROFESIONES = [
      r'construccion civil'),
     ('carpinteria', r'carpinter[oa]|mueblista', r'carpinteria|muebleria'),
     ('soldadura', r'soldador[a]?|maestro soldador|estructurer[oa]', r'soldadura|estructuras metalicas'),
+    ('mecanica-automotriz', r'mecanic[oa] (?:automotriz|de autos)|tecnic[oa] (?:en )?mecanica automotriz',
+     r'mecanica automotriz'),
+    ('edicion-de-video', r'editor[a]? (?:de video|audiovisual)|montajista|postproductor[a]?', r'edicion de video|postproduccion'),
+    ('produccion-de-eventos', r'productor[a]? de eventos|organizador[a]? de eventos|wedding planner|event planner',
+     r'produccion de eventos|organizacion de eventos'),
+    ('marketing-y-rrpp', r'community manager|relacionador[a]? public[oa]|(?:especialista|ejecutiv[oa]|analista|encargad[oa]) '
+                         r'(?:en |de )?marketing', r'marketing digital|relaciones publicas'),
+    ('asesoria-legal', r'abogad[oa]', r'asesoria (?:legal|juridica)|derecho (?:de familia|laboral|civil|penal)'),
+    # "arquitecto de software" es otra cosa: es de Desarrollo web.
+    ('arquitectura', r'arquitect[oa](?! de (?:software|soluciones|datos)| cloud)', r'arquitectura(?! de (?:software|soluciones|datos))'),
+    ('traduccion', r'traductor[a]?', r'traduccion'),
+    ('entrenamiento-personal', r'entrenador[a]? personal|personal trainer|preparador[a]? fisic[oa]', r'entrenamiento personal'),
     ('pintura', r'pintor[a]?', r'pintura'),
     ('jardineria', r'jardiner[oa]|paisajista', r'jardineria|paisajismo'),
     ('limpieza', r'auxiliar de aseo|asesora del hogar|personal de aseo', r'servicio de aseo'),
