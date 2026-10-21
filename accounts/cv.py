@@ -61,6 +61,35 @@ def extraer_texto(archivo):
     return texto[:MAX_TEXTO]
 
 
+# Los PDF hechos con LaTeX guardan la tilde como un signo APARTE y ANTES de la
+# vocal: "Inform´atico", "Espa˜na", "ling¨u´ıstica" (con ı sin punto). Al
+# extraer el texto, esa tilde termina suelta o pegada a la letra anterior, y el
+# 20-10-2026 un perfil quedó publicado como "Ingeniero Inforḿatico".
+_ANTES_DE_LA_LETRA = {'\u00b4': '\u0301', '\u02ca': '\u0301', '\u02dc': '\u0303', '\u00a8': '\u0308'}
+_VOCAL = 'aeiouAEIOU'
+
+
+def reparar_tildes(texto):
+    """Devuelve cada tilde a su letra. En español una consonante nunca lleva
+    tilde aguda, ni una vocal virgulilla, ni la g diéresis: si aparecen, la
+    marca era de la letra siguiente."""
+    if not texto:
+        return texto
+    # 1) Signo suelto antes de la letra: "´a" -> "á", "˜n" -> "ñ", "¨u" -> "ü".
+    texto = re.sub(r'([\u00b4\u02ca])\s?([aeiouıAEIOU])',
+                   lambda m: ('i' if m.group(2) == 'ı' else m.group(2)) + '\u0301', texto)
+    texto = re.sub(r'\u02dc\s?([nN])', lambda m: m.group(1) + '\u0303', texto)
+    texto = re.sub(r'\u00a8\s?([uU])', lambda m: m.group(1) + '\u0308', texto)
+    # 2) La marca quedó en la letra anterior: se pasa a la siguiente.
+    texto = unicodedata.normalize('NFD', texto)
+    texto = re.sub(r'([^\W\d_aeiouAEIOU])\u0301([aeiouıAEIOU])',
+                   lambda m: m.group(1) + ('i' if m.group(2) == 'ı' else m.group(2)) + '\u0301', texto)
+    texto = re.sub(r'([aeiouAEIOU])\u0303([nN])', lambda m: m.group(1) + m.group(2) + '\u0303', texto)
+    texto = re.sub(r'([gG])\u0308([uU])', lambda m: m.group(1) + m.group(2) + '\u0308', texto)
+    texto = texto.replace('ı\u0301', 'i\u0301')
+    return unicodedata.normalize('NFC', texto)
+
+
 def _texto_pdf(archivo):
     from pypdf import PdfReader
     try:
@@ -461,6 +490,7 @@ def proponer_perfil(texto):
     """
     from directory.models import Category
 
+    texto = reparar_tildes(texto)  # aquí y no al extraer: todo texto de CV pasa por esta puerta
     lineas = _lineas(texto)
     # Para buscar palabras sueltas se unen las cortadas con guion al final de
     # una línea ("telerehabilita-\nción"). Este texto no se recorta: el largo

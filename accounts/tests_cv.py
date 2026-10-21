@@ -383,3 +383,52 @@ class RubrosNuevosEnElCV(TestCase):
     def test_un_tecnico_en_computacion_sigue_en_soporte(self):
         datos = proponer_perfil('Pedro Soto Lagos\nTécnico en computación\nFormateo y redes para hogares.\n')
         self.assertEqual(datos['category'], Category.objects.get(slug='soporte-computacional').pk)
+
+
+class TildesCorridasDelPdf(TestCase):
+    """20-10-2026: un perfil quedó publicado como "Ingeniero Inforḿatico". Los
+    PDF hechos con LaTeX traen la tilde aparte y ANTES de la vocal."""
+
+    def test_devuelve_cada_tilde_a_su_letra(self):
+        from accounts.cv import reparar_tildes
+        casos = {
+            'Inform´atico': 'Informático',      # signo suelto antes de la vocal
+            'Inforḿatico': 'Informático',      # marca pegada a la consonante
+            'Inforḿatico': 'Informático',       # ya compuesta: la "ḿ" del perfil real
+            'Espa˜na': 'España',
+            'ling¨u´ıstica': 'lingüística',
+            'Ingenier´ıa': 'Ingeniería',
+        }
+        for entrada, esperado in casos.items():
+            self.assertEqual(reparar_tildes(entrada), esperado, repr(entrada))
+
+    def test_no_toca_lo_que_ya_esta_bien(self):
+        from accounts.cv import reparar_tildes
+        for bien in ('Kinesióloga', 'Concepción', 'Universidad del Bío Bío', 'Pingüino', 'Liceo O´Higgins'):
+            self.assertEqual(reparar_tildes(bien), bien)
+
+    def test_el_cv_de_latex_llega_bien_al_formulario(self):
+        texto = ('Gonzalo Pérez Rojas\nIngeniero Inform´atico\nT´ıtulo: Ingeniero Inform´atico\n'
+                 'Universidad del B´ıo B´ıo, Concepci´on\nExperiencia\n'
+                 'Desarrollo de sistemas para pymes 2012-2024\n+56 9 8765 4321\n' + 'texto de relleno ' * 10)
+        datos = proponer_perfil(texto)
+        self.assertNotIn('ḿ', str(datos))
+        self.assertIn('Informático', datos.get('profession_title', ''))
+
+
+class MigracionReparaTildes(TestCase):
+    def test_repara_el_titulo_ya_guardado(self):
+        import importlib
+        from django.apps import apps
+        from directory.models import Category, Commune, Provider, Region
+        call_command('seed_categorias', stdout=StringIO())
+        region = Region.objects.create(name='Valparaíso', slug='valparaiso', is_active=True)
+        comuna = Commune.objects.create(region=region, name='Limache', slug='limache', is_active=True)
+        p = Provider.objects.create(
+            business_name='Gonzalo', category=Category.objects.get(slug='desarrollo-web'), commune=comuna,
+            short_description='x', whatsapp_number='+56987654321', profession_title='Ingeniero Inforḿatico',
+            institution='Universidad del Bío Bío')
+        importlib.import_module('directory.migrations.0017_reparar_tildes_del_cv').reparar(apps, None)
+        p.refresh_from_db()
+        self.assertEqual(p.profession_title, 'Ingeniero Informático')
+        self.assertEqual(p.institution, 'Universidad del Bío Bío')

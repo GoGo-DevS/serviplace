@@ -475,3 +475,16 @@ suegro es constructor, gásfiter, eléctrico, soldadura… y solo me dejó una".
   · Admin: filter_horizontal para los otros rubros.
 Pruebas: 253.
 ---
+
+---
+[20-10-2026] — Se inscribió Gonzalo (Comunidad TI, Limache, desarrollo web). Su
+título quedó publicado como "Ingeniero Inforḿatico": su CV en PDF (LaTeX) trae
+la tilde aparte y ANTES de la vocal, y quedó pegada a la consonante.
+  · accounts.cv.reparar_tildes, al entrar a proponer_perfil: signo suelto antes
+    de la vocal ("´a", "˜n", "¨u", "´ı") y marca pegada a la letra anterior
+    (consonante con tilde + vocal, vocal con virgulilla + n, g con diéresis +
+    u) vuelven a su letra. No toca lo que está bien ni "O´Higgins".
+  · Migración de datos 0017: repara título e institución ya guardados con ese
+    patrón (que en español no existe). Lógica copiada en la migración.
+Pruebas: 257.
+---
