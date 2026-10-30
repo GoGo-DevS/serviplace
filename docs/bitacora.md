@@ -539,3 +539,14 @@ landings contradecían los anuncios (peluquería "una foto principal", electrici
 y /servicios/peluqueria/maipu/ dan 404 (sin perfiles): los creativos 21 y 33
 graban /servicios/en/maipu/. No se lanzó nada (gasta plata: lo lanza Diego).
 ---
+
+[30-10-2026] Piezas estáticas de la campaña de Maipú: 19 láminas 1080x1350
+(C19 kine, C08 gásfiter x5, C12 mecánicos x6, C24 profe x6, C23 profe) en
+GoGoCRM/contenido/salida/24-serviplace-meta-maipu/ (commit 19c3549 del repo
+GoGoCRM), con README.md que trae texto principal, título, botón y URL con
+utm_content por creativo. Tarjetas con el CSS real del sitio y rotuladas
+EJEMPLO (no hay perfiles reales que mostrar). Sin emojis ni flechas. Faltan
+las que necesitan cámara: C4/C1 (suegro, con permiso), C5 (pantalla del
+celular), C10, C27, C28. GA4: contacto_whatsapp, publicar_perfil y sign_up
+quedaron marcados como eventos clave. No se lanzó ningún anuncio.
+---
