@@ -374,7 +374,7 @@ PROFESIONES = {
         'ejemplo_larga': 'Soy peluquera con diez años de oficio. Hago cortes de mujer, hombre y niño, color, mechas y peinados para matrimonios y graduaciones. Atiendo a domicilio en Rancagua y Machalí, también a adultos mayores que no pueden salir. Para eventos conviene agendar con una semana de anticipación.',
         'faq': [
             ('¿Puedo publicar si trabajo en un salón?', 'Sí. Puedes publicar tu propio perfil y aclarar dónde atiendes.'),
-            ('¿Puedo subir fotos de mis trabajos?', 'El perfil tiene una foto principal: usa tu mejor trabajo o tu logo.'),
+            ('¿Puedo subir fotos de mis trabajos?', 'Sí: hasta 8 fotos de tus trabajos, y eliges cuál sale de portada en tu tarjeta. Tu logo o tu foto va aparte.'),
         ],
     },
     'manicure-y-estetica': {
@@ -679,7 +679,7 @@ PROFESIONES = {
         'ejemplo_larga': 'Soy electricista autorizado SEC clase D. Instalo y reparo enchufes, interruptores y luminarias, cambio tableros y automáticos, y reviso instalaciones antiguas que se cortan. Trabajo en Puente Alto, La Florida y San José de Maipo. Te entrego un presupuesto por escrito antes de partir y boleta al terminar.',
         'faq': [
             ('¿Qué pasa si no tengo licencia SEC?', 'Puedes publicar, pero tu perfil va a competir con electricistas que la muestran. Ver la guía de la SEC para saber cómo obtenerla.'),
-            ('¿ServiPlace verifica mi licencia?', 'El dato lo escribes tú y es tu responsabilidad. Tus clientes pueden comprobarlo en el buscador de la SEC.'),
+            ('¿ServiPlace verifica mi licencia?', 'Sí: pones tu licencia y su clase, la revisamos en el buscador público de la SEC y tu perfil muestra el sello «Licencia SEC comprobada». Tus clientes también pueden comprobarla ahí.'),
         ],
     },
     'seguridad-hogar': {

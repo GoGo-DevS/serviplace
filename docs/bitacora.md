@@ -529,3 +529,13 @@ dicen QUÉ se comprobó:
   · Admin: los fieldsets no mostraban "otros rubros" (d21051b): arreglado.
 Pruebas: 272 (10 nuevas, 3 mutaciones detectadas).
 ---
+
+[30-10-2026] Estrategia de anuncios para captar profesionales en Maipú (skill
+meta-ads): outputs/meta_ads_strategy.md, 5 personas, 11 dolores, 33 creativos,
+partir con 6 (C4, C5, C10, C19, C27, C28) a $5.000/día, objetivo Tráfico (no hay
+Pixel) con utm_content por creativo. Revisada contra el sitio: dos FAQ de las
+landings contradecían los anuncios (peluquería "una foto principal", electricidad
+"la licencia la escribes tú") y quedaron corregidas; /servicios/kinesiologia/maipu/
+y /servicios/peluqueria/maipu/ dan 404 (sin perfiles): los creativos 21 y 33
+graban /servicios/en/maipu/. No se lanzó nada (gasta plata: lo lanza Diego).
+---
