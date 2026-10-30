@@ -177,6 +177,7 @@ class ProviderForm(AntispamFormMixin, forms.ModelForm):
             'institution',
             'graduation_year',
             'health_registry',
+            'licencia_sec',
         ]
         labels = {
             'business_name': 'Nombre con el que te presentas',
@@ -202,6 +203,7 @@ class ProviderForm(AntispamFormMixin, forms.ModelForm):
             'institution': 'Dónde estudiaste',
             'graduation_year': 'Año de titulación',
             'health_registry': 'N° de registro en la Superintendencia de Salud',
+            'licencia_sec': 'Licencia SEC (opcional)',
         }
         help_texts = {
             'short_description': 'Máximo 220 caracteres. Es lo que se ve en la tarjeta.',
@@ -214,6 +216,7 @@ class ProviderForm(AntispamFormMixin, forms.ModelForm):
             'institution': 'Ej: Universidad de Concepción, INACAP, Duoc UC.',
             'graduation_year': 'Si todavía estudias, el año en que te titulas.',
             'health_registry': 'Solo si eres profesional de la salud. Tus pacientes pueden comprobarlo en el registro público.',
+            'licencia_sec': 'Clase y tipo, ej: «Clase D eléctrica» o «Clase 3 gas». La comprobamos en el buscador público de la SEC y tu perfil muestra el sello.',
         }
         error_messages = {
             'foto': {'invalid_image': 'No pudimos leer ese archivo como imagen. Usa JPG, PNG o WebP.'},
@@ -226,6 +229,7 @@ class ProviderForm(AntispamFormMixin, forms.ModelForm):
             'institution': forms.TextInput(attrs={'placeholder': 'Ej: Universidad de Concepción'}),
             'graduation_year': forms.NumberInput(attrs={'placeholder': 'Ej: 2025', 'inputmode': 'numeric'}),
             'health_registry': forms.TextInput(attrs={'placeholder': 'Ej: 654321', 'inputmode': 'numeric'}),
+            'licencia_sec': forms.TextInput(attrs={'placeholder': 'Ej: Clase D eléctrica'}),
             'sector': forms.TextInput(attrs={'placeholder': 'Ej: Ciudad Satélite'}),
             'phone': forms.TextInput(attrs={'placeholder': '+56 9 1234 5678', 'inputmode': 'tel'}),
             'website': forms.URLInput(attrs={'placeholder': 'https://tusitio.cl', 'inputmode': 'url'}),
@@ -253,7 +257,8 @@ class ProviderForm(AntispamFormMixin, forms.ModelForm):
         # Para que el formulario se adapte al rubro elegido (18-10-2026: a un
         # ingeniero en informática le pedía el registro de la Superintendencia
         # de Salud y le daba "Kinesióloga" de ejemplo).
-        self.categorias_info = {str(c.pk): {'salud': c.pide_registro_salud, 'grupo': c.group} for c in categorias}
+        self.categorias_info = {str(c.pk): {'salud': c.pide_registro_salud, 'sec': c.pide_licencia_sec, 'grupo': c.group}
+                                for c in categorias}
         nombres = dict(Category.GROUP_CHOICES)
         self.fields['category'].choices = [('', 'Elige un rubro')] + [
             (nombres[clave], [(c.pk, c.name) for c in categorias if c.group == clave])
@@ -314,6 +319,9 @@ class ProviderForm(AntispamFormMixin, forms.ModelForm):
 
     def clean_description(self):
         return limpiar_texto(self.cleaned_data['description'], permitir_saltos=True)
+
+    def clean_licencia_sec(self):
+        return limpiar_texto(self.cleaned_data.get('licencia_sec', ''))
 
     def clean_address(self):
         return limpiar_texto(self.cleaned_data.get('address', ''))
@@ -428,6 +436,9 @@ class ProviderForm(AntispamFormMixin, forms.ModelForm):
         # se guarda (no tendría cómo comprobarse y confunde en la ficha).
         if categoria and not salud:
             datos['health_registry'] = ''
+        # La licencia SEC solo tiene sentido en electricidad, gas y climatización.
+        if categoria and not any(c and c.pide_licencia_sec for c in [categoria] + otras):
+            datos['licencia_sec'] = ''
         # Ofrecer atención de salud sin título es ejercicio ilegal de la
         # profesión. Quien está en práctica puede publicar igual, pero en lo
         # que ya puede hacer (clases, apoyo), no como kinesiólogo. Vale también

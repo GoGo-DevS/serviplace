@@ -69,12 +69,16 @@ class ProviderAdmin(admin.ModelAdmin):
     readonly_fields = ('views_count', 'whatsapp_clicks_count', 'claimed_at', 'created_at', 'updated_at')
     inlines = [ProviderImageInline]
     fieldsets = (
-        ('Información principal', {'fields': ('business_name', 'slug', 'contact_name', 'category', 'short_description', 'description')}),
+        ('Información principal', {'fields': ('business_name', 'slug', 'contact_name', 'category', 'otras_categorias',
+                                              'short_description', 'description')}),
         ('Contacto', {'fields': ('phone', 'whatsapp_number', 'email')}),
         ('Ubicación y zona de atención', {'fields': ('commune', 'sector', 'address', 'service_area')}),
         ('Perfil profesional', {'fields': (
-            'profession_title', 'institution', 'graduation_year', 'health_registry',
+            'profession_title', 'institution', 'graduation_year', 'health_registry', 'licencia_sec',
             'attends_home', 'attends_office', 'attends_online',
+        )}),
+        ('Sellos (se dan desde /cuenta/comprobaciones/)', {'fields': (
+            'whatsapp_codigo', 'whatsapp_confirmado_en', 'registro_salud_comprobado_en', 'licencia_sec_comprobada_en',
         )}),
         ('Estado del perfil', {'fields': ('is_verified', 'is_featured', 'is_active', 'data_status', 'owner', 'claimed_at')}),
         ('Suscripción', {'fields': ('subscription_status', 'subscription_expires_at')}),

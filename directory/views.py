@@ -168,7 +168,7 @@ def _listado(request, *, categoria=None, grupo=None, comuna=None, query=''):
 
     # `pk` al final: sin un desempate único, al paginar uno se repite en la
     # página 2 y otro no aparece nunca (orden no determinista en Postgres).
-    providers = providers.order_by('-is_featured', '-is_verified', 'business_name', 'pk')
+    providers = providers.por_confianza()
 
     # D1 — El listado se pagina (361 en una página eran 162.604 px en un teléfono).
     paginador = Paginator(providers, PROVEEDORES_POR_PAGINA)

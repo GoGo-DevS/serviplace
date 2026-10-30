@@ -559,3 +559,13 @@ body:has(.galeria-visor[open]) { overflow: hidden; }
 .otro-chip:has(input:checked) { border-color: var(--sp-accent); background: var(--sp-blue-light); }
 .otro-chip:has(input:disabled) { opacity: .45; cursor: not-allowed; }
 .otro-chip.es-principal { display: none; }
+
+/* ---- Sellos que dicen qué se comprobó (30-10-2026) ---- */
+.badge-sello { background: #fff; color: var(--sp-green-dark); border: 1px solid var(--sp-green); font-weight: 700; }
+.badge-sello::before { content: "✓ "; }
+.sellos-lista { margin: 0 0 .8rem; padding-left: 1.1rem; display: grid; gap: .35rem; font-size: .93rem; }
+.confirmar-wa { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .75rem; padding: .85rem 1rem; margin-bottom: 1rem; border-radius: 14px; background: var(--sp-green-light); color: var(--sp-ink); font-size: .9rem; }
+.confirmar-wa > div { flex: 1 1 280px; }
+.comprobaciones .detail-block { margin-bottom: 1rem; }
+.comprobacion-fila { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .6rem; padding: .7rem 0; border-top: 1px solid var(--sp-line); }
+.comprobacion-dato { font-family: var(--font-mono); font-weight: 600; }

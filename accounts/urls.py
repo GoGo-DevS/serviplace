@@ -10,6 +10,7 @@ urlpatterns = [
     path('cuenta/login/', views.LoginThrottledView.as_view(), name='login'),
     path('cuenta/logout/', auth_views.LogoutView.as_view(next_page='core:home'), name='logout'),
     path('cuenta/dashboard/', views.dashboard, name='dashboard'),
+    path('cuenta/comprobaciones/', views.comprobaciones, name='comprobaciones'),
     path('cuenta/publicar/', views.provider_create, name='provider_create'),
     path('cuenta/publicar/leer-cv/', views.leer_cv, name='leer_cv'),
     path('cuenta/mi-perfil/<slug:slug>/editar/', views.provider_edit, name='provider_edit'),

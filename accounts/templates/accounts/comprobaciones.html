@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% comment %}Solo staff. Los sellos dicen QUÉ se comprobó: dar uno sin revisarlo es mentirle al vecino.{% endcomment %}
+{% block content %}
+<section class="page-header">
+  <div class="container py-4">
+    <h1 class="h2 mb-1">Comprobaciones</h1>
+    <p class="text-muted mb-0">Cada sello se da después de revisar el dato, no antes.</p>
+  </div>
+</section>
+
+<section class="container py-4 comprobaciones">
+  <div class="detail-block">
+    <h2>WhatsApp por confirmar <small class="text-muted">{{ whatsapp|length }}</small></h2>
+    <p class="form-text">Confírmalo solo si en tu WhatsApp llegó el mensaje con <b>ese código</b> desde <b>ese número</b>.</p>
+    {% for fila in whatsapp %}
+    <div class="comprobacion-fila">
+      <div><a href="{{ fila.p.get_absolute_url }}" target="_blank" rel="noopener"><b>{{ fila.p.business_name }}</b></a>
+        <span class="text-muted">· {{ fila.p.commune.name }} · publicado {{ fila.p.created_at|date:"d-m-Y" }}</span><br>
+        <span class="comprobacion-dato">{{ fila.numero }}</span> · código <span class="comprobacion-dato">{{ fila.p.whatsapp_codigo }}</span></div>
+      <form method="post">{% csrf_token %}<input type="hidden" name="perfil" value="{{ fila.p.pk }}"><input type="hidden" name="sello" value="whatsapp">
+        <button class="btn btn-success btn-sm" type="submit">Confirmar WhatsApp</button></form>
+    </div>
+    {% empty %}<p class="mb-0 text-muted">Nada pendiente.</p>{% endfor %}
+  </div>
+
+  <div class="detail-block">
+    <h2>Registro de salud por revisar <small class="text-muted">{{ salud|length }}</small></h2>
+    <p class="form-text">Búscalo por nombre en el <a href="{{ url_rnpi }}" target="_blank" rel="noopener">Registro Nacional de Prestadores Individuales</a> y confirma que el número y la profesión calzan.</p>
+    {% for p in salud %}
+    <div class="comprobacion-fila">
+      <div><a href="{{ p.get_absolute_url }}" target="_blank" rel="noopener"><b>{{ p.business_name }}</b></a>
+        <span class="text-muted">{% if p.contact_name %}· {{ p.contact_name }} {% endif %}· {{ p.profession_title|default:p.category.name }}</span><br>
+        Registro <span class="comprobacion-dato">{{ p.health_registry }}</span></div>
+      <form method="post">{% csrf_token %}<input type="hidden" name="perfil" value="{{ p.pk }}"><input type="hidden" name="sello" value="salud">
+        <button class="btn btn-success btn-sm" type="submit">Registro comprobado</button></form>
+    </div>
+    {% empty %}<p class="mb-0 text-muted">Nada pendiente.</p>{% endfor %}
+  </div>
+
+  <div class="detail-block">
+    <h2>Licencia SEC por revisar <small class="text-muted">{{ sec|length }}</small></h2>
+    <p class="form-text">Búscalo por comuna y tipo en el <a href="{{ url_sec }}" target="_blank" rel="noopener">buscador de instaladores autorizados por la SEC</a>.</p>
+    {% for p in sec %}
+    <div class="comprobacion-fila">
+      <div><a href="{{ p.get_absolute_url }}" target="_blank" rel="noopener"><b>{{ p.business_name }}</b></a>
+        <span class="text-muted">{% if p.contact_name %}· {{ p.contact_name }} {% endif %}· {{ p.commune.name }}</span><br>
+        <span class="comprobacion-dato">{{ p.licencia_sec }}</span></div>
+      <form method="post">{% csrf_token %}<input type="hidden" name="perfil" value="{{ p.pk }}"><input type="hidden" name="sello" value="sec">
+        <button class="btn btn-success btn-sm" type="submit">Licencia comprobada</button></form>
+    </div>
+    {% empty %}<p class="mb-0 text-muted">Nada pendiente.</p>{% endfor %}
+  </div>
+
+  <div class="detail-block">
+    <h2>Sellos dados</h2>
+    {% for p in recientes %}
+    <div class="comprobacion-fila">
+      <div><b>{{ p.business_name }}</b><br>
+        {% if p.whatsapp_confirmado %}<span class="badge badge-sello">WhatsApp confirmado</span>{% endif %}
+        {% if p.registro_salud_comprobado %}<span class="badge badge-sello">Registro de salud</span>{% endif %}
+        {% if p.licencia_sec_comprobada %}<span class="badge badge-sello">Licencia SEC</span>{% endif %}</div>
+      <div class="d-flex gap-1 flex-wrap">
+        {% if p.whatsapp_confirmado %}<form method="post">{% csrf_token %}<input type="hidden" name="perfil" value="{{ p.pk }}"><input type="hidden" name="sello" value="whatsapp"><input type="hidden" name="accion" value="quitar"><button class="btn btn-outline-primary btn-sm" type="submit">Quitar WhatsApp</button></form>{% endif %}
+        {% if p.registro_salud_comprobado %}<form method="post">{% csrf_token %}<input type="hidden" name="perfil" value="{{ p.pk }}"><input type="hidden" name="sello" value="salud"><input type="hidden" name="accion" value="quitar"><button class="btn btn-outline-primary btn-sm" type="submit">Quitar registro</button></form>{% endif %}
+        {% if p.licencia_sec_comprobada %}<form method="post">{% csrf_token %}<input type="hidden" name="perfil" value="{{ p.pk }}"><input type="hidden" name="sello" value="sec"><input type="hidden" name="accion" value="quitar"><button class="btn btn-outline-primary btn-sm" type="submit">Quitar licencia</button></form>{% endif %}
+      </div>
+    </div>
+    {% empty %}<p class="mb-0 text-muted">Todavía no hay sellos.</p>{% endfor %}
+  </div>
+</section>
+{% endblock %}

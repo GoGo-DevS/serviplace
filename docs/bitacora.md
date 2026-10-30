@@ -506,3 +506,26 @@ fotógrafo, editor de videos, gestor de eventos, relaciones públicas/marketing,
     software" NO cae en Arquitectura).
 Pruebas: 262.
 ---
+
+---
+[30-10-2026] — Diego: "hacer que los que se inscriban ya vengan verificados".
+Decisión: NO un "Verificado" automático (la página Hazte Verificado promete
+"datos revisados por el equipo": darlo sin revisar sería una promesa falsa y
+mataría el valor del sello que se piensa cobrar). En su lugar, sellos que
+dicen QUÉ se comprobó:
+  · WhatsApp confirmado: el dueño toca "Confirmar mi WhatsApp" (panel y su
+    ficha), se abre WhatsApp con "Código: SP-1234" hacia el número de
+    ServiPlace; Diego ve el mensaje llegar desde ESE número y lo confirma en
+    /cuenta/comprobaciones/ (solo staff, 404 al resto). Sin costo ni API.
+  · Registro de salud comprobado (RNPI) y Licencia SEC comprobada (buscador
+    SEC vía ChileAtiende): campo nuevo licencia_sec, solo en electricidad,
+    gasfitería y climatización; Diego los revisa con el enlace a mano.
+  · Cambiar el dato borra su sello (Provider.save compara con lo guardado).
+  · Incentivo: Provider.objects.por_confianza() ordena destacados,
+    verificados y con WhatsApp confirmado primero.
+  · Sellos en tarjeta, ficha (con qué se revisó y cuándo), panel; "Qué
+    significa cada sello" en Seguridad y confianza. Migraciones 0018 (campos)
+    y 0019 (códigos para los perfiles existentes).
+  · Admin: los fieldsets no mostraban "otros rubros" (d21051b): arreglado.
+Pruebas: 272 (10 nuevas, 3 mutaciones detectadas).
+---

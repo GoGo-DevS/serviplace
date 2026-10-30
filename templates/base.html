@@ -89,7 +89,8 @@
         <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
           <li class="nav-item"><a class="nav-link" href="{% url 'directory:provider_list' %}">Buscar</a></li>
           <li class="nav-item"><a class="nav-link" href="{% url 'core:para_profesionales' %}">Para profesionales</a></li>
-          {% if user.is_staff %}<li class="nav-item"><a class="nav-link" href="{% url 'core:metricas' %}">Métricas</a></li>{% endif %}
+          {% if user.is_staff %}<li class="nav-item"><a class="nav-link" href="{% url 'core:metricas' %}">Métricas</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'accounts:comprobaciones' %}">Comprobaciones</a></li>{% endif %}
           {% if user.is_authenticated %}
             <li class="nav-item"><a class="nav-link" href="{% url 'accounts:dashboard' %}">Mi cuenta</a></li>
             <li class="nav-item ms-lg-1"><a class="btn btn-publicar nav-cta" href="{% url 'accounts:provider_create' %}">Publicar mis servicios</a></li>

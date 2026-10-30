@@ -27,7 +27,7 @@ def home(request):
         Provider.objects.publicos().exclude(foto='')
         .select_related('category', 'commune').prefetch_related('otras_categorias').distinct()
         .prefetch_related(Prefetch('images', queryset=ProviderImage.objects.filter(is_cover=True), to_attr='portadas'))
-        .order_by('-is_featured', '-is_verified', 'business_name', 'pk')[:6]
+        .por_confianza()[:6]
     )
     publicos = Provider.objects.publicos()
     total_providers = publicos.count()

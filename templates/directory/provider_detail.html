@@ -14,6 +14,7 @@
           <span class="badge badge-category">{{ provider.category.name }}</span>
           {% for otro in otros_rubros %}<a class="badge badge-category badge-otro" href="{{ otro.url }}">{{ otro.categoria.name }}</a>{% endfor %}
           {% if provider.verificado_publico %}<span class="badge badge-verified">Verificado</span>{% endif %}
+          {% if provider.whatsapp_confirmado %}<span class="badge badge-sello" title="El número de WhatsApp es de esta persona">WhatsApp confirmado</span>{% endif %}{% if provider.registro_salud_comprobado %}<span class="badge badge-sello" title="Revisado en el registro de la Superintendencia de Salud">Registro de salud comprobado</span>{% endif %}{% if provider.licencia_sec_comprobada %}<span class="badge badge-sello" title="Revisada en el buscador de la SEC">Licencia SEC comprobada</span>{% endif %}
           {% if not provider.owner %}
             <a class="badge badge-new" href="{% url 'accounts:claim_profile' provider.slug %}">¿Es tuyo? Reclámalo</a>
           {% endif %}
@@ -40,6 +41,14 @@
         <h2>Sobre este servicio</h2>
         <p class="mb-0">{{ provider.description|linebreaksbr }}</p>
       </div>
+
+{% if user.is_authenticated and provider.owner_id == user.id and not provider.whatsapp_confirmado and provider.url_confirmar_whatsapp %}
+      <div class="confirmar-wa">
+        <div><b>Confirma tu WhatsApp</b> y tu perfil muestra el sello «WhatsApp confirmado» y sube en los listados.
+          Toca el botón: se abre WhatsApp con un mensaje listo, solo envíalo. Lo confirmamos durante el día.</div>
+        <a class="btn btn-success" href="{{ provider.url_confirmar_whatsapp }}" target="_blank" rel="noopener" data-ga="confirmar_whatsapp" data-ga-origen="ficha">Confirmar mi WhatsApp</a>
+      </div>
+      {% endif %}
 
       <!-- Fotos -->
       {% with fotos=provider.images.all %}
@@ -124,6 +133,13 @@
 
       <div class="detail-block">
         <h2>Antes de contratar</h2>
+        {% if provider.tiene_sellos %}
+        <ul class="sellos-lista">
+          {% if provider.whatsapp_confirmado %}<li><b>WhatsApp confirmado:</b> el número es de esta persona (lo confirmó el {{ provider.whatsapp_confirmado_en|date:"d-m-Y" }}).</li>{% endif %}
+          {% if provider.registro_salud_comprobado %}<li><b>Registro de salud comprobado:</b> N° {{ provider.health_registry }}, revisado en el registro de la Superintendencia de Salud el {{ provider.registro_salud_comprobado_en|date:"d-m-Y" }}.</li>{% endif %}
+          {% if provider.licencia_sec_comprobada %}<li><b>Licencia SEC comprobada:</b> {{ provider.licencia_sec }}, revisada en el buscador de la SEC el {{ provider.licencia_sec_comprobada_en|date:"d-m-Y" }}.</li>{% endif %}
+        </ul>
+        {% endif %}
         {% if provider.pide_registro_salud %}
         <p>Confirma el valor de la sesión, la disponibilidad y si entrega boleta. Antes de atenderte, comprueba que esté inscrito en el registro de prestadores de la Superintendencia de Salud.</p>
         {% else %}

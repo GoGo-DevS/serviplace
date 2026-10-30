@@ -3,6 +3,8 @@ from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
+from django.db.models import Q
+from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.utils.http import url_has_allowed_host_and_scheme
@@ -204,7 +206,8 @@ def provider_create(request):
             if provider.spam_flag:
                 messages.info(request, 'Recibimos tu perfil. Quedó en revisión y lo publicaremos apenas lo mire una persona.')
             else:
-                messages.success(request, f'Listo: "{provider.business_name}" ya está publicado.')
+                messages.success(request, f'Listo: "{provider.business_name}" ya está publicado. '
+                                          'Último paso: confirma tu WhatsApp con el botón de tu perfil.')
             return redirect(provider.get_absolute_url() if provider.is_active else 'accounts:dashboard')
     else:
         inicial = dict(borrador)
@@ -246,6 +249,44 @@ def provider_edit(request, slug):
         'is_create': False,
         'max_fotos': MAX_FOTOS,
         'page_title': f'Editar {provider.business_name} | ServiPlace',
+        'robots': 'noindex',
+    })
+
+
+@login_required
+def comprobaciones(request):
+    """Donde Diego da los sellos (30-10-2026). WhatsApp: el dueño manda desde
+    su número un mensaje con su código al WhatsApp de ServiPlace; aquí se
+    confirma después de ver en el chat que llegó desde ESE número. Salud y SEC:
+    se revisan en el registro público, con el enlace a mano."""
+    if not request.user.is_staff:
+        raise Http404  # no se anuncia que existe
+    campos = {'whatsapp': 'whatsapp_confirmado_en', 'salud': 'registro_salud_comprobado_en',
+              'sec': 'licencia_sec_comprobada_en'}
+    if request.method == 'POST':
+        campo = campos.get(request.POST.get('sello', ''))
+        provider = Provider.objects.filter(pk=request.POST.get('perfil', '0') or 0).first() \
+            if (request.POST.get('perfil') or '').isdigit() else None
+        if campo and provider:
+            dar = request.POST.get('accion') != 'quitar'
+            Provider.objects.filter(pk=provider.pk).update(**{campo: timezone.now() if dar else None})
+            messages.success(request, f'{"Listo" if dar else "Quitado"}: {provider.business_name}.')
+        return redirect('accounts:comprobaciones')
+
+    publicos = Provider.objects.publicos().select_related('commune').order_by('-created_at')
+    return render(request, 'accounts/comprobaciones.html', {
+        'whatsapp': [
+            {'p': p, 'numero': formatear_telefono(p.whatsapp_number)}
+            for p in publicos.filter(whatsapp_confirmado_en__isnull=True)
+        ],
+        'salud': publicos.exclude(health_registry='').filter(registro_salud_comprobado_en__isnull=True),
+        'sec': publicos.exclude(licencia_sec='').filter(licencia_sec_comprobada_en__isnull=True),
+        'recientes': publicos.filter(
+            Q(whatsapp_confirmado_en__isnull=False) | Q(registro_salud_comprobado_en__isnull=False)
+            | Q(licencia_sec_comprobada_en__isnull=False)).order_by('-updated_at')[:20],
+        'url_rnpi': 'https://rnpi.superdesalud.gob.cl/',
+        'url_sec': 'https://www.chileatiende.gob.cl/fichas/67276-buscador-de-instaladores-electricos-y-de-gas-autorizados-por-la-sec',
+        'page_title': 'Comprobaciones | ServiPlace',
         'robots': 'noindex',
     })
 

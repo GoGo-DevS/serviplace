@@ -1,3 +1,6 @@
+import secrets
+from urllib.parse import urlencode
+
 from django.conf import settings
 from django.db import models
 from django.urls import reverse
@@ -107,11 +110,28 @@ class Category(models.Model):
         return self.seo_nombre or self.name
 
     @property
+    def pide_licencia_sec(self):
+        return self.slug in RUBROS_SEC
+
+    @property
     def group_slug(self):
         return self.GROUP_SLUGS.get(self.group, '')
 
     def get_absolute_url(self):
         return reverse('directory:listado_rubro', kwargs={'rubro': self.slug})
+
+
+# Rubros donde la SEC autoriza a quien trabaja (electricidad, gas). La licencia
+# se comprueba a mano en el buscador público de la SEC (30-10-2026).
+RUBROS_SEC = {'electricidad', 'gasfiteria', 'climatizacion'}
+
+
+def _digitos(valor):
+    return ''.join(c for c in (valor or '') if c.isdigit())
+
+
+def nuevo_codigo():
+    return f'SP-{secrets.randbelow(9000) + 1000}'
 
 
 class ProviderQuerySet(models.QuerySet):
@@ -135,6 +155,13 @@ class ProviderQuerySet(models.QuerySet):
         """
         otros = Provider.otras_categorias.through.objects.filter(category=categoria).values('provider_id')
         return self.filter(models.Q(category=categoria) | models.Q(pk__in=otros))
+
+    def por_confianza(self):
+        """Destacados, verificados y con WhatsApp confirmado primero. Confirmar
+        el WhatsApp sube en los listados: es el incentivo para hacerlo."""
+        return self.annotate(wa_confirmado=models.ExpressionWrapper(
+            models.Q(whatsapp_confirmado_en__isnull=False), output_field=models.BooleanField(),
+        )).order_by('-is_featured', '-is_verified', '-wa_confirmado', 'business_name', 'pk')
 
     def del_grupo(self, grupo):
         otros = Provider.otras_categorias.through.objects.filter(category__group=grupo).values('provider_id')
@@ -217,6 +244,15 @@ class Provider(models.Model):
     attends_home = models.BooleanField('atiende a domicilio', default=False)
     attends_office = models.BooleanField('atiende en consulta o local', default=False)
     attends_online = models.BooleanField('atiende online', default=False)
+    # 30-10-2026 — Sellos que dicen QUÉ se comprobó, en vez de un "verificado"
+    # genérico para todos (Diego: "que los que se inscriban ya vengan
+    # verificados"; un sello que no comprueba nada sería una promesa falsa).
+    # Cambiar el dato borra su sello: lo comprobado era el dato anterior.
+    whatsapp_codigo = models.CharField(max_length=10, blank=True)
+    whatsapp_confirmado_en = models.DateTimeField(null=True, blank=True)
+    registro_salud_comprobado_en = models.DateTimeField(null=True, blank=True)
+    licencia_sec = models.CharField('licencia SEC', max_length=60, blank=True)
+    licencia_sec_comprobada_en = models.DateTimeField(null=True, blank=True)
     is_verified = models.BooleanField(default=False)
     is_featured = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
@@ -259,6 +295,19 @@ class Provider(models.Model):
         return self.business_name
 
     def save(self, *args, **kwargs):
+        if self.pk and kwargs.get('update_fields') is None:
+            antes = Provider.objects.filter(pk=self.pk).values(
+                'whatsapp_number', 'health_registry', 'licencia_sec').first()
+            if antes:
+                if _digitos(antes['whatsapp_number']) != _digitos(self.whatsapp_number):
+                    self.whatsapp_confirmado_en = None
+                    self.whatsapp_codigo = ''
+                if (antes['health_registry'] or '') != (self.health_registry or ''):
+                    self.registro_salud_comprobado_en = None
+                if (antes['licencia_sec'] or '') != (self.licencia_sec or ''):
+                    self.licencia_sec_comprobada_en = None
+        if not self.whatsapp_codigo:
+            self.whatsapp_codigo = nuevo_codigo()
         if not self.slug:
             nombre = slugify(self.business_name)
             comuna = slugify(self.commune.name)
@@ -350,6 +399,36 @@ class Provider(models.Model):
     @property
     def pide_registro_salud(self):
         return any(c.pide_registro_salud for c in self.rubros)
+
+    @property
+    def pide_licencia_sec(self):
+        return any(c.pide_licencia_sec for c in self.rubros)
+
+    @property
+    def whatsapp_confirmado(self):
+        return self.whatsapp_confirmado_en is not None
+
+    @property
+    def registro_salud_comprobado(self):
+        return bool(self.registro_salud_comprobado_en and self.health_registry)
+
+    @property
+    def licencia_sec_comprobada(self):
+        return bool(self.licencia_sec_comprobada_en and self.licencia_sec)
+
+    @property
+    def tiene_sellos(self):
+        return self.whatsapp_confirmado or self.registro_salud_comprobado or self.licencia_sec_comprobada
+
+    @property
+    def url_confirmar_whatsapp(self):
+        """El mensaje que el dueño manda desde SU WhatsApp al de ServiPlace. Que
+        llegue desde ese número, con ese código, es lo que se comprueba."""
+        numero = settings.DEFAULT_CONTACT_WHATSAPP
+        if not numero or not self.whatsapp_codigo:
+            return ''
+        texto = f'Hola, confirmo mi WhatsApp en ServiPlace. Código: {self.whatsapp_codigo} ({self.business_name})'
+        return f'https://wa.me/{numero}?{urlencode({"text": texto})}'
 
 
 class ProviderImage(models.Model):

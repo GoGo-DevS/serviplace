@@ -127,6 +127,7 @@
             <div class="col-md-6">{% include "accounts/_campo.html" with campo=form.institution %}</div>
             <div class="col-md-4">{% include "accounts/_campo.html" with campo=form.graduation_year %}</div>
             <div class="col-md-8" data-solo-salud>{% include "accounts/_campo.html" with campo=form.health_registry %}</div>
+            <div class="col-md-8" data-solo-sec>{% include "accounts/_campo.html" with campo=form.licencia_sec %}</div>
           </div>
 
           <h3 class="form-section-title">Contacto y ubicación</h3>
@@ -202,6 +203,7 @@
     if (!select) return;
     var info = JSON.parse(document.getElementById('categorias-info').textContent);
     var saludEl = document.querySelector('[data-solo-salud]');
+    var secEl = document.querySelector('[data-solo-sec]');
     var otros = Array.prototype.slice.call(document.querySelectorAll('[data-otro-rubro]'));
     var avisoOtros = document.querySelector('[data-otros-aviso]');
     var MAX_OTROS = {{ form.max_otros }};
@@ -234,6 +236,8 @@
       // El registro de salud aparece si CUALQUIERA de los rubros es de salud.
       var salud = (c && c.salud) || marcados.some(function (o) { var i = info[o.value]; return i && i.salud; });
       if (saludEl) saludEl.hidden = !salud;
+      var sec = (c && c.sec) || marcados.some(function (o) { var i = info[o.value]; return i && i.sec; });
+      if (secEl) secEl.hidden = !sec;
       var ej = EJEMPLOS[c ? c.grupo : ''];
       if (ej) { titulo.placeholder = ej[0]; institucion.placeholder = ej[1]; }
     }
