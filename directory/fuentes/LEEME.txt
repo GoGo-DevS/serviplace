@@ -1,0 +1,5 @@
+Fuentes para dibujar la historia de Instagram (directory/historia.py, 02-11-2026).
+Son las mismas de static/fonts/ (subconjunto latin, licencia SIL Open Font
+License 1.1: ver static/fonts/LICENCIAS.txt), pasadas de woff2 a ttf con
+fontTools para no depender de que el Pillow del servidor sepa leer woff2.
+No se sirven al público: no van en static/.

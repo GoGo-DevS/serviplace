@@ -1,3 +1,5 @@
+from urllib.parse import urlencode
+
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login
@@ -119,7 +121,7 @@ def register(request):
 @login_required
 def dashboard(request):
     my_providers = Provider.objects.filter(owner=request.user).select_related('category', 'commune').prefetch_related(
-        'otras_categorias')
+        'otras_categorias', 'images')  # images: la versión de la historia de Instagram las cuenta
     profile, _ = UserProfile.objects.get_or_create(user=request.user)
     claims = ProviderReport.objects.filter(claimant=request.user, kind=ProviderReport.CLAIM).select_related('provider')
     total_views = sum(p.views_count for p in my_providers)
@@ -344,10 +346,24 @@ def claim_profile(request, slug):
 
 def hazte_verificado(request):
     wa_number = settings.DEFAULT_CONTACT_WHATSAPP
-    wa_message = 'Hola, quiero verificar mi perfil en ServiPlace.'
-    wa_url = f'https://wa.me/{wa_number}?text={wa_message.replace(" ", "%20")}' if wa_number else ''
+    # 02-11-2026: el mensaje decía solo "quiero verificar mi perfil" y Diego no
+    # sabía de qué perfil se trataba (le pasó con el primero que se inscribió
+    # solo). Si quien lo pide ya tiene perfil, el mensaje dice cuál es y lleva
+    # su código: como llega desde su número, con ese mismo mensaje también se
+    # le puede confirmar el WhatsApp en /cuenta/comprobaciones/.
+    perfil = None
+    if request.user.is_authenticated:
+        perfil = Provider.objects.publicos().filter(owner=request.user).order_by('is_verified', '-created_at').first()
+    if perfil:
+        wa_message = f'Hola, quiero verificar mi perfil en ServiPlace: {perfil.business_name}, {settings.SITE_URL}{perfil.get_absolute_url()}'
+        if perfil.whatsapp_codigo:
+            wa_message += f' Código: {perfil.whatsapp_codigo}'
+    else:
+        wa_message = 'Hola, quiero verificar mi perfil en ServiPlace.'
+    wa_url = f'https://wa.me/{wa_number}?{urlencode({"text": wa_message})}' if wa_number else ''
     return render(request, 'accounts/hazte_verificado.html', {
         'wa_url': wa_url,
+        'perfil': perfil,
         'page_title': 'Perfil Verificado | ServiPlace',
         'meta_description': 'Qué es el perfil verificado de ServiPlace, qué incluye y cómo se obtiene.',
     })

@@ -236,6 +236,38 @@
         navigator.clipboard.writeText(texto).then(function () { aviso('Copiado'); }, function () { aviso('Cópialo desde la barra'); });
       });
     });
+    // Historia de Instagram (02-11-2026; directory/_historia.html). La imagen
+    // se baja al ABRIR el cuadro y no al tocar "Compartir": iOS solo deja
+    // compartir dentro del mismo toque, sin una descarga esperando de por
+    // medio. En el teléfono se comparte el archivo (Instagram aparece en el
+    // menú); en el computador se descarga.
+    document.querySelectorAll('[data-historia]').forEach(function (d) {
+      var abrir = document.querySelector('[data-historia-abrir="' + d.id + '"]');
+      if (!abrir || typeof d.showModal !== 'function') return;
+      var compartir = d.querySelector('[data-historia-compartir]');
+      var descargar = d.querySelector('[data-historia-descargar]');
+      var archivo = null;
+      var telefono = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+      abrir.addEventListener('click', function (e) {
+        e.preventDefault();
+        var img = d.querySelector('img');
+        if (!img.getAttribute('src')) img.src = d.dataset.src;
+        d.showModal();
+        if (archivo || !telefono || !window.fetch || !window.File || !navigator.canShare) return;
+        fetch(d.dataset.src).then(function (r) { return r.blob(); }).then(function (b) {
+          var f = new File([b], descargar.getAttribute('download'), { type: 'image/jpeg' });
+          if (!navigator.canShare({ files: [f] })) return;
+          archivo = f;
+          compartir.hidden = false;
+          descargar.hidden = true;
+        }).catch(function () {});
+      });
+      compartir.addEventListener('click', function () {
+        if (archivo) navigator.share({ files: [archivo] }).catch(function () {});
+      });
+      d.querySelector('[data-historia-cerrar]').addEventListener('click', function () { d.close(); });
+      d.addEventListener('click', function (e) { if (e.target === d) d.close(); });
+    });
   </script>
   {% block extra_js %}{% endblock %}
 </body>

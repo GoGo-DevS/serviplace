@@ -550,3 +550,35 @@ las que necesitan cámara: C4/C1 (suegro, con permiso), C5 (pantalla del
 celular), C10, C27, C28. GA4: contacto_whatsapp, publicar_perfil y sign_up
 quedaron marcados como eventos clave. No se lanzó ningún anuncio.
 ---
+
+[02-11-2026] Primer inscrito que llegó solo: Aníbal (Midnight Studio, diseño
+gráfico, Quilicura). Mandó "quiero verificar mi perfil" desde el botón de
+Hazte Verificado, sin decir cuál ni traer código: no había cómo confirmarle
+el WhatsApp con ese mensaje. Arreglo: si quien lo pide tiene perfil, el
+mensaje lleva nombre, enlace y "Código: SP-####".
+
+Historia de Instagram con la ficha (pedido de Diego: "una ficha para
+compartir fácil en IG como storie, y que eso se pegue"):
+  · /prestadores/<slug>/historia.jpg: JPEG 1080x1920 dibujado con Pillow en
+    el servidor (directory/historia.py), fuentes del sitio pasadas a ttf en
+    directory/fuentes/. Tarjeta con rubro, comuna, foto o inicial, nombre,
+    profesión, descripción, sellos, otros rubros, modalidades, 3 fotos de
+    trabajos y "Contactar por WhatsApp"; abajo "serviplace.cl". Todo dentro de
+    la zona segura de Instagram (250-1700). Sin emojis ni teléfono.
+  · Caché por Provider.version_historia (incluye los sellos: se dan con
+    .update() y no tocan updated_at). Con la ?v= vigente, max-age de un día.
+  · Botón "Historia de Instagram" en la ficha y "Compartir en Instagram" en
+    el panel: cuadro con la vista previa, 1) compartir la imagen (en el
+    teléfono, menú nativo con Instagram; en el computador, descarga) y
+    2) copiar el link con utm_source=instagram&utm_medium=historia.
+  · El "pegue": quien llega desde una historia ve en la ficha "¿Tú también
+    ofreces un servicio? Publica gratis" (evento clic_publicar, origen
+    historia). Eventos nuevos: abrir_historia, compartir_historia.
+  · La fila de compartir no hacía wrap: con el tercer botón se salía por la
+    derecha en el teléfono. Arreglada. El aviso iba en la columna de
+    contacto y la tarjeta sticky lo tapaba al bajar: va bajo "Compartir".
+Pruebas: 286 (14 nuevas), 6 mutaciones detectadas. QA en navegador local:
+cuadro en escritorio y en 390 px sin scroll horizontal, sin errores JS.
+INCONCLUSO: el botón "Compartir imagen" solo aparece en un teléfono real
+(el Chromium de prueba no tiene navigator.canShare con archivos).
+---

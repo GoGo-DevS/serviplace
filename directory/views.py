@@ -1,9 +1,10 @@
 from urllib.parse import quote
 
 from django.conf import settings
+from django.core.cache import cache
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db.models import Count, F, Prefetch, Q
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
@@ -15,6 +16,7 @@ from core import guias
 from . import seo
 from .busqueda import rubros_de_la_busqueda
 from .catalogo import categorias_por_grupo, grupos_de, perfiles_por_rubro
+from .historia import dibujar as dibujar_historia
 from .models import Category, Commune, Provider, ProviderImage, Region
 
 # Cuántos prestadores por página. 24 entra en 3 columnas en escritorio y en 2
@@ -333,8 +335,35 @@ def provider_detail(request, slug):
         'og_title': f'{provider.business_name} en SERVIPLACE',
         'og_image': og_image,
         'og_description': provider.short_description,
+        # Llegó tocando el enlace de una historia de Instagram (02-11-2026):
+        # entre los seguidores de un independiente hay otros independientes, y
+        # a ellos se les invita a publicar. Así la historia trae oferta, no solo visitas.
+        'desde_historia': request.GET.get('utm_medium') == 'historia',
     }
     return render(request, 'directory/provider_detail.html', context)
+
+
+def historia(request, slug):
+    """La historia de Instagram de la ficha (directory/historia.py), en JPEG.
+    Se guarda en la caché por versión: la piden el cuadro de compartir y la
+    vista previa, y dibujarla con fotos de R2 no es gratis en el plan free."""
+    provider = get_object_or_404(
+        Provider.objects.publicos().select_related('category', 'commune').prefetch_related(
+            'images', 'otras_categorias'),
+        slug=slug,
+    )
+    version = provider.version_historia
+    clave = f'historia:{provider.pk}:{version}'
+    imagen = cache.get(clave)
+    if imagen is None:
+        imagen = dibujar_historia(provider)
+        cache.set(clave, imagen, 60 * 60 * 24)
+    respuesta = HttpResponse(imagen, content_type='image/jpeg')
+    # Con la ?v= de la versión actual la imagen no cambia: el navegador la guarda un día.
+    respuesta['Cache-Control'] = f'public, max-age={86400 if request.GET.get("v") == version else 300}'
+    respuesta['Content-Disposition'] = f'inline; filename="serviplace-{provider.slug}.jpg"'
+    respuesta['X-Robots-Tag'] = 'noindex'
+    return respuesta
 
 
 def whatsapp_redirect(request, slug):

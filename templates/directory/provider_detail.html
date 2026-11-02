@@ -161,7 +161,19 @@
           Enviar a alguien
         </a>
         <button class="share-btn" type="button" data-copiar="">Copiar enlace</button>
+        {% include "directory/_historia.html" with provider=provider origen="ficha" %}
       </div>
+      {% comment %}
+      Aquí y no en la columna de contacto: esa tarjeta es sticky en escritorio
+      y al bajar se montaba encima de este aviso.
+      {% endcomment %}
+      {% if desde_historia %}
+      <div class="desde-historia mt-3">
+        <b>¿Tú también ofreces un servicio?</b>
+        <p>Publica tu ficha gratis y compártela en tus historias, igual que {{ provider.business_name }}.</p>
+        <a class="btn btn-primary btn-sm" href="{% url 'core:para_profesionales' %}" data-ga="clic_publicar" data-ga-categoria="{{ provider.category.slug }}" data-ga-origen="historia">Publicar gratis</a>
+      </div>
+      {% endif %}
 
     </div>
 

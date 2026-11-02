@@ -13,4 +13,5 @@ urlpatterns = [
     path('servicios/<slug:rubro>/<slug:comuna>/', views.listado_rubro_comuna, name='listado_rubro_comuna'),
     path('prestadores/<slug:slug>/', views.provider_detail, name='provider_detail'),
     path('prestadores/<slug:slug>/whatsapp/', views.whatsapp_redirect, name='whatsapp_redirect'),
+    path('prestadores/<slug:slug>/historia.jpg', views.historia, name='historia'),
 ]

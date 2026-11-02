@@ -155,3 +155,23 @@ class Sellos(TestCase):
         html = self.client.get(reverse('core:trust_and_safety')).content.decode()
         for sello in ('WhatsApp confirmado', 'Registro de salud comprobado', 'Licencia SEC comprobada'):
             self.assertIn(sello, html)
+
+    def _texto_hazte_verificado(self):
+        url = self.client.get(reverse('accounts:hazte_verificado')).context['wa_url']
+        self.assertTrue(url.startswith('https://wa.me/56911112222?'))
+        return parse_qs(urlparse(url).query)['text'][0]
+
+    def test_hazte_verificado_dice_que_perfil_es_y_lleva_su_codigo(self):
+        # 02-11-2026: llegó "quiero verificar mi perfil" sin decir cuál, y sin
+        # código no había cómo confirmar el WhatsApp con ese mismo mensaje.
+        p = self._perfil('Midnight Studio')
+        self.client.force_login(self.dueno)
+        texto = self._texto_hazte_verificado()
+        self.assertIn('Midnight Studio', texto)
+        self.assertIn(p.get_absolute_url(), texto)
+        self.assertIn(f'Código: {p.whatsapp_codigo}', texto)
+
+    def test_hazte_verificado_sin_perfil_pide_los_datos_como_antes(self):
+        self.assertEqual(self._texto_hazte_verificado(), 'Hola, quiero verificar mi perfil en ServiPlace.')
+        self.client.force_login(self.dueno)  # con cuenta pero sin perfil publicado
+        self.assertEqual(self._texto_hazte_verificado(), 'Hola, quiero verificar mi perfil en ServiPlace.')

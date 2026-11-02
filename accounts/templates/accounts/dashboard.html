@@ -80,6 +80,7 @@
               </div>
               {% endif %}
               <div class="d-flex flex-wrap gap-2">
+                {% if provider.is_active %}{% include "directory/_historia.html" with provider=provider origen="panel" clase="btn btn-sm btn-primary d-inline-flex align-items-center gap-1" texto="Compartir en Instagram" %}{% endif %}
                 <a class="btn btn-sm btn-outline-primary" href="{{ provider.get_absolute_url }}">Ver perfil</a>
                 <a class="btn btn-sm btn-outline-primary" href="{% url 'accounts:provider_edit' provider.slug %}">Editar</a>
                 {% if not provider.is_verified %}

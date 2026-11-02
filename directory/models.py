@@ -1,3 +1,4 @@
+import hashlib
 import secrets
 from urllib.parse import urlencode
 
@@ -429,6 +430,32 @@ class Provider(models.Model):
             return ''
         texto = f'Hola, confirmo mi WhatsApp en ServiPlace. Código: {self.whatsapp_codigo} ({self.business_name})'
         return f'https://wa.me/{numero}?{urlencode({"text": texto})}'
+
+    @property
+    def version_historia(self):
+        """Cambia cuando cambia algo de lo que dibuja la historia de Instagram
+        (directory/historia.py). Los sellos se dan con .update(), que no toca
+        updated_at: por eso entran uno por uno y no basta con la fecha."""
+        from .historia import DISENO
+        partes = (
+            DISENO, self.business_name, self.category.name, self.commune.name, self.profession_title,
+            self.sector, self.short_description, self.foto.name if self.foto else '', self.modalities,
+            [c.name for c in self.rubros[1:]], self.verificado_publico, self.whatsapp_confirmado,
+            self.registro_salud_comprobado, self.licencia_sec_comprobada,
+            [i.image.name for i in list(self.images.all())[:3]],
+        )
+        return hashlib.sha1(repr(partes).encode()).hexdigest()[:10]
+
+    @property
+    def url_historia(self):
+        return reverse('directory:historia', kwargs={'slug': self.slug}) + f'?v={self.version_historia}'
+
+    @property
+    def enlace_historia(self):
+        """El que se pega en el sticker de enlace: marcado para que GA4 cuente
+        cuántas visitas trae cada historia (fuente instagram, medio historia)."""
+        return (f'{settings.SITE_URL}{self.get_absolute_url()}'
+                '?utm_source=instagram&utm_medium=historia&utm_campaign=ficha')
 
 
 class ProviderImage(models.Model):
