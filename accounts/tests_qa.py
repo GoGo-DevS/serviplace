@@ -31,10 +31,19 @@ class FormulariosConElEstiloDelSitio(TestCase):
 
 
 class FirmaGoGoDevS(TestCase):
+    """02-11-2026, consejo SEO de Jorge Urzua: el enlace a GoGoDevS lleva la
+    palabra clave como texto ("Desarrollo web"), no la marca, y apunta a
+    https://www.gogodevs.cl/ sin utm ni nofollow. En el pie y en /links/."""
 
     def test_el_pie_enlaza_a_gogodevs(self):
         html = self.client.get(reverse('core:home')).content.decode()
-        self.assertIn('https://gogodevs.cl/?utm_source=serviplace', html)
+        self.assertIn('<a class="firma-gogodevs" href="https://www.gogodevs.cl/" target="_blank" rel="noopener">Desarrollo web</a> por GoGoDevS', html)
+        self.assertNotIn('Hecho en Chile por', html)
+
+    def test_el_tree_enlaza_a_gogodevs(self):
+        html = self.client.get(reverse('core:links')).content.decode()
+        self.assertIn('<a href="https://www.gogodevs.cl/" target="_blank" rel="noopener" data-tree>Desarrollo web</a> por GoGoDevS', html)
+        self.assertNotIn('Hecho en Chile por', html)
 
 
 class ElFormularioSeAdaptaAlRubro(TestCase):
