@@ -294,6 +294,24 @@ def comprobaciones(request):
 
 
 @login_required
+def historias(request):
+    """La historia de Instagram de cada ficha pública, en una sola página
+    (03-11-2026). Diego las sube a @serviplace.cl una por cliente; cada una
+    tiene su cuadro para compartir, descargar y copiar el link del sticker."""
+    if not request.user.is_staff:
+        raise Http404  # no se anuncia que existe
+    fichas = (Provider.objects.publicos()
+              .select_related('category', 'commune')
+              .prefetch_related('otras_categorias', 'images')
+              .order_by('-created_at'))
+    return render(request, 'accounts/historias.html', {
+        'fichas': fichas,
+        'page_title': 'Historias | ServiPlace',
+        'robots': 'noindex',
+    })
+
+
+@login_required
 def claim_profile(request, slug):
     """
     Reclamar NO asigna el perfil al instante: cualquiera con cuenta podría quedarse con el

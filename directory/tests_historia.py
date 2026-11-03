@@ -17,7 +17,9 @@ from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.core.files.base import ContentFile
 from django.core.management import call_command
+from django.db import connection
 from django.test import TestCase, override_settings
+from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
 from django.utils import timezone
 from PIL import Image
@@ -151,6 +153,14 @@ class HistoriaDeInstagram(TestCase):
         self.assertIn(self.p.url_historia, html)
         self.assertIn('utm_source=instagram&amp;utm_medium=historia', html)
 
+    def test_cualquier_visitante_la_ve_arriba_sin_ser_el_dueno(self):
+        # 03-11: abajo quedaba a dos pantallas y parecía cosa del dueño.
+        html = self.client.get(self.p.get_absolute_url()).content.decode()
+        boton = f'data-historia-abrir="historia-{self.p.slug}"'
+        self.assertEqual(html.count(boton), 2)  # arriba y en "Compartir este perfil"
+        self.assertEqual(html.count(f'<dialog class="historia-dialogo" id="historia-{self.p.slug}"'), 1)
+        self.assertLess(html.index(boton), html.index('Sobre este servicio'))
+
     def test_quien_llega_desde_una_historia_ve_la_invitacion_a_publicar(self):
         invitacion = '¿Tú también ofreces un servicio?'
         self.assertNotContains(self.client.get(self.p.get_absolute_url()), invitacion)
@@ -166,3 +176,38 @@ class HistoriaDeInstagram(TestCase):
         html = self.client.get(reverse('accounts:dashboard')).content.decode()
         self.assertIn(f'data-historia-abrir="historia-{self.p.slug}"', html)
         self.assertNotIn(f'data-historia-abrir="historia-{apagado.slug}"', html)
+
+    def _otro(self, nombre, **extra):
+        return Provider.objects.create(
+            owner=self.dueno, business_name=nombre, category=self.cat, commune=self.maipu,
+            short_description='Otro servicio.', whatsapp_number='56933333333', **dict({'is_active': True}, **extra))
+
+    def test_la_pagina_de_historias_es_solo_del_staff_y_trae_cada_ficha_publica(self):
+        apagado = self._otro('Perfil apagado', is_active=False)
+        url = reverse('accounts:historias')
+        self.assertEqual(self.client.get(url).status_code, 302)  # sin sesión: al login
+        self.client.force_login(self.dueno)
+        self.assertEqual(self.client.get(url).status_code, 404)  # un profesional no la ve
+        self.client.force_login(User.objects.create_user('diego', password='otra-clave-larga-99', is_staff=True))
+        respuesta = self.client.get(url)
+        self.assertEqual(respuesta.status_code, 200)
+        self.assertContains(respuesta, self.p.url_historia)
+        self.assertContains(respuesta, f'<dialog class="historia-dialogo" id="historia-{self.p.slug}"')
+        self.assertContains(respuesta, self.p.enlace_historia.replace('&', '&amp;'))
+        self.assertNotContains(respuesta, f'historia-{apagado.slug}')
+        self.assertContains(respuesta, 'noindex')
+
+    def test_la_pagina_de_historias_no_hace_una_consulta_por_ficha(self):
+        self.client.force_login(User.objects.create_user('diego', password='otra-clave-larga-99', is_staff=True))
+        url = reverse('accounts:historias')
+        self.client.get(url)  # lo que se carga una sola vez por sesión
+        with CaptureQueriesContext(connection) as con_una:
+            self.client.get(url)
+        otro_rubro = Category.objects.exclude(pk=self.cat.pk).first()
+        for i, color in enumerate((ROJO, AZUL)):
+            otro = self._otro(f'Otro {i}')
+            otro.otras_categorias.add(otro_rubro)
+            ProviderImage(provider=otro).image.save(f'trabajo-{i}.png', png(color))
+        with CaptureQueriesContext(connection) as con_tres:
+            self.client.get(url)
+        self.assertEqual(len(con_tres), len(con_una))

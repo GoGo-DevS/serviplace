@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% comment %}Solo staff. La historia de cada ficha pública, para subirlas a @serviplace.cl una por cliente.{% endcomment %}
+{% block content %}
+<section class="page-header">
+  <div class="container py-4">
+    <h1 class="h2 mb-1">Historias</h1>
+    <p class="text-muted mb-0">La historia de Instagram de cada ficha pública. Compártela, súbela a la historia y pega su link en el sticker «Enlace».</p>
+  </div>
+</section>
+
+<section class="container py-4">
+  <div class="historias-grid">
+    {% for provider in fichas %}
+    <article class="historia-ficha">
+      <img src="{{ provider.url_historia }}" alt="Historia de {{ provider.business_name }}" width="1080" height="1920" loading="lazy">
+      <h2 class="h6 mb-0"><a href="{{ provider.get_absolute_url }}" target="_blank" rel="noopener">{{ provider.business_name }}</a></h2>
+      <p class="text-muted mb-2">{{ provider.category.name }} · {{ provider.commune.name }}</p>
+      {% include "directory/_historia.html" with provider=provider origen="historias" clase="btn btn-primary btn-sm d-inline-flex align-items-center gap-2" texto="Compartir" %}
+    </article>
+    {% empty %}
+    <p class="text-muted">Todavía no hay fichas públicas.</p>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

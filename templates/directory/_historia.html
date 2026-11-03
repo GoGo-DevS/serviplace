@@ -1,13 +1,16 @@
 {% comment %}
 Historia de Instagram con la ficha (02-11-2026; la imagen la dibuja
 directory/historia.py). Recibe `provider`, `origen` (ficha o panel) y,
-opcional, `clase` y `texto` del botón que abre el cuadro. Sin <dialog> en el
-navegador, el botón abre la imagen sola. El comportamiento está en base.html.
+opcional, `clase` y `texto` del botón que abre el cuadro. Con `solo_boton`
+pone otro botón para un cuadro que ya está en la página (la ficha tiene uno
+arriba y otro en "Compartir este perfil"). Sin <dialog> en el navegador, el
+botón abre la imagen sola. El comportamiento está en base.html.
 {% endcomment %}
 <a class="{{ clase|default:'share-btn' }}" href="{{ provider.url_historia }}" target="_blank" rel="noopener" data-historia-abrir="historia-{{ provider.slug }}" data-ga="abrir_historia" data-ga-categoria="{{ provider.category.slug }}" data-ga-origen="{{ origen }}">
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
   {{ texto|default:"Historia de Instagram" }}
 </a>
+{% if not solo_boton %}
 <dialog class="historia-dialogo" id="historia-{{ provider.slug }}" aria-labelledby="historia-{{ provider.slug }}-titulo" data-historia data-src="{{ provider.url_historia }}">
   <div class="historia-cuerpo">
     <button class="historia-cerrar" type="button" data-historia-cerrar aria-label="Cerrar">&times;</button>
@@ -29,3 +32,4 @@ navegador, el botón abre la imagen sola. El comportamiento está en base.html.
     </div>
   </div>
 </dialog>
+{% endif %}

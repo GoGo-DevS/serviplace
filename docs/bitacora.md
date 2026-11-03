@@ -582,3 +582,23 @@ cuadro en escritorio y en 390 px sin scroll horizontal, sin errores JS.
 INCONCLUSO: el botón "Compartir imagen" solo aparece en un teléfono real
 (el Chromium de prueba no tiene navigator.canShare con archivos).
 ---
+
+## [03-11-2026] Historia de Instagram: cualquiera la comparte, y una página con todas
+Diego: "lo único que la pueden generar son los dueños... quiero compartir la
+tarjeta de mis amigos (diseñador, abogados) y no puedo sin la cuenta de ellos".
+No era un permiso: el botón ya estaba en la ficha pública, sin login, pero en
+el celular quedaba a 2 pantallas (y=1711 de 3368), dentro de "Compartir este
+perfil". Nadie lo encontraba, ni Diego.
+  · Botón "Compartir en tu historia" arriba en la ficha, bajo las modalidades
+    (y=493 en 390x844: se ve sin bajar). Abre el MISMO cuadro: el parcial
+    _historia.html acepta solo_boton y base.html engancha todos los botones
+    de un cuadro (antes, solo el primero).
+  · /cuenta/historias/ (solo staff, 404 para los demás): la historia de cada
+    ficha pública con su botón Compartir, para subirlas a @serviplace.cl una
+    por cliente ("así por cliente"). Sin consultas por fila (prefetch de
+    rubros y fotos, probado con 1 vs 3 fichas). En el menú de staff.
+Pruebas: 3 nuevas; 5 mutaciones detectadas (sin botón arriba, cuadro
+duplicado, sin control de staff, sin prefetch, perfiles apagados). QA local:
+los 2 botones abren el cuadro, 390 px sin scroll horizontal, la página de
+historias carga las 12 imágenes, sin errores JS.
+---

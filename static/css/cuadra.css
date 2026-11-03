@@ -593,3 +593,9 @@ body:has(.historia-dialogo[open]) { overflow: hidden; }
 @media (max-width: 575.98px) { .share-row > span { flex-basis: 100%; } }
 .desde-historia { padding: 1rem 1.1rem; border: 2px dashed var(--sp-accent-deco); border-radius: var(--sp-r-md); background: #fff; font-size: .9rem; }
 .desde-historia p { margin: .3rem 0 .7rem; color: var(--sp-slate); }
+
+/* Historias de todas las fichas (solo staff, /cuenta/historias/) */
+.historias-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 1.5rem 1rem; }
+.historia-ficha > img { display: block; width: 100%; height: auto; aspect-ratio: 9 / 16; margin-bottom: .6rem; border-radius: var(--sp-r-md); background: #1b1f24; }
+.historia-ficha > p { font-size: .85rem; }
+@media (max-width: 575.98px) { .historias-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
