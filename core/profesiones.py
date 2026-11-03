@@ -488,6 +488,33 @@ PROFESIONES = {
             ('¿ServiPlace se queda con parte del pago?', 'No. El acuerdo y el pago son directos entre tú y tu cliente.'),
         ],
     },
+    'estampado-y-ropa-personalizada': {
+        'clientes': 'clientes',
+        'titulo': 'Estampado y ropa personalizada: consigue pedidos',
+        'h1': 'Estampado y ropa personalizada: equipos, empresas y emprendedores de tu zona',
+        'meta': 'Publica gratis tu servicio de estampado: poleras, polerones y camisetas deportivas personalizadas. Muestra tus trabajos y recibe pedidos por WhatsApp.',
+        'intro': 'Quien busca estampado casi siempre tiene una fecha encima: el campeonato del equipo, el aniversario del curso, la despedida de la empresa o el lanzamiento de una marca de ropa. Antes de escribirte quiere ver cómo quedan tus prendas, saber si haces pocas unidades o solo por cantidad, y si trabajas con su diseño o lo creas tú.',
+        'buscan': [
+            'Camisetas de fútbol para equipos y ligas, con nombres, números y escudo.',
+            'Poleras y polerones para cursos, generaciones y eventos.',
+            'Ropa con logo para empresas, locales y emprendimientos.',
+            'Prendas únicas para regalar: una foto, una frase o un diseño propio.',
+        ],
+        'credencial': None,
+        'credencial_texto': 'Aquí no hay un registro que pedir: lo que convence son las prendas terminadas. Sube fotos de trabajos reales, ojalá puestos, y menciona dónde ver más, como tu Instagram.',
+        'tips': [
+            'Di qué técnicas usas: serigrafía, sublimación, vinilo textil, DTF o bordado.',
+            'Aclara si haces pedidos desde una unidad o desde cierta cantidad.',
+            'Cuenta si diseñas tú o trabajas con el diseño que te mandan.',
+            'Indica tus plazos habituales y si haces envíos o solo retiro.',
+        ],
+        'ejemplo_corta': 'Estampado de poleras y camisetas deportivas en La Florida: equipos, cursos y empresas.',
+        'ejemplo_larga': 'Hago estampado en serigrafía y sublimación: camisetas de fútbol con nombre y número, poleras para cursos y ropa con logo para emprendimientos. Puedo trabajar con tu diseño o armarlo contigo. Te muestro una prueba antes de producir y hago envíos a todo Chile. En mi Instagram ves trabajos terminados.',
+        'faq': [
+            ('¿Puedo publicar si además hago diseño gráfico?', 'Sí. Elige un rubro principal y marca el otro en «otros rubros»: apareces en los dos listados.'),
+            ('¿ServiPlace cobra por los pedidos que me lleguen?', 'No. Publicar es gratis y el pedido se acuerda directo contigo, sin comisión.'),
+        ],
+    },
     'fotografia-y-video': {
         'clientes': 'clientes',
         'titulo': 'Fotógrafo independiente: consigue clientes',

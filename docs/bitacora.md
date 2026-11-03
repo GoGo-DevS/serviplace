@@ -602,3 +602,27 @@ duplicado, sin control de staff, sin prefetch, perfiles apagados). QA local:
 los 2 botones abren el cuadro, 390 px sin scroll horizontal, la página de
 historias carga las 12 imágenes, sin errores JS.
 ---
+
+## [03-11-2026] Rubro nuevo: Estampado y ropa personalizada
+Un amigo de Diego (camisetas de fútbol retro, estampado, también diseño
+gráfico) no encontró su rubro al inscribirse y le preguntó a ChatGPT, que
+propuso renombrar "Diseño gráfico" a "Diseño Gráfico, Textil y Publicitario".
+No se hizo: rompe la URL y el SEO de /profesionales/diseno-grafico/ y mezcla
+dos búsquedas distintas (quien busca "estampado de poleras" no busca un
+logo). Se creó un rubro aparte; quien hace las dos marca la otra en "otros
+rubros" y aparece en los dos listados.
+  · estampado-y-ropa-personalizada (grupo profesional, 👕, seo "Estampado de
+    poleras"). Lo crea seed_categorias en el build: get_or_create, no pisa nada.
+  · Página de captación /profesionales/estampado-y-ropa-personalizada/ con
+    contenido propio (sin precios). Sinónimos de búsqueda: estampado, polera,
+    polerón, camiseta, sublimación, serigrafía, bordado, textil. El CV
+    reconoce "diseñador textil", serigrafista y estampador.
+  · Formulario: bajo "Rubro principal", "¿No está tu rubro? Elige el más
+    parecido y avísanos por WhatsApp para sumarlo" (evento rubro_faltante;
+    sin DEFAULT_CONTACT_WHATSAPP no se muestra).
+  · De paso: las páginas de rubro y las guías se salían 12 px por el lado en
+    el celular (row g-5: margen negativo mayor que el del contenedor; pasaba
+    también en producción). Ahora g-4 g-lg-5; 390 px exactos.
+Pruebas: 3 nuevas + la de contenido que exige página a cada rubro;
+4 mutaciones detectadas (sin sinónimos, sin patrón de CV, sin página, sin aviso).
+---

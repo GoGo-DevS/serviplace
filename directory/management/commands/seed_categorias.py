@@ -48,6 +48,7 @@ SEO_NOMBRES = {
     'manicure-y-estetica': 'Manicurista',
     'contabilidad': 'Contador',
     'diseno-grafico': 'Diseñador gráfico',
+    'estampado-y-ropa-personalizada': 'Estampado de poleras',
     'fotografia-y-video': 'Fotógrafo',
     'soporte-computacional': 'Técnico en computación',
     'desarrollo-web': 'Desarrollador web',
@@ -102,6 +103,11 @@ CATEGORIAS = [
 
     ('contabilidad', 'Contabilidad y trámites', 'Inicio de actividades, contabilidad para pymes, declaraciones y trámites.', '📊', P, False),
     ('diseno-grafico', 'Diseño gráfico', 'Logos, redes sociales, material impreso e identidad de marca.', '🖌️', P, False),
+    # 03-11-2026: un amigo de Diego (camisetas de fútbol, estampado) no encontró
+    # su rubro al inscribirse. Aparte de diseño gráfico: quien busca "estampado
+    # de poleras" no busca un logo. Quien hace las dos marca la otra en "otros rubros".
+    ('estampado-y-ropa-personalizada', 'Estampado y ropa personalizada',
+     'Poleras, polerones y camisetas deportivas personalizadas: estampado, sublimación y bordado por pedido.', '👕', P, False),
     ('fotografia-y-video', 'Fotografía y video', 'Eventos, productos, retratos y contenido para redes.', '📷', P, False),
     ('soporte-computacional', 'Soporte computacional', 'Reparación de computadores, redes, respaldos y formateo.', '💻', P, False),
     ('desarrollo-web', 'Desarrollo web y apps', 'Sitios web, tiendas online, apps y sistemas a medida para negocios.', '🌐', P, False),

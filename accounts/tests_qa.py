@@ -69,6 +69,19 @@ class ElFormularioSeAdaptaAlRubro(TestCase):
         self.assertTrue(info[str(Category.objects.get(slug='kinesiologia').pk)]['salud'])
         self.assertFalse(info[str(Category.objects.get(slug='desarrollo-web').pk)]['salud'])
 
+    def test_quien_no_encuentra_su_rubro_puede_avisar_y_estampado_existe(self):
+        # 03-11-2026: un amigo de Diego no encontró el suyo y le preguntó a ChatGPT.
+        from django.test import override_settings
+        from directory.models import Category
+        estampado = Category.objects.get(slug='estampado-y-ropa-personalizada')
+        with override_settings(DEFAULT_CONTACT_WHATSAPP='56911112222'):
+            html = self.client.get(reverse('accounts:provider_create')).content.decode()
+        self.assertIn(f'<option value="{estampado.pk}">Estampado y ropa personalizada</option>', html)
+        self.assertIn('href="https://wa.me/56911112222?text=Hola%2C%20no%20encuentro%20mi%20rubro', html)
+        with override_settings(DEFAULT_CONTACT_WHATSAPP=''):
+            sin_numero = self.client.get(reverse('accounts:provider_create')).content.decode()
+        self.assertNotIn('data-rubro-faltante', sin_numero)  # sin número, sin enlace roto
+
     def test_fuera_de_salud_el_registro_no_se_guarda(self):
         import time
         from django.core import signing

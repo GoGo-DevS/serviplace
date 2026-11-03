@@ -384,6 +384,13 @@ class RubrosNuevosEnElCV(TestCase):
         datos = proponer_perfil('Pedro Soto Lagos\nTécnico en computación\nFormateo y redes para hogares.\n')
         self.assertEqual(datos['category'], Category.objects.get(slug='soporte-computacional').pk)
 
+    def test_un_disenador_textil_queda_en_estampado_y_uno_grafico_no(self):
+        # 03-11-2026: el rubro nació porque un diseñador de camisetas no encontró el suyo.
+        textil = proponer_perfil('Matías Rojas Pino\nDiseñador textil\nSerigrafía y sublimación de camisetas deportivas.\n')
+        self.assertEqual(textil['category'], Category.objects.get(slug='estampado-y-ropa-personalizada').pk)
+        grafica = proponer_perfil('Andrea Castro Vidal\nDiseñadora gráfica\nLogos e identidad de marca.\n')
+        self.assertEqual(grafica['category'], Category.objects.get(slug='diseno-grafico').pk)
+
 
 class TildesCorridasDelPdf(TestCase):
     """20-10-2026: un perfil quedó publicado como "Ingeniero Inforḿatico". Los

@@ -58,7 +58,10 @@
           <div class="row g-3 mb-4">
             <div class="col-md-8">{% include "accounts/_campo.html" with campo=form.business_name %}</div>
             <div class="col-md-4">{% include "accounts/_campo.html" with campo=form.contact_name %}</div>
-            <div class="col-md-6">{% include "accounts/_campo.html" with campo=form.category %}</div>
+            <div class="col-md-6">{% include "accounts/_campo.html" with campo=form.category %}
+              {% comment %}03-11-2026: un amigo de Diego no encontró su rubro y terminó preguntándole a ChatGPT. Que nos avise a nosotros.{% endcomment %}
+              {% if DEFAULT_CONTACT_WHATSAPP %}<p class="form-text mt-1 mb-0" data-rubro-faltante>¿No está tu rubro? Elige el más parecido y <a href="https://wa.me/{{ DEFAULT_CONTACT_WHATSAPP }}?text={{ 'Hola, no encuentro mi rubro en ServiPlace. Lo que hago es: '|urlencode }}" target="_blank" rel="noopener" data-ga="rubro_faltante">avísanos por WhatsApp</a> para sumarlo.</p>{% endif %}
+            </div>
             <div class="col-md-6">{% include "accounts/_campo.html" with campo=form.commune %}</div>
             <div class="col-12">
               {% comment %}18-10-2026: un maestro hace varias cosas (construcción, gasfitería, electricidad, soldadura).{% endcomment %}

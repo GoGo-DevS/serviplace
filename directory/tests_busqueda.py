@@ -53,6 +53,14 @@ class BusquedaPorOficio(TestCase):
         for q, esperado in casos.items():
             self.assertIn(esperado, self._nombres(q), q)
 
+    def test_estampado_se_encuentra_por_la_prenda_y_no_se_mezcla_con_diseno(self):
+        # 03-11-2026: rubro nuevo; la gente escribe la prenda, no "ropa personalizada".
+        self._perfil('Camisetas Retro', 'estampado-y-ropa-personalizada')
+        self._perfil('Pedro Diseño', 'diseno-grafico')
+        for q in ('estampado de poleras', 'camisetas de fútbol personalizadas', 'polerones', 'sublimación'):
+            self.assertEqual(self._nombres(q), {'Camisetas Retro'}, q)
+        self.assertEqual(self._nombres('diseñador'), {'Pedro Diseño'})
+
     def test_tambien_por_un_rubro_extra(self):
         self._perfil('Maestro Juan', 'construccion', otras=['gasfiteria', 'soldadura'])
         self.assertEqual(self._nombres('soldador'), {'Maestro Juan'})

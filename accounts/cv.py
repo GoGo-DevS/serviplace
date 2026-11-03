@@ -230,6 +230,8 @@ PROFESIONES = [
     ('contabilidad', r'contador[a]?(?: auditor[a]?| public[oa])?|ingenier[oa] en contabilidad|'
                      r'tecnic[oa] en contabilidad', r'contabilidad|auditoria'),
     ('diseno-grafico', r'disenador[a]? grafic[oa]', r'diseno grafico'),
+    ('estampado-y-ropa-personalizada', r'disenador[a]? textil|serigrafista|estampador[a]?',
+     r'diseno textil|serigrafia|sublimacion textil|estampado textil'),
     ('fotografia-y-video', r'fotograf[oa]|realizador[a]? audiovisual|camarograf[oa]',
      r'fotografia|comunicacion audiovisual'),
     # 18-10-2026: rubros nuevos. Desarrollo va ANTES que soporte: "ingeniero en

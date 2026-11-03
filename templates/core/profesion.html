@@ -29,7 +29,7 @@ nombre del perfil de ejemplo es un <p> (no rompe el orden de títulos).
 </section>
 
 <section class="container py-5 profesion">
-  <div class="row g-5">
+  <div class="row g-4 g-lg-5">{# g-5 en el celular sacaba 12 px por el lado: su margen negativo es mayor que el del contenedor #}
     <div class="col-lg-7">
       <h2>Lo que buscan tus {{ c.clientes }}</h2>
       <ul class="profesion-lista">

@@ -41,6 +41,8 @@ SINONIMOS = {
     'tatuajes': ['tatuador', 'tattoo'],
     'contabilidad': ['contador', 'contadora', 'impuestos'],
     'diseno-grafico': ['disenador', 'disenadora', 'logo'],
+    'estampado-y-ropa-personalizada': ['estampado', 'estampar', 'polera', 'poleron', 'camiseta', 'sublimacion',
+                                       'serigrafia', 'bordado', 'textil'],
     'fotografia-y-video': ['fotografo', 'fotografa', 'camarografo', 'videografo'],
     'soporte-computacional': ['informatico', 'informatica', 'computador', 'notebook'],
     'desarrollo-web': ['informatico', 'informatica', 'programador', 'pagina web', 'sitio web', 'software'],
