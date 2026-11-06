@@ -167,6 +167,9 @@ class HistoriaDeInstagram(TestCase):
         desde_historia = self.client.get(self.p.get_absolute_url(), {'utm_medium': 'historia'})
         self.assertContains(desde_historia, invitacion)
         self.assertContains(desde_historia, reverse('core:para_profesionales'))
+        # 06-11: abajo (2,2 pantallas en el celular) nadie la tocó en 44 visitas.
+        html = desde_historia.content.decode()
+        self.assertLess(html.index(invitacion), html.index('Sobre este servicio'))
 
     def test_el_panel_la_ofrece_solo_para_los_perfiles_publicos(self):
         apagado = Provider.objects.create(

@@ -34,6 +34,19 @@
         compartir la ficha. Cualquiera puede, sin cuenta. El cuadro es el mismo.
         {% endcomment %}
         <div class="mt-3">{% include "directory/_historia.html" with provider=provider origen="ficha-arriba" solo_boton=True clase="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-2" texto="Compartir en tu historia" %}</div>
+        {% comment %}
+        06-11-2026: iba bajo "Compartir este perfil", a 2,2-2,5 pantallas en el
+        celular. De 44 visitas desde historias (28 días), 0 tocaron "Publicar
+        gratis": quien llega desde una historia mira la ficha y se va. Va aquí,
+        donde aterriza. Solo para esa visita (utm_medium=historia).
+        {% endcomment %}
+        {% if desde_historia %}
+        <div class="desde-historia mt-3">
+          <b>¿Tú también ofreces un servicio?</b>
+          <p>Publica tu ficha gratis y compártela en tus historias, igual que {{ provider.business_name }}.</p>
+          <a class="btn btn-primary btn-sm" href="{% url 'core:para_profesionales' %}" data-ga="clic_publicar" data-ga-categoria="{{ provider.category.slug }}" data-ga-origen="historia">Publicar gratis</a>
+        </div>
+        {% endif %}
       </div>
     </div>
   </div>
@@ -169,17 +182,6 @@
         <button class="share-btn" type="button" data-copiar="">Copiar enlace</button>
         {% include "directory/_historia.html" with provider=provider origen="ficha" %}
       </div>
-      {% comment %}
-      Aquí y no en la columna de contacto: esa tarjeta es sticky en escritorio
-      y al bajar se montaba encima de este aviso.
-      {% endcomment %}
-      {% if desde_historia %}
-      <div class="desde-historia mt-3">
-        <b>¿Tú también ofreces un servicio?</b>
-        <p>Publica tu ficha gratis y compártela en tus historias, igual que {{ provider.business_name }}.</p>
-        <a class="btn btn-primary btn-sm" href="{% url 'core:para_profesionales' %}" data-ga="clic_publicar" data-ga-categoria="{{ provider.category.slug }}" data-ga-origen="historia">Publicar gratis</a>
-      </div>
-      {% endif %}
 
     </div>
 
