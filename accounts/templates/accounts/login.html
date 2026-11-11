@@ -20,6 +20,18 @@
       {% endif %}
       <button type="submit" class="btn btn-primary w-100 btn-lg mt-2" data-enviando="Entrando…">Iniciar sesión</button>
     </form>
+    {% comment %}
+    11-11-2026: no había cómo recuperar la clave. El sitio todavía no envía
+    correos, así que la recuperación pasa por el WhatsApp de ServiPlace y la
+    clave nueva se pone desde el admin, después de confirmar que el correo
+    calza con la cuenta.
+    {% endcomment %}
+    {% if DEFAULT_CONTACT_WHATSAPP %}
+    <p class="text-center mt-3 mb-0" style="font-size:.88rem" data-olvide-clave>
+      <a href="https://wa.me/{{ DEFAULT_CONTACT_WHATSAPP }}?text={{ 'Hola, olvidé mi contraseña de ServiPlace. El correo de mi cuenta es: '|urlencode }}" target="_blank" rel="noopener" data-ga="olvide_clave">¿Olvidaste tu contraseña?</a>
+      <span class="text-muted">Escríbenos por WhatsApp y te ayudamos.</span>
+    </p>
+    {% endif %}
     <p class="text-center text-muted mt-3" style="font-size:.88rem">
       ¿Sin cuenta? <a href="{% url 'accounts:register' %}">Crear cuenta gratis →</a>
     </p>

@@ -73,9 +73,15 @@ class LoginForm(AuthenticationForm):
     """El formulario de Django tal cual no trae las clases del sitio: los campos
     salían con el estilo del navegador y la etiqueta pegada al lado."""
 
+    # 11-11-2026: se entra con el usuario o con el correo (accounts/backends.py).
+    error_messages = {
+        **AuthenticationForm.error_messages,
+        'invalid_login': 'El usuario o correo y la contraseña no coinciden. Puedes entrar con tu correo.',
+    }
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['username'].label = 'Nombre de usuario'
+        self.fields['username'].label = 'Usuario o correo'
         self.fields['password'].label = 'Contraseña'
         self.fields['username'].widget.attrs.update({'class': 'form-control', 'autocomplete': 'username'})
         self.fields['password'].widget.attrs.update({'class': 'form-control', 'autocomplete': 'current-password'})

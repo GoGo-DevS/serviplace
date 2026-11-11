@@ -86,6 +86,8 @@ INSTALLED_APPS = [
 
 LOGIN_URL = '/cuenta/login/'
 LOGIN_REDIRECT_URL = '/cuenta/dashboard/'
+# Se entra con el usuario o con el correo, sin distinguir mayúsculas (11-11-2026).
+AUTHENTICATION_BACKENDS = ['accounts.backends.UsuarioOCorreoBackend']
 LOGOUT_REDIRECT_URL = '/'
 
 MIDDLEWARE = [
