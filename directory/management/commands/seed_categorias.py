@@ -58,6 +58,7 @@ SEO_NOMBRES = {
     'automotoras': 'Automotora',
     'uniformes-y-ropa-de-trabajo': 'Tienda de uniformes',
     'reposteria-y-dulces': 'Repostería',
+    'juguetes': 'Tienda de juguetes',
     'fletes-y-logistica': 'Fletes',
     'traslados-y-turismo': 'Transporte de pasajeros',
 }
@@ -125,6 +126,9 @@ CATEGORIAS = [
     ('automotoras', 'Automotoras', 'Venta de vehículos, con financiamiento y recepción en parte de pago.', '🚙', T, False),
     ('uniformes-y-ropa-de-trabajo', 'Uniformes y ropa de trabajo', 'Uniformes clínicos y ropa de trabajo, en tienda o con despacho.', '🥼', T, False),
     ('reposteria-y-dulces', 'Repostería y dulces', 'Tortas, alfajores y dulces por encargo, con retiro o despacho.', '🧁', T, False),
+    # 11-11-2026: Manitos Curiosas (juguetes educativos), invitada por Diego, no
+    # encontró su rubro. Va con las tiendas, como Repostería: vende productos.
+    ('juguetes', 'Juguetes', 'Juguetes educativos y didácticos, de madera, peluches y juguetes hechos a mano, con retiro o despacho.', '🧸', T, False),
 ]
 
 

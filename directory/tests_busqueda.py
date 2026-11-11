@@ -61,6 +61,14 @@ class BusquedaPorOficio(TestCase):
             self.assertEqual(self._nombres(q), {'Camisetas Retro'}, q)
         self.assertEqual(self._nombres('diseñador'), {'Pedro Diseño'})
 
+    def test_juguetes_existe_y_se_encuentra(self):
+        # 11-11-2026: una emprendedora de juguetes no encontró su rubro.
+        self._perfil('Juguetes de Madera Rosa', 'juguetes')
+        self._perfil('Dulces Ana', 'reposteria-y-dulces')
+        for q in ('juguetes', 'juguetería en maipú', 'peluches', 'juguetes didácticos', 'montessori'):
+            self.assertEqual(self._nombres(q), {'Juguetes de Madera Rosa'}, q)
+        self.assertEqual(self.cat['juguetes'].group, Category.TIENDAS)
+
     def test_tambien_por_un_rubro_extra(self):
         self._perfil('Maestro Juan', 'construccion', otras=['gasfiteria', 'soldadura'])
         self.assertEqual(self._nombres('soldador'), {'Maestro Juan'})

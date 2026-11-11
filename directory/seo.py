@@ -40,6 +40,7 @@ TIPO_SCHEMA = {
     'automotoras': 'AutoDealer',
     'uniformes-y-ropa-de-trabajo': 'ClothingStore',
     'reposteria-y-dulces': 'Bakery',
+    'juguetes': 'ToyStore',
     'fletes-y-logistica': 'MovingCompany',
     'traslados-y-turismo': 'TravelAgency',
 }
