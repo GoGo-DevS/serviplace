@@ -2,7 +2,7 @@ from urllib.parse import urlencode
 
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth import login
+from django.contrib.auth import get_user_model, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
 from django.db.models import Q
@@ -269,6 +269,15 @@ def comprobaciones(request):
         campo = campos.get(request.POST.get('sello', ''))
         provider = Provider.objects.filter(pk=request.POST.get('perfil', '0') or 0).first() \
             if (request.POST.get('perfil') or '').isdigit() else None
+        if request.POST.get('accion') == 'publicar' and provider and provider.owner_id:
+            # Una ficha retenida por el antispam (o apagada) que Diego revisó y
+            # es de una persona real. Se publica y se le quita la marca a la cuenta.
+            nota = f'{provider.moderation_note}\nPublicada a mano por {request.user.username} el {timezone.localdate():%d-%m-%Y}.'.strip()
+            Provider.objects.filter(pk=provider.pk).update(is_active=True, spam_flag=False, hidden_at=None,
+                                                           moderation_note=nota)
+            UserProfile.objects.filter(user_id=provider.owner_id).update(spam_flag=False)
+            messages.success(request, f'Publicada: {provider.business_name}.')
+            return redirect('accounts:comprobaciones')
         if campo and provider:
             dar = request.POST.get('accion') != 'quitar'
             Provider.objects.filter(pk=provider.pk).update(**{campo: timezone.now() if dar else None})
@@ -276,7 +285,24 @@ def comprobaciones(request):
         return redirect('accounts:comprobaciones')
 
     publicos = Provider.objects.publicos().select_related('commune').order_by('-created_at')
+    # 11-11-2026: Manitos Curiosas se registró, el 502 le cortó el guardado y no
+    # aparecía en ninguna parte: esta página solo listaba fichas públicas. Aquí
+    # sale quien se registró en los últimos 30 días y no tiene ficha pública:
+    # sin ficha, con una a medias o retenida por el antispam.
+    sin_ficha = (get_user_model().objects
+                 .filter(date_joined__gte=timezone.now() - timezone.timedelta(days=30), is_staff=False)
+                 .exclude(pk__in=Provider.objects.publicos().values('owner_id'))
+                 .select_related('profile')
+                 .prefetch_related('providers')
+                 .order_by('-date_joined'))
     return render(request, 'accounts/comprobaciones.html', {
+        'sin_ficha': [
+            {'u': u, 'fichas': list(u.providers.all()),
+             'wa': _wa_digitos(getattr(getattr(u, 'profile', None), 'whatsapp', ''))}
+            for u in sin_ficha
+        ],
+        'texto_ayuda': ('Hola, soy Diego de ServiPlace. Vi que te registraste pero tu ficha no quedó '
+                        'publicada. ¿Te ayudo a terminarla?'),
         'whatsapp': [
             {'p': p, 'numero': formatear_telefono(p.whatsapp_number)}
             for p in publicos.filter(whatsapp_confirmado_en__isnull=True)
@@ -291,6 +317,14 @@ def comprobaciones(request):
         'page_title': 'Comprobaciones | ServiPlace',
         'robots': 'noindex',
     })
+
+
+def _wa_digitos(numero):
+    """'+56 9 1234 5678' o '912345678' -> '56912345678' (para wa.me). Vacío si no sirve."""
+    digitos = ''.join(c for c in (numero or '') if c.isdigit())
+    if len(digitos) == 9 and digitos.startswith('9'):
+        digitos = '56' + digitos
+    return digitos if len(digitos) == 11 and digitos.startswith('569') else ''
 
 
 @login_required

@@ -175,3 +175,68 @@ class Sellos(TestCase):
         self.assertEqual(self._texto_hazte_verificado(), 'Hola, quiero verificar mi perfil en ServiPlace.')
         self.client.force_login(self.dueno)  # con cuenta pero sin perfil publicado
         self.assertEqual(self._texto_hazte_verificado(), 'Hola, quiero verificar mi perfil en ServiPlace.')
+
+
+class RegistradosSinFichaPublica(TestCase):
+    """11-11-2026: Manitos Curiosas se registró, el guardado se cortó (502) y no
+    aparecía en comprobaciones, que solo listaba fichas públicas."""
+
+    setUp = Sellos.setUp
+
+    def _ficha(self, nombre, slug='gasfiteria', **extra):
+        return Provider.objects.create(
+            owner=self.dueno, business_name=nombre, category=self.cat[slug], commune=self.maipu,
+            short_description='Ficha de prueba.', whatsapp_number='56987654321', **extra)
+
+    def _pagina(self):
+        self.client.force_login(self.staff)
+        return self.client.get(URL).content.decode()
+
+    def test_sale_quien_se_registro_y_no_publico_y_no_quien_ya_publico(self):
+        User.objects.create_user('manitos', email='hola@manitoscuriosas.cl', password='clave-larga-de-verdad-99')
+        self._ficha('Juan Gásfiter', is_active=True)  # juan ya tiene ficha pública
+        viejo = User.objects.create_user('antiguo', email='antiguo@x.cl', password='clave-larga-de-verdad-99')
+        User.objects.filter(pk=viejo.pk).update(date_joined=timezone.now() - timezone.timedelta(days=45))
+        html = self._pagina()
+        self.assertIn('hola@manitoscuriosas.cl', html)
+        self.assertIn('No alcanzó a publicar nada.', html)
+        self.assertNotIn('antiguo@x.cl', html)  # más de 30 días
+        self.assertEqual(html.count('data-sin-ficha'), 1)  # ni juan (publicó) ni diego (staff)
+
+    def test_una_ficha_retenida_se_ve_y_se_puede_publicar(self):
+        retenida = self._ficha('Manitos Curiosas', slug='juguetes', is_active=False,
+                               spam_flag=True, spam_reasons='rapido')
+        UserProfile = self.dueno.profile.__class__
+        UserProfile.objects.filter(user=self.dueno).update(spam_flag=True)
+        html = self._pagina()
+        self.assertIn('retenida por el antispam (rapido)', html)
+        self.client.post(URL, {'perfil': retenida.pk, 'accion': 'publicar'})
+        retenida.refresh_from_db()
+        self.assertTrue(retenida.is_active)
+        self.assertFalse(retenida.spam_flag)
+        self.assertIn('Publicada a mano por diego', retenida.moderation_note)
+        self.assertFalse(UserProfile.objects.get(user=self.dueno).spam_flag)
+        self.assertIn(retenida, Provider.objects.publicos())
+
+    def test_quien_no_es_staff_no_puede_publicar_una_retenida(self):
+        retenida = self._ficha('Retenida', is_active=False, spam_flag=True)
+        self.client.force_login(self.dueno)
+        self.assertEqual(self.client.post(URL, {'perfil': retenida.pk, 'accion': 'publicar'}).status_code, 404)
+        retenida.refresh_from_db()
+        self.assertFalse(retenida.is_active)
+
+    def test_no_hace_una_consulta_por_persona(self):
+        from django.db import connection
+        from django.test.utils import CaptureQueriesContext
+        User.objects.create_user('uno', email='uno@x.cl', password='clave-larga-de-verdad-99')
+        self._pagina()
+        with CaptureQueriesContext(connection) as con_uno:
+            self._pagina()
+        for n in ('dos', 'tres', 'cuatro'):
+            u = User.objects.create_user(n, email=f'{n}@x.cl', password='clave-larga-de-verdad-99')
+            Provider.objects.create(owner=u, business_name=f'Ficha {n}', category=self.cat['gasfiteria'],
+                                    commune=self.maipu, short_description='x', whatsapp_number='56911111111',
+                                    is_active=False, spam_flag=True)
+        with CaptureQueriesContext(connection) as con_cuatro:
+            self._pagina()
+        self.assertEqual(len(con_cuatro), len(con_uno))

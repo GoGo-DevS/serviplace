@@ -24,6 +24,30 @@
   </div>
 
   <div class="detail-block">
+    {% comment %}11-11-2026: Manitos Curiosas se registró, el guardado se cortó y no aparecía en ninguna parte.{% endcomment %}
+    <h2>Registrados sin ficha pública <small class="text-muted">{{ sin_ficha|length }}</small></h2>
+    <p class="form-text">Últimos 30 días. Sin ficha, con una a medias o retenida por el antispam. Publica solo si es una persona real.</p>
+    {% for fila in sin_ficha %}
+    <div class="comprobacion-fila" data-sin-ficha>
+      <div><b>{{ fila.u.username }}</b> <span class="text-muted">· {{ fila.u.email|default:"sin correo" }} · se registró el {{ fila.u.date_joined|date:"d-m-Y" }}</span><br>
+        {% for f in fila.fichas %}
+          <span class="comprobacion-dato">{{ f.business_name }}</span>
+          <span class="text-muted">· {% if f.spam_flag %}retenida por el antispam{% if f.spam_reasons %} ({{ f.spam_reasons }}){% endif %}{% elif not f.is_active %}apagada{% endif %} · creada el {{ f.created_at|date:"d-m-Y H:i" }}</span><br>
+        {% empty %}<span class="text-muted">No alcanzó a publicar nada.</span>{% endfor %}
+      </div>
+      <div class="d-flex gap-1 flex-wrap">
+        {% for f in fila.fichas %}{% if f.spam_flag or not f.is_active %}
+        <form method="post">{% csrf_token %}<input type="hidden" name="perfil" value="{{ f.pk }}"><input type="hidden" name="accion" value="publicar">
+          <button class="btn btn-success btn-sm" type="submit">Publicar {{ f.business_name|truncatechars:24 }}</button></form>
+        {% endif %}{% endfor %}
+        {% if fila.wa %}<a class="btn btn-outline-primary btn-sm" href="https://wa.me/{{ fila.wa }}?text={{ texto_ayuda|urlencode }}" target="_blank" rel="noopener">WhatsApp</a>{% endif %}
+        {% if fila.u.email %}<a class="btn btn-outline-primary btn-sm" href="mailto:{{ fila.u.email }}">Correo</a>{% endif %}
+      </div>
+    </div>
+    {% empty %}<p class="mb-0 text-muted">Todos los registrados de los últimos 30 días tienen su ficha publicada.</p>{% endfor %}
+  </div>
+
+  <div class="detail-block">
     <h2>Registro de salud por revisar <small class="text-muted">{{ salud|length }}</small></h2>
     <p class="form-text">Búscalo por nombre en el <a href="{{ url_rnpi }}" target="_blank" rel="noopener">Registro Nacional de Prestadores Individuales</a> y confirma que el número y la profesión calzan.</p>
     {% for p in salud %}
