@@ -240,3 +240,50 @@ class RegistradosSinFichaPublica(TestCase):
         with CaptureQueriesContext(connection) as con_cuatro:
             self._pagina()
         self.assertEqual(len(con_cuatro), len(con_uno))
+
+
+class VerificadoRevisadoAMano(TestCase):
+    """11-11-2026: Diego quería verificar a todos. "Hazte verificado" promete
+    "tus datos fueron revisados y confirmados por el equipo": se verifica ficha
+    por ficha desde comprobaciones, y solo con el WhatsApp ya confirmado."""
+
+    setUp = Sellos.setUp
+
+    def _ficha(self, nombre, **extra):
+        return Provider.objects.create(
+            owner=self.dueno, business_name=nombre, category=self.cat['gasfiteria'], commune=self.maipu,
+            short_description='Ficha de prueba.', whatsapp_number='56987654321', is_active=True, **extra)
+
+    def _verificar(self, p, accion=''):
+        self.client.force_login(self.staff)
+        return self.client.post(URL, {'perfil': p.pk, 'sello': 'verificado', 'accion': accion})
+
+    def test_sin_whatsapp_confirmado_no_se_puede_verificar(self):
+        p = self._ficha('Sin confirmar')
+        self.client.force_login(self.staff)
+        html = self.client.get(URL).content.decode()
+        self.assertIn('Primero confirma su WhatsApp', html)
+        self._verificar(p)
+        p.refresh_from_db()
+        self.assertFalse(p.is_verified)
+
+    def test_con_whatsapp_confirmado_se_verifica_y_el_publico_lo_ve(self):
+        p = self._ficha('Confirmado', whatsapp_confirmado_en=timezone.now())
+        self._verificar(p)
+        p.refresh_from_db()
+        self.assertTrue(p.is_verified)
+        self.client.logout()
+        self.assertContains(self.client.get(p.get_absolute_url()), 'badge-verified')
+
+    def test_se_puede_quitar(self):
+        p = self._ficha('Verificado', whatsapp_confirmado_en=timezone.now(), is_verified=True)
+        self._verificar(p, accion='quitar')
+        p.refresh_from_db()
+        self.assertFalse(p.is_verified)
+
+    def test_quien_no_es_staff_no_verifica(self):
+        p = self._ficha('Confirmado', whatsapp_confirmado_en=timezone.now())
+        self.client.force_login(self.dueno)
+        self.assertEqual(self.client.post(URL, {'perfil': p.pk, 'sello': 'verificado'}).status_code, 404)
+        p.refresh_from_db()
+        self.assertFalse(p.is_verified)

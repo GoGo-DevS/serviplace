@@ -24,6 +24,26 @@
   </div>
 
   <div class="detail-block">
+    {% comment %}11-11-2026: "Hazte verificado" promete que el equipo revisó y confirmó los datos. Se da ficha por ficha.{% endcomment %}
+    <h2>Verificado por revisar <small class="text-muted">{{ por_verificar|length }}</small></h2>
+    <p class="form-text">El público lee «tus datos fueron revisados y confirmados por el equipo». Verifica solo si el WhatsApp está confirmado y comprobaste que el negocio existe: lo conoces, o su sitio o Instagram calzan con la ficha.</p>
+    {% for p in por_verificar %}
+    <div class="comprobacion-fila" data-por-verificar>
+      <div><a href="{{ p.get_absolute_url }}" target="_blank" rel="noopener"><b>{{ p.business_name }}</b></a>
+        <span class="text-muted">· {{ p.category.name }} · publicada el {{ p.created_at|date:"d-m-Y" }}</span><br>
+        {% if p.whatsapp_confirmado %}<span class="badge badge-sello">WhatsApp confirmado</span>{% else %}<span class="text-muted">WhatsApp sin confirmar</span>{% endif %}
+        {% if p.website %} · <a href="{{ p.website }}" target="_blank" rel="noopener nofollow">{{ p.website_corto }}</a>{% endif %}
+        {% if p.instagram %} · <a href="{{ p.instagram_url }}" target="_blank" rel="noopener nofollow">@{{ p.instagram }}</a>{% endif %}
+        <span class="text-muted">· {{ p.n_fotos }} foto{{ p.n_fotos|pluralize }}{% if p.foto %} y logo{% endif %}</span></div>
+      {% if p.whatsapp_confirmado %}
+      <form method="post">{% csrf_token %}<input type="hidden" name="perfil" value="{{ p.pk }}"><input type="hidden" name="sello" value="verificado">
+        <button class="btn btn-success btn-sm" type="submit">Verificar</button></form>
+      {% else %}<span class="text-muted" style="font-size:.85rem">Primero confirma su WhatsApp</span>{% endif %}
+    </div>
+    {% empty %}<p class="mb-0 text-muted">Todas las fichas públicas están verificadas.</p>{% endfor %}
+  </div>
+
+  <div class="detail-block">
     {% comment %}11-11-2026: Manitos Curiosas se registró, el guardado se cortó y no aparecía en ninguna parte.{% endcomment %}
     <h2>Registrados sin ficha pública <small class="text-muted">{{ sin_ficha|length }}</small></h2>
     <p class="form-text">Últimos 30 días. Sin ficha, con una a medias o retenida por el antispam. Publica solo si es una persona real.</p>
@@ -80,10 +100,12 @@
     {% for p in recientes %}
     <div class="comprobacion-fila">
       <div><b>{{ p.business_name }}</b><br>
+        {% if p.verificado_publico %}<span class="badge badge-verified">Verificado</span>{% endif %}
         {% if p.whatsapp_confirmado %}<span class="badge badge-sello">WhatsApp confirmado</span>{% endif %}
         {% if p.registro_salud_comprobado %}<span class="badge badge-sello">Registro de salud</span>{% endif %}
         {% if p.licencia_sec_comprobada %}<span class="badge badge-sello">Licencia SEC</span>{% endif %}</div>
       <div class="d-flex gap-1 flex-wrap">
+        {% if p.is_verified %}<form method="post">{% csrf_token %}<input type="hidden" name="perfil" value="{{ p.pk }}"><input type="hidden" name="sello" value="verificado"><input type="hidden" name="accion" value="quitar"><button class="btn btn-outline-primary btn-sm" type="submit">Quitar verificado</button></form>{% endif %}
         {% if p.whatsapp_confirmado %}<form method="post">{% csrf_token %}<input type="hidden" name="perfil" value="{{ p.pk }}"><input type="hidden" name="sello" value="whatsapp"><input type="hidden" name="accion" value="quitar"><button class="btn btn-outline-primary btn-sm" type="submit">Quitar WhatsApp</button></form>{% endif %}
         {% if p.registro_salud_comprobado %}<form method="post">{% csrf_token %}<input type="hidden" name="perfil" value="{{ p.pk }}"><input type="hidden" name="sello" value="salud"><input type="hidden" name="accion" value="quitar"><button class="btn btn-outline-primary btn-sm" type="submit">Quitar registro</button></form>{% endif %}
         {% if p.licencia_sec_comprobada %}<form method="post">{% csrf_token %}<input type="hidden" name="perfil" value="{{ p.pk }}"><input type="hidden" name="sello" value="sec"><input type="hidden" name="accion" value="quitar"><button class="btn btn-outline-primary btn-sm" type="submit">Quitar licencia</button></form>{% endif %}

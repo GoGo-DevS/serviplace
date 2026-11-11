@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
-from django.db.models import Q
+from django.db.models import Count, Q
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
@@ -278,6 +278,17 @@ def comprobaciones(request):
             UserProfile.objects.filter(user_id=provider.owner_id).update(spam_flag=False)
             messages.success(request, f'Publicada: {provider.business_name}.')
             return redirect('accounts:comprobaciones')
+        if request.POST.get('sello') == 'verificado' and provider and provider.owner_id:
+            # 11-11-2026: la página "Hazte verificado" promete "tus datos fueron
+            # revisados y confirmados por el equipo". Se verifica a mano, ficha
+            # por ficha, y solo con el WhatsApp ya confirmado.
+            dar = request.POST.get('accion') != 'quitar'
+            if dar and not provider.whatsapp_confirmado:
+                messages.error(request, f'{provider.business_name}: primero confirma su WhatsApp.')
+            else:
+                Provider.objects.filter(pk=provider.pk).update(is_verified=dar)
+                messages.success(request, f'{"Verificado" if dar else "Quitado el verificado"}: {provider.business_name}.')
+            return redirect('accounts:comprobaciones')
         if campo and provider:
             dar = request.POST.get('accion') != 'quitar'
             Provider.objects.filter(pk=provider.pk).update(**{campo: timezone.now() if dar else None})
@@ -309,9 +320,11 @@ def comprobaciones(request):
         ],
         'salud': publicos.exclude(health_registry='').filter(registro_salud_comprobado_en__isnull=True),
         'sec': publicos.exclude(licencia_sec='').filter(licencia_sec_comprobada_en__isnull=True),
+        'por_verificar': publicos.filter(is_verified=False).select_related('category')
+                                 .annotate(n_fotos=Count('images')).order_by('-created_at'),
         'recientes': publicos.filter(
             Q(whatsapp_confirmado_en__isnull=False) | Q(registro_salud_comprobado_en__isnull=False)
-            | Q(licencia_sec_comprobada_en__isnull=False)).order_by('-updated_at')[:20],
+            | Q(licencia_sec_comprobada_en__isnull=False) | Q(is_verified=True)).order_by('-updated_at')[:30],
         'url_rnpi': 'https://rnpi.superdesalud.gob.cl/',
         'url_sec': 'https://www.chileatiende.gob.cl/fichas/67276-buscador-de-instaladores-electricos-y-de-gas-autorizados-por-la-sec',
         'page_title': 'Comprobaciones | ServiPlace',
