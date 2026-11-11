@@ -199,6 +199,75 @@
 {% block extra_js %}
 {{ form.categorias_info|json_script:"categorias-info" }}
 <script>
+  // Las fotos se achican en el propio teléfono antes de subirse (11-11-2026).
+  // Guardar el perfil daba 502: 8 fotos de 4-8 MB por 4G tardaban más que los
+  // 30 s que aguanta el servidor. El servidor igual las deja en WebP de menos
+  // de 100 KB (directory/imagenes.py); esto solo evita subir megas de más.
+  // Si el navegador no puede, se suben como vienen.
+  (function () {
+    var LADOS = {id_foto: 1280, id_fotos: 2048};  // el doble de lo que guarda el servidor
+    var pendientes = 0;
+    var aEnviar = null;
+
+    function achicar(archivo, lado) {
+      return new Promise(function (listo) {
+        if (!/^image\/(jpeg|png|webp)$/.test(archivo.type) || archivo.size < 400 * 1024) return listo(archivo);
+        var url = URL.createObjectURL(archivo);
+        var img = new Image();
+        img.onload = function () {
+          var escala = Math.min(1, lado / Math.max(img.naturalWidth, img.naturalHeight));
+          var lienzo = document.createElement('canvas');
+          lienzo.width = Math.round(img.naturalWidth * escala);
+          lienzo.height = Math.round(img.naturalHeight * escala);
+          lienzo.getContext('2d').drawImage(img, 0, 0, lienzo.width, lienzo.height);  // sin EXIF: sin GPS
+          URL.revokeObjectURL(url);
+          var tipo = archivo.type === 'image/png' ? 'image/png' : 'image/jpeg';
+          lienzo.toBlob(function (blob) {
+            if (!blob || blob.size >= archivo.size) return listo(archivo);
+            var nombre = archivo.name.replace(/\.[^.]+$/, '') + (tipo === 'image/png' ? '.png' : '.jpg');
+            listo(new File([blob], nombre, {type: tipo, lastModified: Date.now()}));
+          }, tipo, 0.85);
+        };
+        img.onerror = function () { URL.revokeObjectURL(url); listo(archivo); };
+        img.src = url;
+      });
+    }
+
+    Object.keys(LADOS).forEach(function (id) {
+      var input = document.getElementById(id);
+      if (!input || !window.DataTransfer || !window.Promise) return;
+      input.addEventListener('change', function (e) {
+        if (input.dataset.achicado) return;  // es el aviso que lanzamos nosotros
+        var archivos = Array.prototype.slice.call(input.files);
+        if (!archivos.length) return;
+        e.stopImmediatePropagation();  // la vista previa espera las fotos ya achicadas
+        pendientes++;
+        Promise.all(archivos.map(function (a) { return achicar(a, LADOS[id]); })).then(function (listos) {
+          try {
+            var dt = new DataTransfer();
+            listos.forEach(function (a) { dt.items.add(a); });
+            input.files = dt.files;
+          } catch (err) { /* sin DataTransfer: se suben las originales */ }
+          input.dataset.achicado = '1';
+          input.dispatchEvent(new Event('change', {bubbles: true}));
+          delete input.dataset.achicado;
+          pendientes--;
+          if (!pendientes && aEnviar) { var f = aEnviar; aEnviar = null; f.requestSubmit ? f.requestSubmit() : f.submit(); }
+        });
+      }, true);
+    });
+
+    // Si apretan Publicar mientras se achican, se espera y se envía solo.
+    var form = document.querySelector('form[data-vista-previa]');
+    if (form) form.addEventListener('submit', function (e) {
+      if (!pendientes) return;
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      aEnviar = form;
+    }, true);
+  })();
+</script>
+<script>
   // El formulario se adapta al rubro: el registro de salud solo para salud, y
   // ejemplos de título e institución que calcen con lo que hace la persona.
   (function () {
