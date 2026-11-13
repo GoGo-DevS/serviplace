@@ -518,5 +518,7 @@ class LoImportadoNoSePresentaComoValidado(Base):
         self._perfil(self.gasfiter, 'Importado', owner=None)
         self._perfil(self.gasfiter, 'Con dueño')
         html = self.client.get(reverse('core:home')).content.decode()
-        self.assertIn('1 perfil publicado por sus dueños', html)
+        # 13-11-2026: sin "por sus dueños": los clientes de GoGoDevS los cargó Diego.
+        self.assertIn('1 perfil publicado', html)
+        self.assertNotIn('por sus dueños', html)
 

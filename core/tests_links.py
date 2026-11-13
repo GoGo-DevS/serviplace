@@ -49,7 +49,9 @@ class LinksDeInstagram(TestCase):
         self.assertIn(reverse('directory:listado_rubro', args=[hogar]), html)
         self.assertNotIn(reverse('directory:listado_rubro', args=[salud]), html,
                          'ofrece un rubro sin un solo perfil publicado')
-        self.assertIn('1 perfil publicado por sus dueños', html)
+        # 13-11-2026: sin "por sus dueños": 14 perfiles son clientes de GoGoDevS cargados por Diego.
+        self.assertIn('1 perfil publicado', html)
+        self.assertNotIn('por sus dueños', html)
 
     def test_cada_boton_se_mide_con_tree_click(self):
         html = self._html()
