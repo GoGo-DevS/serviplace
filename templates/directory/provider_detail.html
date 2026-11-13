@@ -13,13 +13,12 @@
         <div class="d-flex flex-wrap gap-2 mb-2 align-items-center">
           <span class="badge badge-category">{{ provider.category.name }}</span>
           {% for otro in otros_rubros %}<a class="badge badge-category badge-otro" href="{{ otro.url }}">{{ otro.categoria.name }}</a>{% endfor %}
-          {% if provider.verificado_publico %}<span class="badge badge-verified">Verificado</span>{% endif %}
           {% if provider.whatsapp_confirmado %}<span class="badge badge-sello" title="El número de WhatsApp es de esta persona">WhatsApp confirmado</span>{% endif %}{% if provider.registro_salud_comprobado %}<span class="badge badge-sello" title="Revisado en el registro de la Superintendencia de Salud">Registro de salud comprobado</span>{% endif %}{% if provider.licencia_sec_comprobada %}<span class="badge badge-sello" title="Revisada en el buscador de la SEC">Licencia SEC comprobada</span>{% endif %}
           {% if not provider.owner %}
             <a class="badge badge-new" href="{% url 'accounts:claim_profile' provider.slug %}">¿Es tuyo? Reclámalo</a>
           {% endif %}
         </div>
-        <h1 class="mb-1" style="font-size:clamp(1.65rem,4vw,2.75rem);letter-spacing:-.025em">{{ provider.business_name }}</h1>
+        <h1 class="mb-1" style="font-size:clamp(1.65rem,4vw,2.75rem);letter-spacing:-.025em">{{ provider.business_name }}{% if provider.verificado_publico %}{% include 'directory/_check_verificado.html' %}{% endif %}</h1>
         {% if provider.profession_title %}<p class="detail-profession mb-1">{{ provider.profession_title }}{% if provider.graduation_year %} · {% if provider.is_student %}se titula en {{ provider.graduation_year }}{% else %}titulado/a en {{ provider.graduation_year }}{% endif %}{% endif %}</p>{% endif %}
         <p class="lead mb-0">{{ provider.short_description }}</p>
         <p class="text-muted mt-1 mb-0" style="font-size:.95rem">{{ provider.sector }} · {{ provider.commune.name }}</p>
@@ -152,8 +151,9 @@
 
       <div class="detail-block">
         <h2>Antes de contratar</h2>
-        {% if provider.tiene_sellos %}
+        {% if provider.tiene_sellos or provider.verificado_publico %}
         <ul class="sellos-lista">
+          {% if provider.verificado_publico %}<li><b>Verificado por ServiPlace</b> {% include 'directory/_check_verificado.html' %}: con su WhatsApp confirmado, revisamos que el negocio exista.</li>{% endif %}
           {% if provider.whatsapp_confirmado %}<li><b>WhatsApp confirmado:</b> el número es de esta persona (lo confirmó el {{ provider.whatsapp_confirmado_en|date:"d-m-Y" }}).</li>{% endif %}
           {% if provider.registro_salud_comprobado %}<li><b>Registro de salud comprobado:</b> N° {{ provider.health_registry }}, revisado en el registro de la Superintendencia de Salud el {{ provider.registro_salud_comprobado_en|date:"d-m-Y" }}.</li>{% endif %}
           {% if provider.licencia_sec_comprobada %}<li><b>Licencia SEC comprobada:</b> {{ provider.licencia_sec }}, revisada en el buscador de la SEC el {{ provider.licencia_sec_comprobada_en|date:"d-m-Y" }}.</li>{% endif %}

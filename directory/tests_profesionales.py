@@ -506,7 +506,7 @@ class LoImportadoNoSePresentaComoValidado(Base):
         duena = User.objects.create_user('duena', password='clave-larga-de-verdad-99')
         self._perfil(self.kine, 'Camila R.', is_verified=True, owner=duena)
         html = self.client.get(reverse('directory:provider_list')).content.decode()
-        self.assertIn('>Verificado<', html)
+        self.assertIn('data-check-verificado', html)  # la insignia azul (13-11)
 
     def test_la_portada_no_destaca_importados(self):
         self._perfil(self.gasfiter, 'Cerrajero de Maps', is_verified=True, is_featured=True, owner=None)

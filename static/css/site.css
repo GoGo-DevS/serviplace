@@ -1570,3 +1570,16 @@ a:hover { color: var(--sp-blue-dark); }
   /* Tres destacados bastan en el teléfono; seis eran 2.500 px de scroll. */
   .featured-row > div:nth-child(n+4) { display: none; }
 }
+
+/* Insignia azul de Verificado junto al nombre (13-11-2026), como en las redes.
+   Mide 1em: crece con el título donde esté (h1 de la ficha, h3 de la tarjeta). */
+.check-verificado {
+  display: inline-block;
+  width: .82em;
+  height: .82em;
+  margin-left: .28em;
+  vertical-align: -.06em;
+  color: #1d8cf8;
+  flex: none;
+}
+.sellos-lista .check-verificado { width: 1.05em; height: 1.05em; margin: 0 .1em; vertical-align: -.18em; }

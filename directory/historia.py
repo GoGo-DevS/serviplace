@@ -12,6 +12,7 @@ abajo la barra para responder. Sin emojis ni flechas (voz de marca) y sin
 teléfono: el enlace lleva a la ficha, que ya lo muestra.
 """
 import io
+import math
 import re
 from functools import lru_cache
 from pathlib import Path
@@ -20,7 +21,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageOps
 
 # Subirlo cuando cambie el dibujo: cambia la versión de todas las historias
 # (Provider.version_historia) y nadie recibe la imagen vieja guardada.
-DISENO = 1
+DISENO = 2  # 13-11-2026: insignia azul de Verificado junto al nombre
 
 ANCHO, ALTO = 1080, 1920
 FUENTES = Path(__file__).resolve().parent / 'fuentes'
@@ -30,8 +31,9 @@ NEGRITA = 'atkinson-hyperlegible-700.ttf'
 
 FONDO, CUADRICULA = '#1b1f24', '#2a3038'
 TINTA, GRIS, ACENTO, MARCA, VERDE = '#1b1f24', '#5a6068', '#0e7490', '#06b6d4', '#0f7a40'
+AZUL_CHECK = '#1d8cf8'
 CHIPS = {  # fondo, letra: los mismos tonos de las insignias del sitio
-    'verificado': ('#fbf0d6', '#8a5a00'),
+    'verificado': ('#dbeafe', '#1d5fbf'),  # azul, como la insignia
     'sello': ('#dcefe2', '#0b6233'),
     'rubro': ('#cffafe', '#155e75'),
     'modalidad': ('#eef2f6', '#3a4047'),
@@ -139,6 +141,24 @@ def _logo(lado):
     return capa.resize((lado, lado), Image.LANCZOS)
 
 
+def _check(lado):
+    """La insignia azul de Verificado (la misma del sitio): un sello festoneado con
+    un visto blanco. Se dibuja a 8x y se achica, para que el borde salga suave."""
+    k = 8
+    t = lado * k
+    capa = Image.new('RGBA', (t, t), (0, 0, 0, 0))
+    lapiz = ImageDraw.Draw(capa)
+    c, radio, bulto = t / 2, t * 0.37, t * 0.13
+    for i in range(8):
+        a = math.tau * i / 8
+        x, y = c + t * 0.345 * math.cos(a), c + t * 0.345 * math.sin(a)
+        lapiz.ellipse((x - bulto, y - bulto, x + bulto, y + bulto), fill=AZUL_CHECK)
+    lapiz.ellipse((c - radio, c - radio, c + radio, c + radio), fill=AZUL_CHECK)
+    lapiz.line([(t * 0.31, t * 0.52), (t * 0.44, t * 0.64), (t * 0.70, t * 0.38)], fill='white',
+               width=int(t * 0.095), joint='curve')
+    return capa.resize((lado, lado), Image.LANCZOS)
+
+
 def _datos(provider):
     chips = []
     if provider.verificado_publico:
@@ -155,6 +175,7 @@ def _datos(provider):
         'rubro': _limpio(provider.category.name).upper(),
         'comuna': _limpio(provider.commune.name),
         'nombre': _limpio(provider.business_name) or 'ServiPlace',
+        'verificado': provider.verificado_publico,
         'subtitulo': _limpio(provider.profession_title or provider.sector),
         'descripcion': _limpio(provider.short_description),
         'chips': chips,
@@ -210,7 +231,8 @@ def _tarjeta(img, y0, datos, lineas_descripcion):
     # Foto o inicial, nombre y profesión.
     avatar = 164
     ancho_texto = interior - avatar - 36
-    fuente_nombre, lineas_nombre = _nombre(datos['nombre'], ancho_texto)
+    lado_check = 52 if datos.get('verificado') else 0
+    fuente_nombre, lineas_nombre = _nombre(datos['nombre'], ancho_texto - (lado_check + 14 if lado_check else 0))
     alto_linea_nombre = int(fuente_nombre.size * 1.08)
     lineas_sub = _partir(datos['subtitulo'], _fuente(TEXTO, 32), ancho_texto, 2) if datos['subtitulo'] else []
     alto_texto = len(lineas_nombre) * alto_linea_nombre + (10 + 40 * len(lineas_sub) if lineas_sub else 0)
@@ -224,8 +246,14 @@ def _tarjeta(img, y0, datos, lineas_descripcion):
             lapiz.text((x0 + avatar / 2, ya + avatar / 2), datos['nombre'][0].upper(),
                        font=_fuente(TITULO, 84), fill=ACENTO, anchor='mm')
         yt = y + (alto_fila - alto_texto) // 2
-        for linea in lineas_nombre:
+        for i, linea in enumerate(lineas_nombre):
             lapiz.text((x0 + avatar + 36, yt), linea, font=fuente_nombre, fill=TINTA, anchor='la')
+            if lado_check and i == len(lineas_nombre) - 1:
+                # Junto a la última línea del nombre, centrada en la altura de las letras.
+                xc = int(x0 + avatar + 36 + fuente_nombre.getlength(linea) + 14)
+                caja = lapiz.textbbox((x0 + avatar + 36, yt), linea, font=fuente_nombre, anchor='la')
+                yc = int((caja[1] + caja[3]) / 2 - lado_check / 2)
+                img.paste(_check(lado_check), (xc, yc), _check(lado_check))
             yt += alto_linea_nombre
         yt += 10
         for linea in lineas_sub:

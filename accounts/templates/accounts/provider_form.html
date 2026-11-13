@@ -163,7 +163,7 @@
           <div class="ficha-who">
             <div class="ficha-avatar{% if provider.foto %} con-foto{% endif %}" data-previa-avatar{% if provider.foto %} data-actual="{{ provider.foto.url }}"{% endif %}>{% if provider.foto %}<img src="{{ provider.foto.url }}" alt="" width="46" height="52">{% else %}?{% endif %}</div>
             <div>
-              <p class="ficha-nombre" data-previa="business_name" data-vacio="Tu nombre o el de tu negocio">Tu nombre o el de tu negocio</p>
+              <p class="ficha-nombre"><span data-previa="business_name" data-vacio="Tu nombre o el de tu negocio">Tu nombre o el de tu negocio</span>{% if provider.verificado_publico %}{% include 'directory/_check_verificado.html' %}{% endif %}</p>
               <p data-previa="sector" data-vacio="Tu sector o barrio">Tu sector o barrio</p>
             </div>
           </div>
@@ -173,7 +173,7 @@
             <dt>Título</dt><dd data-previa="profession_title"></dd>
             <dt data-previa-inst>Estudió en</dt><dd data-previa="institution" data-previa-inst></dd>
           </dl>
-          <div class="ficha-tags" data-previa-tags>{% if provider.verificado_publico %}<span class="badge badge-verified">Verificado</span>{% endif %}</div>
+          <div class="ficha-tags" data-previa-tags></div>
           <div class="ficha-acciones">
             <span class="ficha-ver" aria-disabled="true">Ver ficha →</span>
             <span class="btn btn-success">WhatsApp</span>

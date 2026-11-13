@@ -67,11 +67,10 @@
               <div class="d-flex flex-wrap gap-2 mb-1">
                 <span class="badge badge-category">{{ provider.category.name }}</span>
                 {% for otro in provider.otras_categorias.all %}<span class="badge badge-category">{{ otro.name }}</span>{% endfor %}
-                {% if provider.is_verified %}<span class="badge badge-verified">Verificado</span>{% endif %}
                 {% if provider.whatsapp_confirmado %}<span class="badge badge-sello" title="El número de WhatsApp es de esta persona">WhatsApp confirmado</span>{% endif %}{% if provider.registro_salud_comprobado %}<span class="badge badge-sello" title="Revisado en el registro de la Superintendencia de Salud">Registro de salud comprobado</span>{% endif %}{% if provider.licencia_sec_comprobada %}<span class="badge badge-sello" title="Revisada en el buscador de la SEC">Licencia SEC comprobada</span>{% endif %}
                 {% if provider.is_featured %}<span class="badge badge-featured">Destacado</span>{% endif %}
               </div>
-              <h3 class="h6 mb-0">{{ provider.business_name }}</h3>
+              <h3 class="h6 mb-0">{{ provider.business_name }}{% if provider.verificado_publico %}{% include 'directory/_check_verificado.html' %}{% endif %}</h3>
               <p class="text-muted mb-2" style="font-size:.85rem">{% if provider.sector %}{{ provider.sector }}, {% endif %}{{ provider.commune.name }}</p>
               {% if not provider.whatsapp_confirmado and provider.url_confirmar_whatsapp %}
               <div class="confirmar-wa mb-2">

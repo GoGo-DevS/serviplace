@@ -273,7 +273,7 @@ class VerificadoRevisadoAMano(TestCase):
         p.refresh_from_db()
         self.assertTrue(p.is_verified)
         self.client.logout()
-        self.assertContains(self.client.get(p.get_absolute_url()), 'badge-verified')
+        self.assertContains(self.client.get(p.get_absolute_url()), 'data-check-verificado')  # la insignia azul (13-11)
 
     def test_se_puede_quitar(self):
         p = self._ficha('Verificado', whatsapp_confirmado_en=timezone.now(), is_verified=True)

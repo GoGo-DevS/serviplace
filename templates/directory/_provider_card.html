@@ -16,7 +16,7 @@ incompleto. El nombre es el enlace a la ficha; WhatsApp es el botón.
     <div class="ficha-who">
       <div class="ficha-avatar{% if provider.foto %} con-foto{% endif %}" aria-hidden="true">{% if provider.foto %}<img src="{{ provider.foto.url }}" alt="" loading="lazy" width="46" height="52">{% else %}{{ provider.business_name|first|upper }}{% endif %}</div>
       <div>
-        <h3><a href="{{ provider.get_absolute_url }}">{{ provider.business_name }}</a></h3>
+        <h3><a href="{{ provider.get_absolute_url }}">{{ provider.business_name }}</a>{% if provider.verificado_publico %}{% include 'directory/_check_verificado.html' %}{% endif %}</h3>
         <p>{{ provider.sector }}</p>
       </div>
     </div>
@@ -34,9 +34,8 @@ incompleto. El nombre es el enlace a la ficha; WhatsApp es el botón.
     </dl>
     {% endif %}
 
-    {% if provider.modalities or provider.verificado_publico or provider.tiene_sellos %}
+    {% if provider.modalities or provider.tiene_sellos %}
     <div class="ficha-tags">
-      {% if provider.verificado_publico %}<span class="badge badge-verified">Verificado</span>{% endif %}
       {% if provider.whatsapp_confirmado %}<span class="badge badge-sello" title="El número de WhatsApp es de esta persona">WhatsApp confirmado</span>{% endif %}{% if provider.registro_salud_comprobado %}<span class="badge badge-sello" title="Revisado en el registro de la Superintendencia de Salud">Registro de salud comprobado</span>{% endif %}{% if provider.licencia_sec_comprobada %}<span class="badge badge-sello" title="Revisada en el buscador de la SEC">Licencia SEC comprobada</span>{% endif %}
       {% for modalidad in provider.modalities %}<span class="mini-pill">{{ modalidad }}</span>{% endfor %}
     </div>
