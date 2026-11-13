@@ -16,8 +16,11 @@ VOA Chile y Travesía atienden todo Chile (lo confirmó Diego): comuna base
 Santiago y "Atención en todo Chile".
 
 Quedaron fuera por falta de un dato verificable en su sitio (18-10-2026):
-Max Services (sin WhatsApp), Vizo Glow (el número no es WhatsApp en su sitio),
 Punto Parcelas (sin comuna) y AZA (es una organización, no un servicio).
+Max Services y Vizo Glow también quedaron fuera ese día por el WhatsApp; entran
+el 13-11-2026 porque Diego dio el dato en el chat: Max Services usa el
++56 9 5639 0964 (no está en su sitio, que solo publica el fijo) y el número del
+sitio de Vizo Glow sí es su WhatsApp. Esa fuente queda anotada en 'fuentes'.
 """
 
 FUENTE = 'cliente-gogodevs'
@@ -349,5 +352,44 @@ CLIENTES = [
             ('5.webp', 'Tracto camión en patio de contenedores'),
         ],
         'fuentes': ['https://travesialogistica.cl', 'https://travesialogistica.cl/contacto/'],
+    },
+    {
+        'slug': 'max-services',
+        'nombre': 'Max Services SpA',
+        'contacto': 'Max Services',
+        'rubro': 'climatizacion',
+        'comuna': 'el-bosque',
+        'sector': 'El Bosque',
+        'direccion': 'Lynch 9619, El Bosque',
+        'atiende': 'Región Metropolitana y regiones',
+        'whatsapp': '56956390964',
+        'telefono': '+56 2 2559 0108',
+        'email': 'contacto@maxservicesspa.cl',
+        'web': 'https://maxservicesspa.cl',
+        'a_domicilio': True,
+        'corta': 'Climatización, aire acondicionado, ventilación, extracción y presurización de escaleras. Instalación y mantención desde 2011.',
+        'larga': ('Max Services SpA instala y mantiene sistemas de climatización y aire acondicionado, ventilación, '
+                  'extracción y presurización de escaleras para empresas, edificios, constructoras, hospitales y '
+                  'retail. Trabaja en Santiago desde 2011, con proyectos en la Región Metropolitana y en regiones.'),
+        'fuentes': ['https://maxservicesspa.cl', 'https://maxservicesspa.cl/contacto/',
+                    'WhatsApp entregado por Diego Dinamarca en el chat el 13-11-2026'],
+    },
+    {
+        'slug': 'vizo-glow',
+        'nombre': 'Vizo Glow',
+        'rubro': 'maquillaje-y-cosmetica',
+        'comuna': 'santiago',
+        'sector': 'Tienda online',
+        'atiende': 'Despacho en la RM y a regiones',
+        'whatsapp': '56984138244',
+        'telefono': '+56 9 8413 8244',
+        'web': 'https://vizoglow.cl',
+        'instagram': 'vizoglow',
+        'online': True,
+        'corta': 'Maquillaje, skincare y cosmética: paletas, rubores, polvos y tendencias, con despacho en la RM y a regiones.',
+        'larga': ('Vizo Glow es una tienda online de maquillaje y cosmética: paletas de sombras, rubores, polvos '
+                  'compactos, skincare y lo último en tendencias. Se compra en vizoglow.cl, con despacho a todas '
+                  'las comunas de la Región Metropolitana y a regiones.'),
+        'fuentes': ['https://vizoglow.cl', 'WhatsApp confirmado por Diego Dinamarca en el chat el 13-11-2026'],
     },
 ]
