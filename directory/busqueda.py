@@ -56,6 +56,7 @@ SINONIMOS = {
     'traslados-y-turismo': ['traslado', 'transfer', 'aeropuerto'],
     'reposteria-y-dulces': ['torta', 'pasteleria'],
     'juguetes': ['juguete', 'jugueteria', 'peluche', 'didactico', 'montessori', 'juguetes educativos'],
+    'maquillaje-y-cosmetica': ['maquillaje', 'cosmetica', 'cosmeticos', 'skincare', 'labial', 'sombras', 'rubor', 'delineador'],
 }
 
 

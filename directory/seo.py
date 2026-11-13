@@ -41,6 +41,7 @@ TIPO_SCHEMA = {
     'uniformes-y-ropa-de-trabajo': 'ClothingStore',
     'reposteria-y-dulces': 'Bakery',
     'juguetes': 'ToyStore',
+    'maquillaje-y-cosmetica': 'HealthAndBeautyBusiness',
     'fletes-y-logistica': 'MovingCompany',
     'traslados-y-turismo': 'TravelAgency',
 }

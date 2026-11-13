@@ -69,6 +69,14 @@ class BusquedaPorOficio(TestCase):
             self.assertEqual(self._nombres(q), {'Juguetes de Madera Rosa'}, q)
         self.assertEqual(self.cat['juguetes'].group, Category.TIENDAS)
 
+    def test_maquillaje_y_cosmetica_existe_y_se_encuentra(self):
+        # 13-11-2026: Vizo Glow (tienda de maquillaje) no tenía rubro.
+        self._perfil('Glow Maquillaje', 'maquillaje-y-cosmetica')
+        self._perfil('Uñas Sofía', 'manicure-y-estetica')
+        for q in ('maquillaje', 'cosmética', 'cosméticos', 'skincare', 'labial'):
+            self.assertEqual(self._nombres(q), {'Glow Maquillaje'}, q)
+        self.assertEqual(self.cat['maquillaje-y-cosmetica'].group, Category.TIENDAS)
+
     def test_tambien_por_un_rubro_extra(self):
         self._perfil('Maestro Juan', 'construccion', otras=['gasfiteria', 'soldadura'])
         self.assertEqual(self._nombres('soldador'), {'Maestro Juan'})

@@ -59,6 +59,7 @@ SEO_NOMBRES = {
     'uniformes-y-ropa-de-trabajo': 'Tienda de uniformes',
     'reposteria-y-dulces': 'Repostería',
     'juguetes': 'Tienda de juguetes',
+    'maquillaje-y-cosmetica': 'Tienda de maquillaje',
     'fletes-y-logistica': 'Fletes',
     'traslados-y-turismo': 'Transporte de pasajeros',
 }
@@ -129,6 +130,9 @@ CATEGORIAS = [
     # 11-11-2026: Manitos Curiosas (juguetes educativos), invitada por Diego, no
     # encontró su rubro. Va con las tiendas, como Repostería: vende productos.
     ('juguetes', 'Juguetes', 'Juguetes educativos y didácticos, de madera, peluches y juguetes hechos a mano, con retiro o despacho.', '🧸', T, False),
+    # 13-11-2026: Vizo Glow (tienda de maquillaje, cliente de GoGoDevS) no tenía
+    # rubro. Con las tiendas: vende productos, no es un servicio de estética.
+    ('maquillaje-y-cosmetica', 'Maquillaje y cosmética', 'Maquillaje, skincare y cosmética, con retiro o despacho.', '💄', T, False),
 ]
 
 
