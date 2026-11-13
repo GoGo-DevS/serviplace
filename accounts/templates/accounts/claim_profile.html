@@ -15,7 +15,7 @@
       <div class="provider-card-avatar" style="width:56px;height:56px;font-size:1.4rem;flex-shrink:0">{{ provider.business_name|first|upper }}</div>
       <div>
         <h2 class="h4 mb-1">{{ provider.business_name }}</h2>
-        <p class="text-muted mb-0">{{ provider.category.name }} — {{ provider.sector }}, {{ provider.commune.name }}</p>
+        <p class="text-muted mb-0">{{ provider.category.name }} — {% if provider.sector_limpio %}{{ provider.sector_limpio }}, {% endif %}{{ provider.commune.name }}</p>
       </div>
     </div>
 

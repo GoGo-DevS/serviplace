@@ -361,6 +361,15 @@ class Provider(models.Model):
         return self.source_name == 'seed_offline'
 
     @property
+    def sector_limpio(self):
+        """El sector para mostrar: sin la puntuación final que a veces trae
+        ("Santiago." se leía "Santiago., Maipú") y vacío si solo repite la comuna."""
+        sector = (self.sector or '').strip().rstrip('.,;:').strip()
+        if sector.lower() == (self.commune.name if self.commune_id else '').strip().lower():
+            return ''
+        return sector
+
+    @property
     def verificado_publico(self):
         """La insignia "Verificado" que ve el público.
 

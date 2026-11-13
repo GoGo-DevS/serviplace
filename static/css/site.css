@@ -1236,7 +1236,10 @@ a:hover { color: var(--sp-blue-dark); }
     box-shadow: 0 -6px 20px rgba(15,23,42,.12);
   }
 
-  .desktop-whatsapp-button { display: none; }
+  /* !important: el botón lleva .d-flex de Bootstrap (display:flex !important) y
+     le ganaba a este display:none; en el teléfono salían dos botones de WhatsApp
+     seguidos, el de la tarjeta y el de la barra fija (13-11-2026). */
+  .desktop-whatsapp-button { display: none !important; }
   .site-footer { margin-bottom: 76px; }
 }
 

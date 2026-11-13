@@ -13,7 +13,7 @@
         <div class="d-flex flex-wrap gap-2 mb-2 align-items-center">
           <span class="badge badge-category">{{ provider.category.name }}</span>
           {% for otro in otros_rubros %}<a class="badge badge-category badge-otro" href="{{ otro.url }}">{{ otro.categoria.name }}</a>{% endfor %}
-          {% if provider.whatsapp_confirmado %}<span class="badge badge-sello" title="El número de WhatsApp es de esta persona">WhatsApp confirmado</span>{% endif %}{% if provider.registro_salud_comprobado %}<span class="badge badge-sello" title="Revisado en el registro de la Superintendencia de Salud">Registro de salud comprobado</span>{% endif %}{% if provider.licencia_sec_comprobada %}<span class="badge badge-sello" title="Revisada en el buscador de la SEC">Licencia SEC comprobada</span>{% endif %}
+          {% include 'directory/_sellos.html' %}
           {% if not provider.owner %}
             <a class="badge badge-new" href="{% url 'accounts:claim_profile' provider.slug %}">¿Es tuyo? Reclámalo</a>
           {% endif %}
@@ -21,7 +21,7 @@
         <h1 class="mb-1" style="font-size:clamp(1.65rem,4vw,2.75rem);letter-spacing:-.025em">{{ provider.business_name }}{% if provider.verificado_publico %}{% include 'directory/_check_verificado.html' %}{% endif %}</h1>
         {% if provider.profession_title %}<p class="detail-profession mb-1">{{ provider.profession_title }}{% if provider.graduation_year %} · {% if provider.is_student %}se titula en {{ provider.graduation_year }}{% else %}titulado/a en {{ provider.graduation_year }}{% endif %}{% endif %}</p>{% endif %}
         <p class="lead mb-0">{{ provider.short_description }}</p>
-        <p class="text-muted mt-1 mb-0" style="font-size:.95rem">{{ provider.sector }} · {{ provider.commune.name }}</p>
+        <p class="text-muted mt-1 mb-0" style="font-size:.95rem">{% if provider.sector_limpio %}{{ provider.sector_limpio }} · {% endif %}{{ provider.commune.name }}</p>
         {% if provider.modalities %}
         <div class="d-flex gap-2 flex-wrap mt-2">
           {% for modalidad in provider.modalities %}<span class="mini-pill">{{ modalidad }}</span>{% endfor %}
@@ -195,7 +195,7 @@
         <div class="contact-card-body">
           <dl class="info-list">
             <dt>Contacto</dt><dd>{{ provider.contact_name }}</dd>
-            <dt>Sector</dt><dd>{{ provider.sector }}, {{ provider.commune.name }}</dd>
+            <dt>Sector</dt><dd>{% if provider.sector_limpio %}{{ provider.sector_limpio }}, {% endif %}{{ provider.commune.name }}</dd>
             <dt>Teléfono</dt><dd>{{ provider.phone }}</dd>
             {% if provider.email %}<dt>Email</dt><dd>{{ provider.email }}</dd>{% endif %}
             {% comment %}rel="ugc": el enlace lo escribe quien publica, no ServiPlace.{% endcomment %}

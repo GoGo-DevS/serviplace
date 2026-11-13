@@ -563,6 +563,29 @@ body:has(.galeria-visor[open]) { overflow: hidden; }
 /* ---- Sellos que dicen qué se comprobó (30-10-2026) ---- */
 .badge-sello { background: #fff; color: var(--sp-green-dark); border: 1px solid var(--sp-green); font-weight: 700; }
 .badge-sello::before { content: "✓ "; }
+
+/* ---- Sellos con ícono (13-11-2026): directory/_sellos.html ----
+   Cada sello dice qué se comprobó; el ícono dice de un vistazo de qué se trata. */
+.sello {
+  display: inline-flex; align-items: center; gap: .42rem;
+  padding: .24rem .7rem .24rem .26rem; border-radius: 999px;
+  font-family: var(--font-head, inherit); font-weight: 700; font-size: .78rem; line-height: 1.2;
+  letter-spacing: -.005em; white-space: nowrap;
+  border: 1px solid transparent; box-shadow: 0 1px 2px rgba(15, 23, 42, .06);
+}
+.sello-ico {
+  display: inline-grid; place-items: center; flex: none;
+  width: 1.55rem; height: 1.55rem; border-radius: 999px; color: #fff;
+  box-shadow: inset 0 -2px 0 rgba(0, 0, 0, .08);
+}
+.sello-ico svg { width: .95rem; height: .95rem; }
+.sello-wa { background: #e8f8ee; color: #0b6b3a; border-color: rgba(37, 211, 102, .35); }
+.sello-wa .sello-ico { background: #25d366; }
+.sello-salud { background: #e6f4f8; color: #0b5c73; border-color: rgba(14, 116, 144, .3); }
+.sello-salud .sello-ico { background: #0e7490; }
+.sello-sec { background: #fff4dc; color: #8a4b00; border-color: rgba(217, 119, 6, .35); }
+.sello-sec .sello-ico { background: #d97706; }
+.ficha-tags .sello { font-size: .74rem; }
 .sellos-lista { margin: 0 0 .8rem; padding-left: 1.1rem; display: grid; gap: .35rem; font-size: .93rem; }
 .confirmar-wa { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .75rem; padding: .85rem 1rem; margin-bottom: 1rem; border-radius: 14px; background: var(--sp-green-light); color: var(--sp-ink); font-size: .9rem; }
 .confirmar-wa > div { flex: 1 1 280px; }
