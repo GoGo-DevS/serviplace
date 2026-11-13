@@ -48,8 +48,10 @@ class SellosConIcono(TestCase):
             for sello, texto in (('whatsapp', 'WhatsApp confirmado'), ('salud', 'Registro de salud comprobado'),
                                  ('sec', 'Licencia SEC comprobada')):
                 i = html.index(f'data-sello="{sello}"')
-                self.assertIn('class="sello-ico"', html[i:i + 300])
-                self.assertIn(texto, html[i:i + 1600])
+                # WhatsApp es solo el logo con el visto ("Opción A"); el texto queda oculto
+                # para lectores de pantalla. Salud y SEC siguen con ícono y texto.
+                self.assertIn('class="wa-logo"' if sello == 'whatsapp' else 'class="sello-ico"', html[i:i + 300])
+                self.assertIn(texto, html[i:i + 2400])
 
     def test_sin_comprobar_no_hay_sellos(self):
         html = self.client.get(self._perfil().get_absolute_url()).content.decode()

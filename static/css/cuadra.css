@@ -586,6 +586,15 @@ body:has(.galeria-visor[open]) { overflow: hidden; }
 .sello-sec { background: #fff4dc; color: #8a4b00; border-color: rgba(217, 119, 6, .35); }
 .sello-sec .sello-ico { background: #d97706; }
 .ficha-tags .sello { font-size: .74rem; }
+/* WhatsApp confirmado: el logo a color con un visto verde (13-11, "Opción A" de Diego). */
+.sello-wa-logo { position: relative; display: inline-flex; flex: none; width: 2rem; height: 2rem; vertical-align: middle; }
+.sello-wa-logo .wa-logo { width: 100%; height: 100%; filter: drop-shadow(0 1px 2px rgba(15, 23, 42, .15)); }
+.sello-wa-logo .wa-check {
+  position: absolute; right: -4px; bottom: -4px; width: 1rem; height: 1rem; border-radius: 50%;
+  display: grid; place-items: center; background: #16a34a; border: 2px solid #fff;
+}
+.sello-wa-logo .wa-check svg { width: .62rem; height: .62rem; fill: none; stroke: #fff; stroke-width: 3.6; stroke-linecap: round; stroke-linejoin: round; }
+.ficha-tags .sello-wa-logo { width: 1.75rem; height: 1.75rem; }
 .sellos-lista { margin: 0 0 .8rem; padding-left: 1.1rem; display: grid; gap: .35rem; font-size: .93rem; }
 .confirmar-wa { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .75rem; padding: .85rem 1rem; margin-bottom: 1rem; border-radius: 14px; background: var(--sp-green-light); color: var(--sp-ink); font-size: .9rem; }
 .confirmar-wa > div { flex: 1 1 280px; }
