@@ -239,6 +239,9 @@ SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_HTTPONLY = False  # el JS del sitio no lo lee, pero Django lo necesita para forms
 SESSION_COOKIE_SAMESITE = 'Lax'
 CSRF_COOKIE_SAMESITE = 'Lax'
+# 15-11-2026: la página de Django para un 403 de CSRF está en inglés y no dice
+# qué hacer. Quien la veía al registrarse ya tenía la cuenta creada y no lo sabía.
+CSRF_FAILURE_VIEW = 'core.views.csrf_fallo'
 if not DEBUG:
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True

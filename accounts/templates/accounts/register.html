@@ -1,31 +1,85 @@
 {% extends "base.html" %}
 
 {% block content %}
+{% comment %}
+15-11-2026 — De 172 que abrían esta página en 30 días, 26 creaban la cuenta.
+Pedía nombre de usuario con reglas, la contraseña dos veces y un CV, y casi no
+decía qué se gana. Ahora: correo y contraseña (el CV se ofrece en el paso 2) y,
+al lado, lo que se lleva y cómo sigue. Nada de cifras inventadas.
+{% endcomment %}
 <section class="page-header">
   <div class="container py-4">
-    <span class="eyebrow">Únete gratis</span>
-    <h1 class="h2 mt-2 mb-1">Crea tu cuenta en SERVIPLACE</h1>
-    <p class="text-muted mb-0">Publica tu servicio en minutos y recibe consultas directas por WhatsApp.</p>
+    <span class="eyebrow">Paso 1 de 2 · Gratis</span>
+    <h1 class="h2 mt-2 mb-1">Publica tus servicios en ServiPlace</h1>
+    <p class="text-muted mb-0">Gratis y sin comisión: los clientes te escriben directo a tu WhatsApp. Crea tu cuenta con tu correo y después armas tu ficha.</p>
   </div>
 </section>
 
 <section class="container py-5">
-  <div class="auth-card">
-    <p class="form-microcopy">Sin moderación previa. Publicas y queda visible de inmediato.</p>
-    {% include "_errores_form.html" %}
-    <form method="post" enctype="multipart/form-data" novalidate data-un-envio>
-      {% csrf_token %}
-      {% if ref_code %}<input type="hidden" name="ref" value="{{ ref_code }}">{% endif %}
-      {% include "_antispam.html" %}
-      {% for field in form.visible_fields %}{% if field.name != "sitio_web_confirmacion" %}
-        <div class="mb-3">{% include "accounts/_campo.html" with campo=field %}</div>
-      {% endif %}{% endfor %}
-      <button type="submit" class="btn btn-primary w-100 btn-lg mt-2" data-enviando="Creando tu cuenta…">Crear cuenta gratis</button>
-      <p class="form-text text-center mt-2 mb-0">Al crear tu cuenta aceptas los <a href="{% url 'core:terms' %}">términos de uso</a> y la <a href="{% url 'core:privacy' %}">política de privacidad</a>.</p>
-    </form>
-    <p class="text-center text-muted mt-3" style="font-size:.88rem">
-      ¿Ya tienes cuenta? <a href="{% url 'accounts:login' %}">Iniciar sesión</a>
-    </p>
+  <div class="row g-4 g-xl-5 justify-content-center">
+    <div class="col-lg-6 col-xl-5">
+      <div class="auth-card registro-card">
+        {% if csrf_aviso %}
+        <div class="registro-aviso" role="alert"><b>La página se había quedado desactualizada.</b> Por seguridad, escribe tu contraseña otra vez y vuelve a enviar. Tu correo ya está puesto.
+          {% if sin_cookies %}<br>Si vuelve a pasar, tu navegador puede estar bloqueando las cookies. Si abriste el enlace desde Instagram o Facebook, ábrelo en Chrome o Safari: menú <b>···</b> y luego <b>Abrir en el navegador</b>.{% endif %}</div>
+        {% endif %}
+        {% include "_errores_form.html" %}
+        <form method="post" novalidate data-un-envio data-recargar-si-vuelve>
+          {% csrf_token %}
+          {% if ref_code %}<input type="hidden" name="ref" value="{{ ref_code }}">{% endif %}
+          {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+          {% include "_antispam.html" %}
+          <div class="mb-3">{% include "accounts/_campo.html" with campo=form.email %}</div>
+          <div class="mb-3 campo-clave">
+            {% include "accounts/_campo.html" with campo=form.password1 %}
+            <button type="button" class="campo-clave-ver" data-ver-clave aria-controls="{{ form.password1.id_for_label }}" aria-pressed="false">Mostrar</button>
+          </div>
+          <div class="mb-3">{% include "accounts/_campo.html" with campo=form.whatsapp %}</div>
+          {% comment %}El usuario sale del correo; solo se muestra si algo falló con él.{% endcomment %}
+          {% if form.username.errors %}<div class="mb-3">{% include "accounts/_campo.html" with campo=form.username %}</div>{% endif %}
+          <button type="submit" class="btn btn-primary w-100 btn-lg mt-2" data-enviando="Creando tu cuenta…">Crear cuenta y seguir con mi ficha</button>
+          <p class="form-text text-center mt-2 mb-0">Al crear tu cuenta aceptas los <a href="{% url 'core:terms' %}">términos de uso</a> y la <a href="{% url 'core:privacy' %}">política de privacidad</a>.</p>
+        </form>
+        <p class="text-center text-muted mt-3 mb-0" style="font-size:.88rem">
+          ¿Ya tienes cuenta? <a href="{% url 'accounts:login' %}">Inicia sesión con tu correo</a>
+        </p>
+      </div>
+    </div>
+
+    <aside class="col-lg-5 col-xl-4" aria-labelledby="beneficios-titulo">
+      <div class="registro-beneficios">
+        <h2 id="beneficios-titulo">Lo que te llevas</h2>
+        <ul class="registro-lista">
+          <li><b>Gratis y sin comisión.</b> Publicar no cuesta nada y no cobramos por tus trabajos.</li>
+          <li><b>Te escriben directo a tu WhatsApp.</b> Sin intermediarios ni formularios de por medio.</li>
+          <li><b>Apareces en tu comuna y en las que atiendes.</b> Marcas las comunas o toda la región.</li>
+          <li><b>Muestras tu trabajo.</b> Fotos, tu formación y sellos de lo que comprobamos: WhatsApp, registro de salud o licencia SEC.</li>
+          <li><b>La compartes en Instagram.</b> Te damos una historia lista con tu ficha.</li>
+        </ul>
+        <h3>Cómo sigue</h3>
+        <ol class="registro-pasos">
+          <li><b>Tu cuenta:</b> correo y contraseña.</li>
+          <li><b>Tu ficha:</b> qué haces, dónde y tu WhatsApp. Si tienes tu CV a mano, lo leemos y llenamos lo que podamos.</li>
+          <li><b>Lista:</b> queda publicada al instante, sin esperar revisión.</li>
+        </ol>
+      </div>
+    </aside>
   </div>
 </section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Ver la contraseña: con una sola casilla (sin confirmar), poder revisarla evita errores.
+  document.querySelectorAll('[data-ver-clave]').forEach(function (b) {
+    var campo = document.getElementById(b.getAttribute('aria-controls'));
+    if (!campo) return;
+    b.addEventListener('click', function () {
+      var ver = campo.type === 'password';
+      campo.type = ver ? 'text' : 'password';
+      b.textContent = ver ? 'Ocultar' : 'Mostrar';
+      b.setAttribute('aria-pressed', ver ? 'true' : 'false');
+    });
+  });
+</script>
 {% endblock %}

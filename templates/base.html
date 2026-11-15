@@ -199,7 +199,11 @@
       });
     });
     // Al volver con "atrás", el formulario vuelve a estar disponible.
-    window.addEventListener('pageshow', function () {
+    window.addEventListener('pageshow', function (e) {
+      // Restaurada desde la memoria del navegador (bfcache), un formulario con
+      // data-recargar-si-vuelve trae un token CSRF que pudo vencer (registrarse
+      // inicia sesión y lo cambia): se recarga para no terminar en un 403.
+      if (e.persisted && document.querySelector('form[data-recargar-si-vuelve]')) { location.reload(); return; }
       document.querySelectorAll('form[data-enviado]').forEach(function (f) {
         delete f.dataset.enviado;
         f.querySelectorAll('button.is-enviando').forEach(function (b) {

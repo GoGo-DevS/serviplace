@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% comment %}
+403 de CSRF (core.views.csrf_fallo). Reemplaza la página en inglés de Django.
+Lo que se envió NO se guardó: hay que decirlo claro y decir cómo reintentar.
+{% endcomment %}
+<section class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-7 col-xl-6">
+      <div class="auth-card">
+        <span class="eyebrow">Error 403</span>
+        <h1 class="h3 mt-2">No pudimos guardar lo que enviaste</h1>
+        <p>La página estuvo abierta mucho rato, se abrió en otra pestaña o la sesión cambió entretanto. Por seguridad, no guardamos ese envío.</p>
+        <p class="mb-3"><b>Qué hacer:</b> vuelve atrás, recarga la página y envía de nuevo.</p>
+        {% if sin_cookies %}
+        <p class="registro-aviso">Si vuelve a pasar, tu navegador puede estar bloqueando las cookies, y sin ellas no podemos recibir formularios. Si abriste el enlace desde Instagram o Facebook, ábrelo en Chrome o Safari: menú <b>···</b> y luego <b>Abrir en el navegador</b>.</p>
+        {% endif %}
+        <div class="d-flex flex-wrap gap-2 mt-3">
+          {% if user.is_authenticated %}
+          <a class="btn btn-primary" href="{% url 'accounts:dashboard' %}">Ir a mi panel</a>
+          {% else %}
+          <a class="btn btn-primary" href="{% url 'accounts:register' %}">Crear mi cuenta</a>
+          <a class="btn btn-outline-primary" href="{% url 'accounts:login' %}">Iniciar sesión</a>
+          {% endif %}
+          <a class="btn btn-light" href="{% url 'core:home' %}">Ir al inicio</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

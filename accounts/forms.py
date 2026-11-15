@@ -5,6 +5,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.utils import timezone
 from django.utils.html import strip_tags
+from django.utils.text import slugify
 
 from django.core.files.uploadedfile import UploadedFile
 
@@ -120,12 +121,22 @@ class RegisterForm(AntispamFormMixin, UserCreationForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        # 15-11-2026 — De 172 que abrían el registro, 26 creaban la cuenta (15 %).
+        # El formulario pedía un nombre de usuario con reglas ("solo letras,
+        # números y @/./+/-/_") y la contraseña dos veces. Ahora basta correo y
+        # contraseña: el usuario sale del correo (se entra con el correo desde el
+        # 11-11) y la contraseña se escribe una vez, con botón para verla. Los dos
+        # campos siguen aceptándose si llegan (formularios viejos, pruebas).
+        self.fields['username'].required = False
         self.fields['username'].label = 'Nombre de usuario'
-        self.fields['username'].help_text = 'Solo letras, números y @/./+/-/_'
+        self.fields['username'].help_text = ''
         self.fields['password1'].label = 'Contraseña'
         self.fields['password1'].help_text = 'Mínimo 8 caracteres. No uses solo números.'
+        self.fields['password2'].required = False
         self.fields['password2'].label = 'Confirmar contraseña'
         self.fields['password2'].help_text = ''
+        self.fields['email'].widget.attrs.update({'autocomplete': 'email', 'inputmode': 'email', 'autofocus': True})
+        self.fields['username'].widget.attrs.pop('autofocus', None)
         # Lo que se leyó del CV, o por qué no se pudo. Un CV ilegible NO
         # impide crear la cuenta: es opcional, y el navegador obligaría a
         # reescribir las contraseñas por un archivo que no hacía falta.
@@ -159,6 +170,28 @@ class RegisterForm(AntispamFormMixin, UserCreationForm):
 
     def antispam_textos(self):
         return [self.data.get('username', ''), self.data.get('email', '')]
+
+    @staticmethod
+    def usuario_desde_correo(email):
+        """'Tomás.Rojas+obra@gmail.com' -> 'tomas.rojas', único (tomas.rojas2, …).
+        Solo lo que acepta el validador de Django: letras, números y @ . + - _."""
+        base = slugify((email or '').split('@')[0].split('+')[0].replace('.', '-')).replace('-', '.')[:30] or 'usuario'
+        candidato, n = base, 2
+        while User.objects.filter(username__iexact=candidato).exists():
+            candidato, n = f'{base}{n}', n + 1
+        return candidato
+
+    def clean(self):
+        # Sin confirmación (el formulario nuevo no la pide): la misma contraseña.
+        if not self.cleaned_data.get('password2') and self.cleaned_data.get('password1'):
+            self.cleaned_data['password2'] = self.cleaned_data['password1']
+        if not self.cleaned_data.get('username') and self.cleaned_data.get('email') and 'username' not in self.errors:
+            self.cleaned_data['username'] = self.usuario_desde_correo(self.cleaned_data['email'])
+        return super().clean()
+
+    def validate_password_for_user(self, user, password_field_name='password1'):
+        # El error de una contraseña débil va en el campo que la persona VE.
+        return super().validate_password_for_user(user, password_field_name=password_field_name)
 
 
 class ProviderForm(AntispamFormMixin, forms.ModelForm):

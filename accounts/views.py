@@ -10,6 +10,7 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.utils.http import url_has_allowed_host_and_scheme
+from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_POST
 
 from core.antispam import excede_limite_ip, ip_cliente
@@ -63,9 +64,13 @@ class LoginThrottledView(LoginView):
         return ctx
 
 
+@never_cache  # una copia vieja de esta página trae un token CSRF vencido: 403 al enviar
 def register(request):
     ref_code = request.GET.get('ref', '') or request.POST.get('ref', '')
     if request.user.is_authenticated:
+        # Quien ya creó la cuenta pero no alcanzó a publicar sigue en el paso 2.
+        if not Provider.objects.filter(owner=request.user).exists():
+            return redirect('accounts:provider_create')
         return redirect('accounts:dashboard')
 
     if request.method == 'POST':
@@ -94,7 +99,7 @@ def register(request):
                 _guardar_borrador_cv(request, form.cv_texto)
             elif form.cv_error:
                 request.session['cv_error'] = f'Tu cuenta quedó creada, pero no pudimos leer tu CV. {form.cv_error}'
-            messages.success(request, f'Bienvenido/a a ServiPlace, {user.username}. Ya puedes publicar tu servicio.')
+            messages.success(request, 'Tu cuenta quedó creada. Ahora arma tu ficha: es el paso 2 de 2.')
             next_url = request.GET.get('next') or request.POST.get('next')
             # `startswith('/')` dejaba pasar `//sitio-ajeno.com`, que el
             # navegador lee como otro dominio: una redirección abierta justo

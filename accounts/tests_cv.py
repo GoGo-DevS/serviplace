@@ -346,9 +346,14 @@ class ElCVAlRegistrarse(TestCase):
         datos.update(extra)
         return self.client.post(reverse('accounts:register'), datos)
 
-    def test_el_registro_ofrece_adjuntar_el_cv(self):
+    def test_el_cv_se_ofrece_en_el_paso_2_no_en_el_registro(self):
+        # 15-11-2026: el registro quedó en correo y contraseña. El CV se sigue
+        # aceptando si llega (formularios viejos), pero se ofrece en la ficha.
         html = self.client.get(reverse('accounts:register')).content.decode()
-        self.assertIn('enctype="multipart/form-data"', html)
+        self.assertNotIn('name="cv"', html)
+        self.assertIn('tu CV', html)
+        self.client.force_login(User.objects.create_user('ana', password='clave-larga-de-verdad-99'))
+        html = self.client.get(reverse('accounts:provider_create')).content.decode()
         self.assertIn('name="cv"', html)
 
     def test_registrarse_con_cv_deja_el_perfil_llenado(self):

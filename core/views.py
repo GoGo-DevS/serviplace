@@ -1,3 +1,5 @@
+import logging
+
 from django.conf import settings
 from django.contrib import messages
 from django.http import Http404
@@ -6,7 +8,10 @@ from django.db.models import Count, Prefetch, Q
 from django.urls import reverse
 from urllib.parse import urlencode
 from django.utils import timezone
+from django.views.decorators.csrf import requires_csrf_token
+from django.middleware.csrf import REASON_NO_CSRF_COOKIE
 
+from accounts.forms import RegisterForm
 from directory.catalogo import categorias_por_grupo, perfiles_por_rubro
 from directory.models import Category, Commune, Provider, ProviderImage, Region
 from leads.models import LeadEvent
@@ -301,3 +306,56 @@ def guia(request, slug):
             seo.articulo(datos, path),
         ),
     })
+
+
+log_csrf = logging.getLogger('serviplace.csrf')
+
+
+@requires_csrf_token
+def csrf_fallo(request, reason=''):
+    """El 403 de CSRF, en castellano y con una salida (CSRF_FAILURE_VIEW).
+
+    15-11-2026: en los registros de Render, "POST /cuenta/registro/ 403" justo
+    después de un registro que sí había creado la cuenta, y de alguien que aún
+    no la tenía. La persona veía "Forbidden (403) CSRF verification failed" en
+    inglés, creía que el registro había fallado y se iba. Ahora:
+      - con la sesión iniciada (la cuenta ya existe): sigue en el paso 2;
+      - sin sesión, en el registro: el mismo formulario con su correo puesto y
+        un token nuevo, para reenviar con solo escribir la contraseña;
+      - en cualquier otro lado: qué pasó y qué hacer.
+    Nunca se ejecuta lo que se envió: sin un token válido no se guarda nada.
+    El motivo queda en el log para saber cuál de los casos es el que ocurre.
+    """
+    sin_cookies = reason == REASON_NO_CSRF_COOKIE and not request.COOKIES
+    log_csrf.warning(
+        'CSRF %s %s: %s | sesion=%s | sin_cookies=%s | ua=%s | referer=%s',
+        request.method, request.path, reason, request.user.is_authenticated, sin_cookies,
+        request.META.get('HTTP_USER_AGENT', '')[:160], request.META.get('HTTP_REFERER', '')[:160],
+    )
+    en_registro = request.path == reverse('accounts:register')
+    en_login = request.path == reverse('accounts:login')
+    if request.user.is_authenticated and (en_registro or en_login):
+        if Provider.objects.filter(owner=request.user).exists():
+            messages.info(request, 'Ya tenías la sesión iniciada. Este es tu panel.')
+            return redirect('accounts:dashboard')
+        messages.info(request, 'Tu cuenta ya quedó creada. Sigue con tu ficha: es el paso 2 de 2.')
+        return redirect('accounts:provider_create')
+    if en_registro and request.method == 'POST':
+        form = RegisterForm(initial={
+            'email': request.POST.get('email', '')[:254],
+            'whatsapp': request.POST.get('whatsapp', '')[:30],
+        })
+        # El correo ya está puesto: lo único que falta escribir es la contraseña.
+        form.fields['email'].widget.attrs.pop('autofocus', None)
+        form.fields['password1'].widget.attrs['autofocus'] = True
+        ref_code = request.POST.get('ref', '')[:40]
+        siguiente = request.POST.get('next', '')[:300]
+        return render(request, 'accounts/register.html', {
+            'form': form, 'ref_code': ref_code, 'next': siguiente,
+            'csrf_aviso': True, 'sin_cookies': sin_cookies,
+            'page_title': 'Crear cuenta gratis | ServiPlace', 'robots': 'noindex',
+        }, status=403)
+    return render(request, 'core/csrf_fallo.html', {
+        'sin_cookies': sin_cookies,
+        'page_title': 'No pudimos guardar el envío | ServiPlace', 'robots': 'noindex',
+    }, status=403)
