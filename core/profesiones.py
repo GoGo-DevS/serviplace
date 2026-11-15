@@ -433,6 +433,91 @@ PROFESIONES = {
         ],
     },
 
+    # 15-11-2026 — Pedro: en belleza "solo había peluquería" y faltaba uno general.
+    'belleza-integral': {
+        'clientes': 'clientas y clientes',
+        'titulo': 'Belleza integral: consigue clientas en tu comuna',
+        'h1': 'Belleza integral: clientas de tu comuna para pelo, uñas, pestañas y más',
+        'meta': 'Publica gratis tu salón o tu servicio de belleza integral: todos tus servicios, fotos de tus trabajos y contacto directo por WhatsApp.',
+        'intro': 'Si haces de todo (corte, color, uñas, pestañas, cejas, maquillaje), tu ventaja es que una clienta resuelve varias cosas en una sola cita. Para que te encuentren, nombra cada servicio en tu perfil y marca también esos rubros: así apareces cuando buscan manicure o peluquería, no solo belleza.',
+        'buscan': [
+            'Varios servicios en una sola visita: pelo, uñas y cejas.',
+            'Arreglo completo para un evento: peinado, maquillaje y uñas.',
+            'Mantención mensual con la misma persona de confianza.',
+            'Atención en un salón o a domicilio.',
+        ],
+        'credencial': None,
+        'credencial_texto': 'Si estudiaste peluquería o cosmetología, o hiciste cursos certificados, agrégalos en tu formación con su institución: puedes poner varios, uno por línea. Cuenta también cómo cuidas la higiene del instrumental.',
+        'tips': [
+            'Haz una lista de servicios agrupada: pelo, uñas, pestañas y cejas, maquillaje.',
+            'Marca como otros rubros lo que más haces (peluquería, manicure): apareces en esos listados.',
+            'Sube fotos de distintos trabajos, no solo de uno.',
+            'Aclara si atiendes en salón, en tu casa o a domicilio, y en qué comunas.',
+        ],
+        'ejemplo_corta': 'Salón de belleza en La Florida: corte, color, manicure, pestañas y maquillaje para eventos.',
+        'ejemplo_larga': 'Tengo un salón pequeño en La Florida donde hago corte y color, manicure con esmaltado permanente, lifting de pestañas y diseño de cejas. Para matrimonios y graduaciones armo el paquete completo: peinado, maquillaje y uñas el mismo día. Atiendo con hora agendada y también voy a domicilio en comunas cercanas.',
+        'faq': [
+            ('¿Elijo Belleza integral o un rubro más específico?', 'Si haces de todo, elige Belleza integral como principal y marca como otros rubros lo que más haces: así apareces en todos esos listados.'),
+            ('¿ServiPlace cobra por cada clienta?', 'No. Publicar es gratis y no cobramos comisión.'),
+        ],
+    },
+
+    'maquillaje-profesional': {
+        'clientes': 'clientas',
+        'titulo': 'Maquilladora profesional: clientas para eventos',
+        'h1': 'Maquillaje profesional: novias, eventos y sesiones de fotos en tu zona',
+        'meta': 'Perfil de maquilladora gratis: los eventos que atiendes, si haces prueba previa y tu Instagram como portafolio. Te escriben directo por WhatsApp.',
+        'intro': 'En maquillaje, la clienta te elige mirando trabajos anteriores y te contrata para una fecha. Lo que más pregunta: si haces prueba previa, si vas al lugar del evento, cuánto dura el maquillaje y con qué productos trabajas. Si tu perfil lo responde, la conversación parte con la fecha.',
+        'buscan': [
+            'Maquillaje de novia con prueba previa.',
+            'Maquillaje para graduaciones, matrimonios y fiestas.',
+            'Maquillaje para sesiones de fotos o grabaciones.',
+            'Clases de automaquillaje y asesoría de imagen.',
+        ],
+        'credencial': None,
+        'credencial_texto': 'Si estudiaste maquillaje profesional o caracterización, ponlo con su institución. Tu Instagram es tu portafolio: agrégalo y sube fotos con buena luz, sin filtros que cambien el resultado.',
+        'tips': [
+            'Muestra tu trabajo con luz natural y sin filtros fuertes.',
+            'Cuenta si haces prueba previa y si te trasladas al lugar del evento.',
+            'Di con qué tipo de productos trabajas y para qué tipos de piel.',
+            'Aclara con cuánta anticipación conviene reservar una fecha.',
+        ],
+        'ejemplo_corta': 'Maquilladora en Viña del Mar: novias, graduaciones y sesiones de fotos, con prueba previa.',
+        'ejemplo_larga': 'Soy maquilladora profesional y me especializo en novias y eventos. Antes del matrimonio hacemos una prueba para elegir el estilo, y el día del evento voy a tu casa o al lugar donde te arreglas. Trabajo con productos de larga duración pensados para fotos. Mis trabajos están en mi Instagram.',
+        'faq': [
+            ('¿Puedo publicar si también hago peinados?', 'Sí. Cuéntalo en la descripción y marca Peluquería como otro rubro: apareces también en ese listado.'),
+            ('¿Este rubro sirve para vender maquillaje?', 'No: es para el servicio de maquillar. Una tienda de productos va en Maquillaje y cosmética, dentro de Tiendas.'),
+        ],
+    },
+
+    'masajes-y-spa': {
+        'clientes': 'clientes',
+        'titulo': 'Masajista independiente: consigue clientes',
+        'h1': 'Masajes y spa: clientes de tu comuna, en tu espacio o a domicilio',
+        'meta': 'Publica gratis tu perfil de masajista: tipos de masaje, si vas a domicilio y cómo trabajas. Tus clientes te escriben directo por WhatsApp.',
+        'intro': 'Quien busca un masaje quiere saber tres cosas antes de escribir: qué tipo de masaje haces, dónde (tu espacio o a domicilio, con camilla) y cuánto dura la sesión. Si además cuentas tu formación, la confianza llega antes.',
+        'buscan': [
+            'Masaje de relajación.',
+            'Masaje descontracturante para espalda y cuello.',
+            'Drenaje linfático.',
+            'Masajes a domicilio o en un spa.',
+        ],
+        'credencial': None,
+        'credencial_texto': 'Si estudiaste masoterapia o tienes cursos certificados, agrégalos con su institución. Si tu trabajo es rehabilitar lesiones, conviene publicar como Kinesiología, donde tus pacientes pueden comprobar tu registro de salud.',
+        'tips': [
+            'Nombra cada tipo de masaje que haces y cuánto dura la sesión.',
+            'Aclara si llevas camilla a domicilio y en qué comunas atiendes.',
+            'Cuenta cómo cuidas la higiene: sábanas limpias y aceites para cada persona.',
+            'Sube una foto de tu espacio de trabajo.',
+        ],
+        'ejemplo_corta': 'Masajista en Ñuñoa: relajación, descontracturante y drenaje linfático, también a domicilio.',
+        'ejemplo_larga': 'Soy masoterapeuta y hago masajes de relajación, descontracturantes y drenaje linfático. Atiendo en mi espacio en Ñuñoa y también voy a domicilio con mi camilla en comunas cercanas. Las sesiones duran una hora y uso sábanas limpias y aceites neutros para cada persona.',
+        'faq': [
+            ('¿Puedo publicar si trabajo en un spa?', 'Sí. Publica tu perfil y aclara en qué spa atiendes y si también vas a domicilio.'),
+            ('¿ServiPlace cobra por cada cliente?', 'No. Publicar es gratis y no cobramos comisión.'),
+        ],
+    },
+
     # -------------------------------------------------- SERVICIOS PROFESIONALES
     'contabilidad': {
         'clientes': 'clientes',

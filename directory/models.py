@@ -60,7 +60,7 @@ class Category(models.Model):
         (HOGAR, 'Hogar y oficios', 'Maestros y técnicos para tu casa.'),
         (SALUD, 'Salud y bienestar', 'Kinesiólogos, psicólogos, nutricionistas y más.'),
         (EDUCACION, 'Clases y educación', 'Profes particulares, idiomas, música y apoyo escolar.'),
-        (BELLEZA, 'Belleza y cuidado personal', 'Peluquería, manicure y estética, también a domicilio.'),
+        (BELLEZA, 'Belleza y cuidado personal', 'Peluquería, manicure, maquillaje, masajes y estética, también a domicilio.'),
         (PROFESIONAL, 'Servicios profesionales', 'Contabilidad, diseño, fotografía, informática y desarrollo web.'),
         (TRANSPORTE, 'Transporte y traslados', 'Fletes, mudanzas, logística y traslado de pasajeros.'),
         (TIENDAS, 'Tiendas y emprendimientos', 'Emprendimientos y tiendas con local o despacho: repostería, repuestos, uniformes y más.'),
@@ -157,20 +157,48 @@ class ProviderQuerySet(models.QuerySet):
         otros = Provider.otras_categorias.through.objects.filter(category=categoria).values('provider_id')
         return self.filter(models.Q(category=categoria) | models.Q(pk__in=otros))
 
-    def por_confianza(self):
+    def por_confianza(self, comuna=None):
         """Destacados, verificados y con WhatsApp confirmado primero. Confirmar
-        el WhatsApp sube en los listados: es el incentivo para hacerlo."""
-        return self.annotate(wa_confirmado=models.ExpressionWrapper(
+        el WhatsApp sube en los listados: es el incentivo para hacerlo.
+
+        Con comuna (15-11-2026): después de los destacados van los que tienen ahí
+        su base, y luego los que solo la atienden (cobertura o toda la región).
+        """
+        qs = self.annotate(wa_confirmado=models.ExpressionWrapper(
             models.Q(whatsapp_confirmado_en__isnull=False), output_field=models.BooleanField(),
-        )).order_by('-is_featured', '-is_verified', '-wa_confirmado', 'business_name', 'pk')
+        ))
+        orden = ['-is_featured', '-is_verified', '-wa_confirmado', 'business_name', 'pk']
+        if comuna is not None:
+            qs = qs.annotate(es_local=models.ExpressionWrapper(
+                models.Q(commune=comuna), output_field=models.BooleanField()))
+            orden.insert(1, '-es_local')
+        return qs.order_by(*orden)
 
     def del_grupo(self, grupo):
         otros = Provider.otras_categorias.through.objects.filter(category__group=grupo).values('provider_id')
         return self.filter(models.Q(category__group=grupo) | models.Q(pk__in=otros))
 
+    def que_atienden(self, comuna):
+        """Los que tienen esa comuna como base, la marcaron entre las que atienden,
+        o atienden toda la región de su comuna base.
+
+        15-11-2026 — Pedro (con quien nació la idea de ServiPlace): "la página te
+        pide una sola comuna, entonces cuando la gente busque por otras comunas
+        no aparece tu servicio". Quien atiende toda la RM solo salía en su comuna.
+        Subconsulta por id, como del_rubro: con el join saldría repetido.
+        """
+        cubre = Provider.comunas_atendidas.through.objects.filter(commune=comuna).values('provider_id')
+        filtro = models.Q(commune=comuna) | models.Q(pk__in=cubre)
+        if comuna.region_id:
+            filtro |= models.Q(atiende_toda_la_region=True, commune__region_id=comuna.region_id)
+        return self.filter(filtro)
+
 
 class Provider(models.Model):
     MAX_OTROS_RUBROS = 5
+    MAX_OTROS_ESTUDIOS = 6
+    # Sobre esto conviene marcar "toda la región": 40 casillas son una lista, no una zona.
+    MAX_COMUNAS_ATENDIDAS = 40
     PUBLIC_PROSPECT = 'prospecto_publico'
     CONTACTED = 'contactado'
     AUTHORIZED = 'autorizado'
@@ -212,6 +240,13 @@ class Provider(models.Model):
     otras_categorias = models.ManyToManyField(
         Category, blank=True, related_name='providers_secundarios', verbose_name='otros rubros')
     commune = models.ForeignKey(Commune, on_delete=models.PROTECT, related_name='providers')
+    # 15-11-2026 — Cobertura (feedback de Pedro): la comuna base es UNA, pero se
+    # atiende en varias. Las que marca aquí (o toda la región de su comuna base)
+    # entran a la búsqueda; `service_area` queda como detalle en texto libre
+    # ("envíos a todo Chile") y no se busca. Ver ProviderQuerySet.que_atienden.
+    comunas_atendidas = models.ManyToManyField(
+        Commune, blank=True, related_name='providers_cobertura', verbose_name='otras comunas que atiende')
+    atiende_toda_la_region = models.BooleanField('atiende toda la región de su comuna', default=False)
     sector = models.CharField(max_length=120)
     description = models.TextField()
     short_description = models.CharField(max_length=220)
@@ -227,6 +262,10 @@ class Provider(models.Model):
     profession_title = models.CharField('título o profesión', max_length=120, blank=True)
     institution = models.CharField('institución', max_length=140, blank=True)
     graduation_year = models.PositiveSmallIntegerField('año de titulación', null=True, blank=True)
+    # 15-11-2026 — Pedro: "hay gente que estudió en más de un lugar" y el campo
+    # era una sola línea. Uno por línea (título, institución, año), hasta
+    # MAX_OTROS_ESTUDIOS; el principal sigue en los tres campos de arriba.
+    otros_estudios = models.TextField('otros estudios', blank=True)
     health_registry = models.CharField(
         'registro en la Superintendencia de Salud',
         max_length=12,
@@ -383,7 +422,67 @@ class Provider(models.Model):
 
     @property
     def has_professional_info(self):
-        return bool(self.profession_title or self.institution or self.graduation_year or self.health_registry)
+        return bool(self.profession_title or self.institution or self.graduation_year or self.health_registry
+                    or self.otros_estudios.strip())
+
+    @property
+    def lista_otros_estudios(self):
+        return [linea.strip() for linea in (self.otros_estudios or '').splitlines() if linea.strip()]
+
+    @property
+    def comunas_cobertura(self):
+        """Las otras comunas que atiende, en orden alfabético y sin la base (usa el prefetch si lo hay)."""
+        return sorted((c for c in self.comunas_atendidas.all() if c.pk != self.commune_id), key=lambda c: c.name)
+
+    @property
+    def cobertura_texto(self):
+        """Dónde atiende, en una frase para la ficha. Lo que entra a la búsqueda."""
+        if self.atiende_toda_la_region and self.commune_id and self.commune.region_id:
+            return f'Toda la {self.commune.region.name}'
+        otras = self.comunas_cobertura
+        if otras:
+            nombres = [self.commune.name] + [c.name for c in otras]
+            return ', '.join(nombres[:-1]) + ' y ' + nombres[-1]
+        return ''
+
+    def atiende_en(self, comuna):
+        """¿Aparece en el listado de esa comuna? (base, cobertura o toda la región)."""
+        if not comuna:
+            return True
+        if comuna.pk == self.commune_id:
+            return True
+        if self.atiende_toda_la_region and comuna.region_id and comuna.region_id == self.commune.region_id:
+            return True
+        return any(c.pk == comuna.pk for c in self.comunas_atendidas.all())
+
+    def completitud(self):
+        """Qué tan completo está el perfil y qué le falta, para el panel del dueño.
+
+        15-11-2026 — Pedro: "debería dar más énfasis cuando completan su perfil".
+        Solo cuenta lo que ayuda a que le escriban; la formación no se le pide a
+        una tienda (no tiene).
+        """
+        es_tienda = self.category.group == Category.TIENDAS if self.category_id else False
+        tiene_fotos = self.images.exists() if self.pk else False
+        # En orden de lo que más mueve: el panel muestra los tres primeros que falten.
+        # Las comunas van primero porque deciden en qué búsquedas aparece.
+        puntos = [
+            (bool(self.atiende_toda_la_region or self.comunas_cobertura or self.service_area),
+             'Marca en qué comunas atiendes', 'cobertura'),
+            (tiene_fotos, 'Agrega fotos de tus trabajos', 'fotos'),
+            (bool(self.foto), 'Sube tu logo o una foto tuya', 'foto'),
+            (self.whatsapp_confirmado, 'Confirma tu WhatsApp (sube en los listados)', ''),
+            (len((self.description or '').strip()) >= 150, 'Cuenta con más detalle qué haces y cómo trabajas', 'servicio'),
+            (bool(self.attends_home or self.attends_office or self.attends_online), 'Cuenta cómo atiendes', 'modalidad'),
+            (bool(self.website or self.instagram), 'Agrega tu Instagram o tu sitio web', 'contacto'),
+        ]
+        if not es_tienda:
+            puntos.append((self.has_professional_info, 'Agrega tu formación o tus cursos', 'formacion'))
+        hechos = sum(1 for ok, _, _ in puntos if ok)
+        return {
+            'porcentaje': round(100 * hechos / len(puntos)),
+            'faltan': [{'texto': texto, 'ancla': ancla} for ok, texto, ancla in puntos if not ok],
+        }
 
     @property
     def is_student(self):

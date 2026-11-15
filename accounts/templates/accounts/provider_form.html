@@ -80,10 +80,33 @@
                 {% if form.otras_categorias.errors %}<div class="campo-error" id="id_otras_categorias_error">{% for error in form.otras_categorias.errors %}<p>{{ error }}</p>{% endfor %}</div>{% endif %}
               </details>
             </div>
+            <div class="col-12" id="cobertura">
+              {% comment %}15-11-2026 — Pedro: con una sola comuna, quien atiende toda la RM no aparecía en las búsquedas de otras comunas.{% endcomment %}
+              <details class="otros-rubros cobertura"{% if form.atiende_toda_la_region.value or form.comunas_atendidas.value or form.comunas_atendidas.errors %} open{% endif %}>
+                <summary>¿Atiendes en otras comunas? Márcalas para aparecer cuando busquen ahí <small>(opcional)</small></summary>
+                <p class="form-text mt-2 mb-2">Tu comuna base ya está incluida. Si atiendes en muchas, marca toda la región.</p>
+                <label class="otro-chip cobertura-toda" for="{{ form.atiende_toda_la_region.id_for_label }}">{{ form.atiende_toda_la_region }} <span>{{ form.atiende_toda_la_region.label }}</span></label>
+                <div class="cobertura-sectores" data-sectores hidden>
+                  <span class="form-text me-1">Marcar un sector:</span>
+                  {% for nombre in form.cobertura_info.sectores %}<button type="button" class="btn btn-sm btn-outline-primary" data-sector="{{ nombre }}">{{ nombre }}</button>{% endfor %}
+                </div>
+                <div data-cobertura-comunas>
+                {% for region, comunas, abierta in form.comunas_por_region %}
+                  <details class="cobertura-region" data-region="{{ region.pk }}"{% if abierta %} open{% endif %}>
+                    <summary>{{ region.name }}</summary>
+                    <div class="otros-chips">
+                      {% for pk, nombre, marcada in comunas %}<label class="otro-chip"><input type="checkbox" name="comunas_atendidas" value="{{ pk }}"{% if marcada %} checked{% endif %} data-comuna-cobertura> <span>{{ nombre }}</span></label>{% endfor %}
+                    </div>
+                  </details>
+                {% endfor %}
+                </div>
+                {% if form.comunas_atendidas.errors %}<div class="campo-error" id="id_comunas_atendidas_error">{% for error in form.comunas_atendidas.errors %}<p>{{ error }}</p>{% endfor %}</div>{% endif %}
+              </details>
+            </div>
             <div class="col-12">{% include "accounts/_campo.html" with campo=form.sector %}</div>
           </div>
 
-          <h3 class="form-section-title">Tu logo o foto</h3>
+          <h3 class="form-section-title" id="foto">Tu logo o foto</h3>
           <div class="foto-campo mb-4">
             <div class="ficha-avatar foto-preview" aria-hidden="true">{% if provider.foto %}<img src="{{ provider.foto.url }}" alt="">{% else %}{{ form.business_name.value|default:"?"|first|upper }}{% endif %}</div>
             <div class="foto-campo-input">{% include "accounts/_campo.html" with campo=form.foto %}
@@ -110,30 +133,31 @@
           <p class="campo-error" data-fotos-aviso hidden></p>
           <div class="mb-4">{% include "accounts/_campo.html" with campo=form.fotos %}</div>
 
-          <h3 class="form-section-title">Cómo atiendes</h3>
+          <h3 class="form-section-title" id="modalidad">Cómo atiendes</h3>
           <div class="modality-options mb-4">
             {% for campo in form %}{% if campo.name == "attends_home" or campo.name == "attends_office" or campo.name == "attends_online" %}
               <label class="modality-option" for="{{ campo.id_for_label }}">{{ campo }} <span>{{ campo.label }}</span></label>
             {% endif %}{% endfor %}
           </div>
 
-          <h3 class="form-section-title">Tu servicio</h3>
+          <h3 class="form-section-title" id="servicio">Tu servicio</h3>
           <div class="row g-3 mb-4">
             <div class="col-12">{% include "accounts/_campo.html" with campo=form.short_description %}</div>
             <div class="col-12">{% include "accounts/_campo.html" with campo=form.description %}</div>
           </div>
 
-          <h3 class="form-section-title">Tu formación <small>(opcional)</small></h3>
+          <h3 class="form-section-title" id="formacion">Tu formación <small>(opcional)</small></h3>
           <p class="form-text mt-0 mb-3">Si eres profesional o técnico, esto es lo que más confianza genera mientras no tienes reseñas. Si eres maestro u oficio, déjalo en blanco: no hace falta.</p>
           <div class="row g-3 mb-4">
             <div class="col-md-6">{% include "accounts/_campo.html" with campo=form.profession_title %}</div>
             <div class="col-md-6">{% include "accounts/_campo.html" with campo=form.institution %}</div>
             <div class="col-md-4">{% include "accounts/_campo.html" with campo=form.graduation_year %}</div>
+            <div class="col-12">{% include "accounts/_campo.html" with campo=form.otros_estudios %}</div>
             <div class="col-md-8" data-solo-salud>{% include "accounts/_campo.html" with campo=form.health_registry %}</div>
             <div class="col-md-8" data-solo-sec>{% include "accounts/_campo.html" with campo=form.licencia_sec %}</div>
           </div>
 
-          <h3 class="form-section-title">Contacto y ubicación</h3>
+          <h3 class="form-section-title" id="contacto">Contacto y ubicación</h3>
           <div class="row g-3 mb-4">
             <div class="col-md-6">{% include "accounts/_campo.html" with campo=form.phone %}</div>
             <div class="col-md-6">{% include "accounts/_campo.html" with campo=form.whatsapp_number %}</div>
@@ -198,6 +222,46 @@
 
 {% block extra_js %}
 {{ form.categorias_info|json_script:"categorias-info" }}
+{{ form.cobertura_info|json_script:"cobertura-info" }}
+<script>
+  // Cobertura (15-11-2026): la región de la comuna base se abre sola, la base no
+  // se marca (ya está incluida), los atajos de sector solo existen en la RM y
+  // "toda la región" esconde la lista de comunas de esa región.
+  (function () {
+    var info = JSON.parse(document.getElementById('cobertura-info').textContent);
+    var base = document.getElementById('id_commune');
+    var toda = document.getElementById('id_atiende_toda_la_region');
+    var sectores = document.querySelector('[data-sectores]');
+    var checks = Array.prototype.slice.call(document.querySelectorAll('[data-comuna-cobertura]'));
+    if (!base || !checks.length) return;
+    function ajustar() {
+      var region = info.region_de[base.value];
+      checks.forEach(function (c) {
+        var esBase = c.value === base.value;
+        if (esBase) c.checked = false;
+        c.disabled = esBase;
+        c.closest('.otro-chip').classList.toggle('es-principal', esBase);
+      });
+      document.querySelectorAll('details.cobertura-region').forEach(function (d) {
+        var suya = String(region) === d.getAttribute('data-region');
+        if (suya) d.open = true;
+        d.hidden = !!(toda && toda.checked && suya);
+      });
+      if (sectores) sectores.hidden = !(region && region === info.rm) || !!(toda && toda.checked);
+    }
+    document.querySelectorAll('[data-sector]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var ids = (info.sectores[b.getAttribute('data-sector')] || []).map(String);
+        var todas = ids.every(function (id) { var c = checks.find(function (x) { return x.value === id; }); return !c || c.checked || c.disabled; });
+        checks.forEach(function (c) { if (ids.indexOf(c.value) !== -1 && !c.disabled) c.checked = !todas; });
+        b.classList.toggle('active', !todas);
+      });
+    });
+    base.addEventListener('change', ajustar);
+    if (toda) toda.addEventListener('change', ajustar);
+    ajustar();
+  })();
+</script>
 <script>
   // Las fotos se achican en el propio teléfono antes de subirse (11-11-2026).
   // Guardar el perfil daba 502: 8 fotos de 4-8 MB por 4G tardaban más que los

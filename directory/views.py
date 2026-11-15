@@ -140,7 +140,7 @@ def _listado(request, *, categoria=None, grupo=None, comuna=None, query=''):
     providers = Provider.objects.publicos().select_related('category', 'commune').prefetch_related(
         # La foto de portada de cada tarjeta, en una sola consulta (G-04)
         Prefetch('images', queryset=ProviderImage.objects.filter(is_cover=True), to_attr='portadas'),
-        'otras_categorias')
+        'otras_categorias', 'comunas_atendidas')
     if query:
         filtro = (
             Q(business_name__icontains=query)
@@ -153,6 +153,7 @@ def _listado(request, *, categoria=None, grupo=None, comuna=None, query=''):
                 .filter(category__name__icontains=query).values('provider_id'))
             | Q(profession_title__icontains=query)
             | Q(institution__icontains=query)
+            | Q(otros_estudios__icontains=query)
         )
         # "fotógrafo" encuentra Fotografía y video: rubro principal u otro rubro.
         rubros = rubros_de_la_busqueda(query)
@@ -166,11 +167,12 @@ def _listado(request, *, categoria=None, grupo=None, comuna=None, query=''):
     elif grupo:
         providers = providers.del_grupo(grupo)
     if comuna:
-        providers = providers.filter(commune=comuna)
+        # Base, cobertura o toda la región (feedback de Pedro, 15-11-2026).
+        providers = providers.que_atienden(comuna)
 
     # `pk` al final: sin un desempate único, al paginar uno se repite en la
     # página 2 y otro no aparece nunca (orden no determinista en Postgres).
-    providers = providers.por_confianza()
+    providers = providers.por_confianza(comuna)
 
     # D1 — El listado se pagina (361 en una página eran 162.604 px en un teléfono).
     paginador = Paginator(providers, PROVEEDORES_POR_PAGINA)
@@ -207,6 +209,11 @@ def _listado(request, *, categoria=None, grupo=None, comuna=None, query=''):
     # Una categoría vacía es 404, no 200 (auditoría de Jorge): si responde 200,
     # Google la indexa y compite contra las que sí tienen perfiles.
     vacia = es_pagina_limpia and total == 0
+    # Si en la comuna solo hay perfiles que la atienden desde otra (cobertura o
+    # toda la región), la página existe para quien busca, pero fuera del índice:
+    # serían decenas de páginas casi iguales con los mismos perfiles.
+    solo_cobertura = (es_pagina_limpia and comuna is not None and total > 0
+                      and not providers.filter(commune=comuna).exists())
 
     numero = pagina.number
     canonical = path + (f'?page={numero}' if numero > 1 else '')
@@ -232,7 +239,7 @@ def _listado(request, *, categoria=None, grupo=None, comuna=None, query=''):
             fila['url'] = reverse('directory:listado_rubro_comuna',
                                   kwargs={'rubro': categoria.slug, 'comuna': fila['commune__slug']})
     if comuna:
-        conteo = perfiles_por_rubro(publicos.filter(commune=comuna))
+        conteo = perfiles_por_rubro(publicos.que_atienden(comuna))
         otras = Category.objects.filter(slug__in=conteo)
         if categoria:
             otras = otras.exclude(pk=categoria.pk)
@@ -257,7 +264,7 @@ def _listado(request, *, categoria=None, grupo=None, comuna=None, query=''):
         # grupo vacío enlazaba a un listado que responde 404 a propósito, y
         # eso eran enlaces internos rotos en cada listado (rastreo 18-10-2026).
         'grupos_con_perfiles': grupos_de(
-            Provider.objects.publicos().filter(**({'commune': comuna} if comuna else {}))
+            Provider.objects.publicos().que_atienden(comuna) if comuna else Provider.objects.publicos()
         ),
         'selected_group': grupo or '',
         'selected_category': categoria,
@@ -279,10 +286,10 @@ def _listado(request, *, categoria=None, grupo=None, comuna=None, query=''):
         'ga4_busqueda': ga4_busqueda,
         'canonical': settings.SITE_URL + (reverse('directory:provider_list') if query else canonical),
         # Búsqueda libre y páginas vacías: fuera del índice, pero se siguen sus enlaces.
-        'robots': 'noindex, follow' if (query or vacia) else '',
+        'robots': 'noindex, follow' if (query or vacia or solo_cobertura) else '',
         'jsonld': seo.como_script(
             seo.miga(pasos),
-            None if (query or vacia) else seo.listado(h1, path, pagina.object_list, total),
+            None if (query or vacia or solo_cobertura) else seo.listado(h1, path, pagina.object_list, total),
         ),
     }
     return render(request, 'directory/provider_list.html', context, status=404 if vacia else 200)
@@ -291,7 +298,7 @@ def _listado(request, *, categoria=None, grupo=None, comuna=None, query=''):
 def provider_detail(request, slug):
     provider = get_object_or_404(
         Provider.objects.publicos().select_related('category', 'commune__region').prefetch_related(
-            'images', 'otras_categorias'),
+            'images', 'otras_categorias', 'comunas_atendidas'),
         slug=slug,
     )
     # Un bot (Google, la vista previa de WhatsApp) no es una visita: no suma

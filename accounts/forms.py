@@ -11,9 +11,21 @@ from django.core.files.uploadedfile import UploadedFile
 from accounts.cv import ACEPTA, CVIlegible, extraer_texto
 from core.antispam import AntispamFormMixin
 from directory.imagenes import procesar_foto
-from directory.models import Category, Commune, Provider, ProviderImage
+from directory.models import Category, Commune, Provider, ProviderImage, Region
 
 MAX_FOTOS = 8
+
+# 15-11-2026 — Pedro: "hay gente que solo atiende en el sector poniente, sector
+# oriente, Santiago centro". Son atajos del formulario que marcan esas comunas
+# (lo que se guarda y se busca son las comunas). Slugs de seed_regiones_chile.
+SECTORES_RM = {
+    'Oriente': ['las-condes', 'vitacura', 'lo-barnechea', 'providencia', 'nunoa', 'la-reina', 'penalolen', 'macul'],
+    'Centro': ['santiago', 'estacion-central', 'independencia', 'recoleta', 'san-miguel', 'san-joaquin'],
+    'Poniente': ['maipu', 'pudahuel', 'cerrillos', 'lo-prado', 'cerro-navia', 'quinta-normal', 'padre-hurtado'],
+    'Norte': ['quilicura', 'huechuraba', 'conchali', 'renca', 'colina', 'lampa'],
+    'Sur': ['la-florida', 'puente-alto', 'la-pintana', 'san-bernardo', 'el-bosque', 'la-cisterna', 'lo-espejo',
+            'pedro-aguirre-cerda', 'la-granja', 'san-ramon'],
+}
 
 
 class VariasFotosInput(forms.ClearableFileInput):
@@ -165,6 +177,9 @@ class ProviderForm(AntispamFormMixin, forms.ModelForm):
             'category',
             'otras_categorias',
             'commune',
+            # Después de 'commune': clean_comunas_atendidas necesita la base ya limpia.
+            'atiende_toda_la_region',
+            'comunas_atendidas',
             'sector',
             'foto',
             'short_description',
@@ -182,6 +197,7 @@ class ProviderForm(AntispamFormMixin, forms.ModelForm):
             'profession_title',
             'institution',
             'graduation_year',
+            'otros_estudios',
             'health_registry',
             'licencia_sec',
         ]
@@ -200,7 +216,10 @@ class ProviderForm(AntispamFormMixin, forms.ModelForm):
             'website': 'Sitio web (opcional)',
             'instagram': 'Instagram (opcional)',
             'address': 'Dirección (opcional)',
-            'service_area': 'Dónde atiendes (opcional)',
+            'service_area': 'Algo más sobre dónde atiendes (opcional)',
+            'atiende_toda_la_region': 'Atiendo en toda la región de mi comuna',
+            'comunas_atendidas': 'Otras comunas donde atiendes',
+            'otros_estudios': 'Otros estudios o cursos',
             'foto': 'Tu logo o una foto tuya',
             'attends_home': 'A domicilio',
             'attends_office': 'En consulta o local',
@@ -214,7 +233,8 @@ class ProviderForm(AntispamFormMixin, forms.ModelForm):
         help_texts = {
             'short_description': 'Máximo 220 caracteres. Es lo que se ve en la tarjeta.',
             'whatsapp_number': 'Celular chileno. Es el botón principal de tu perfil.',
-            'service_area': 'Ej: Maipú, Cerrillos y Pudahuel',
+            'service_area': 'Ej: también hago envíos a todo Chile. Para aparecer en las búsquedas de otras comunas, márcalas arriba.',
+            'otros_estudios': 'Uno por línea: título, institución y año. Ej: «Magíster en Educación, Universidad de Chile, 2023».',
             'instagram': 'Tu usuario, con o sin @. Sirve como portafolio.',
             'foto': 'JPG, PNG o WebP. La achicamos y le quitamos los datos de ubicación del celular.',
             'profession_title': 'Tu título, oficio o certificación.',
@@ -234,6 +254,7 @@ class ProviderForm(AntispamFormMixin, forms.ModelForm):
             'profession_title': forms.TextInput(attrs={'placeholder': 'Ej: Kinesióloga'}),
             'institution': forms.TextInput(attrs={'placeholder': 'Ej: Universidad de Concepción'}),
             'graduation_year': forms.NumberInput(attrs={'placeholder': 'Ej: 2025', 'inputmode': 'numeric'}),
+            'otros_estudios': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Diplomado en Kinesiología Deportiva, Universidad Mayor, 2024\nCurso de punción seca, 2025'}),
             'health_registry': forms.TextInput(attrs={'placeholder': 'Ej: 654321', 'inputmode': 'numeric'}),
             'licencia_sec': forms.TextInput(attrs={'placeholder': 'Ej: Clase D eléctrica'}),
             'sector': forms.TextInput(attrs={'placeholder': 'Ej: Ciudad Satélite'}),
@@ -281,6 +302,13 @@ class ProviderForm(AntispamFormMixin, forms.ModelForm):
         otras.required = False
         otras.widget = forms.CheckboxSelectMultiple()
         otras.help_text = f'Opcional, hasta {self.max_otros}. Apareces también en esos listados.'
+        # 15-11-2026: cobertura. Las comunas se dibujan a mano, agrupadas por
+        # región (ver comunas_por_region); la validación es la del queryset.
+        cobertura = self.fields['comunas_atendidas']
+        cobertura.queryset = Commune.objects.filter(is_active=True)
+        cobertura.required = False
+        cobertura.widget = forms.CheckboxSelectMultiple()
+        self.max_comunas = Provider.MAX_COMUNAS_ATENDIDAS
         for name, field in self.fields.items():
             if name.startswith('sitio_web') or name.startswith('sello_'):
                 continue
@@ -302,6 +330,56 @@ class ProviderForm(AntispamFormMixin, forms.ModelForm):
             for clave, _, _ in Category.GRUPOS
             if any(c.group == clave for c in self._categorias)
         ]
+
+    def _base_actual(self):
+        """La comuna base elegida (enviada o guardada), para abrir su región."""
+        valor = self['commune'].value()
+        try:
+            return int(getattr(valor, 'pk', valor)) if valor else None
+        except (TypeError, ValueError):
+            return None
+
+    def comunas_por_region(self):
+        """[(región, [(pk, nombre, marcada)], abierta)] — la región de la comuna base va primero y abierta."""
+        valor = self['comunas_atendidas'].value() or []
+        marcadas = {str(getattr(v, 'pk', v)) for v in valor}
+        base = self._base_actual()
+        comunas = list(Commune.objects.filter(is_active=True).select_related('region').order_by('name'))
+        region_base = next((c.region_id for c in comunas if c.pk == base), None)
+        regiones = Region.objects.filter(is_active=True, communes__is_active=True).distinct().order_by('name')
+        filas = [
+            (r, [(c.pk, c.name, str(c.pk) in marcadas) for c in comunas if c.region_id == r.pk],
+             r.pk == region_base or any(str(c.pk) in marcadas for c in comunas if c.region_id == r.pk))
+            for r in regiones
+        ]
+        return sorted(filas, key=lambda f: (f[0].pk != region_base, f[0].name))
+
+    def cobertura_info(self):
+        """Para el JS: región de cada comuna y los atajos por sector de la RM."""
+        comunas = Commune.objects.filter(is_active=True).values_list('pk', 'slug', 'region_id')
+        por_slug = {slug: pk for pk, slug, _ in comunas}
+        sectores = {nombre: [por_slug[s] for s in slugs if s in por_slug] for nombre, slugs in SECTORES_RM.items()}
+        rm = next((region for pk, slug, region in comunas if slug == 'santiago'), None)
+        return {'region_de': {str(pk): region for pk, _, region in comunas}, 'sectores': sectores, 'rm': rm}
+
+    def clean_comunas_atendidas(self):
+        base = self.cleaned_data.get('commune')
+        comunas = [c for c in (self.cleaned_data.get('comunas_atendidas') or []) if c != base]
+        if len(comunas) > self.max_comunas:
+            raise forms.ValidationError(
+                f'Marcaste {len(comunas)} comunas. Si atiendes en tantas, marca «toda la región» (hasta {self.max_comunas}).')
+        return comunas
+
+    def clean_otros_estudios(self):
+        texto = limpiar_texto(self.cleaned_data.get('otros_estudios', ''), permitir_saltos=True)
+        lineas = [l.strip(' -•·\t') for l in texto.splitlines()]
+        lineas = [l for l in lineas if l]
+        if len(lineas) > Provider.MAX_OTROS_ESTUDIOS:
+            raise forms.ValidationError(f'Hasta {Provider.MAX_OTROS_ESTUDIOS} estudios, uno por línea.')
+        largas = [l for l in lineas if len(l) > 160]
+        if largas:
+            raise forms.ValidationError('Cada línea puede tener hasta 160 caracteres: título, institución y año.')
+        return '\n'.join(lineas)
 
     def clean_otras_categorias(self):
         principal = self.cleaned_data.get('category')

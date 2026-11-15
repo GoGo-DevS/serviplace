@@ -72,6 +72,25 @@
               </div>
               <h3 class="h6 mb-0">{{ provider.business_name }}{% if provider.verificado_publico %}{% include 'directory/_check_verificado.html' %}{% endif %}</h3>
               <p class="text-muted mb-2" style="font-size:.85rem">{% if provider.sector_limpio %}{{ provider.sector_limpio }}, {% endif %}{{ provider.commune.name }}</p>
+              {% comment %}15-11-2026 — Pedro: dar más énfasis a completar el perfil. Lo que falta, con enlace directo a esa parte del formulario.{% endcomment %}
+              {% with c=provider.completitud %}
+              {% if c.porcentaje < 100 %}
+              <div class="completitud mb-2" data-completitud="{{ c.porcentaje }}">
+                <div class="d-flex justify-content-between align-items-baseline gap-2" style="font-size:.85rem">
+                  <b>Tu perfil está al {{ c.porcentaje }}%</b>
+                  <a href="{% url 'accounts:provider_edit' provider.slug %}">Completar →</a>
+                </div>
+                <div class="progress mt-1" role="progressbar" aria-label="Perfil completo" aria-valuenow="{{ c.porcentaje }}" aria-valuemin="0" aria-valuemax="100" style="height:6px">
+                  <div class="progress-bar" style="width:{{ c.porcentaje }}%"></div>
+                </div>
+                <ul class="mb-0 mt-1 ps-3" style="font-size:.82rem">
+                  {% for falta in c.faltan|slice:":3" %}<li><a href="{% url 'accounts:provider_edit' provider.slug %}{% if falta.ancla %}#{{ falta.ancla }}{% endif %}">{{ falta.texto }}</a></li>{% endfor %}
+                </ul>
+              </div>
+              {% else %}
+              <p class="mb-2" style="font-size:.85rem;color:var(--sp-green)" data-completitud="100"><b>Perfil completo.</b> Así generas más confianza.</p>
+              {% endif %}
+              {% endwith %}
               {% if not provider.whatsapp_confirmado and provider.url_confirmar_whatsapp %}
               <div class="confirmar-wa mb-2">
                 <div><b>Confirma tu WhatsApp</b> (1 minuto): tu perfil muestra el sello y sube en los listados. Se abre WhatsApp con un mensaje listo; solo envíalo.</div>

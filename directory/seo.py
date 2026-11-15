@@ -188,6 +188,16 @@ def articulo(guia, path):
     }
 
 
+def _zona(provider):
+    """areaServed: la región entera, las comunas que marcó o, si no marcó nada, su texto o su comuna."""
+    if provider.atiende_toda_la_region and provider.commune.region_id:
+        return {'@type': 'AdministrativeArea', 'name': provider.commune.region.name}
+    otras = provider.comunas_cobertura
+    if otras:
+        return [{'@type': 'City', 'name': c.name} for c in [provider.commune] + otras]
+    return provider.service_area or provider.commune.name
+
+
 def perfil(provider, request):
     datos = {
         '@context': 'https://schema.org',
@@ -203,7 +213,7 @@ def perfil(provider, request):
             'addressRegion': provider.commune.region.name if provider.commune.region_id else '',
             'addressCountry': 'CL',
         },
-        'areaServed': provider.service_area or provider.commune.name,
+        'areaServed': _zona(provider),
         'isPartOf': {'@id': id_sitio()},
     }
     if provider.foto:

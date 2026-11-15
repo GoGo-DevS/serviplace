@@ -51,7 +51,7 @@ class ProviderAdmin(admin.ModelAdmin):
         'updated_at',
     )
     list_editable = ('is_verified', 'is_featured', 'is_active')
-    filter_horizontal = ('otras_categorias',)
+    filter_horizontal = ('otras_categorias', 'comunas_atendidas')
     list_filter = ('category__group', 'category', 'commune', 'data_status', 'is_verified', 'is_featured', 'is_active')
     search_fields = (
         'business_name',

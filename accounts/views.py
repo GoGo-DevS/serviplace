@@ -121,7 +121,7 @@ def register(request):
 @login_required
 def dashboard(request):
     my_providers = Provider.objects.filter(owner=request.user).select_related('category', 'commune').prefetch_related(
-        'otras_categorias', 'images')  # images: la versión de la historia de Instagram las cuenta
+        'otras_categorias', 'images', 'comunas_atendidas')  # images: la versión de la historia de Instagram las cuenta
     profile, _ = UserProfile.objects.get_or_create(user=request.user)
     claims = ProviderReport.objects.filter(claimant=request.user, kind=ProviderReport.CLAIM).select_related('provider')
     total_views = sum(p.views_count for p in my_providers)

@@ -46,6 +46,9 @@ SEO_NOMBRES = {
     'psicopedagogia': 'Psicopedagogo',
     'peluqueria': 'Peluquería a domicilio',
     'manicure-y-estetica': 'Manicurista',
+    'belleza-integral': 'Centro de belleza',
+    'maquillaje-profesional': 'Maquilladora profesional',
+    'masajes-y-spa': 'Masajista',
     'contabilidad': 'Contador',
     'diseno-grafico': 'Diseñador gráfico',
     'estampado-y-ropa-personalizada': 'Estampado de poleras',
@@ -102,6 +105,12 @@ CATEGORIAS = [
     ('manicure-y-estetica', 'Manicure y estética', 'Manicure, pedicure, pestañas, cejas y tratamientos faciales.', '💅', B, False),
     # 18-10-2026: para los clientes de GoGoDevS que no calzaban en ninguna.
     ('tatuajes', 'Tatuajes y piercing', 'Tatuajes con diseño propio, cover, retoques y piercing.', '🖋️', B, False),
+    # 15-11-2026 — Pedro: en belleza "solo había peluquería" y faltaba uno general.
+    # Belleza integral es para el salón o la persona que hace de todo; los otros
+    # dos son servicios que no calzaban (el maquillaje de tienda va en Tiendas).
+    ('belleza-integral', 'Belleza integral', 'Salón o profesional que hace de todo: pelo, uñas, pestañas, cejas, maquillaje y tratamientos.', '✨', B, False),
+    ('maquillaje-profesional', 'Maquillaje profesional', 'Maquillaje para eventos, novias y sesiones de fotos; asesoría de imagen.', '💄', B, False),
+    ('masajes-y-spa', 'Masajes y spa', 'Masajes de relajación y descontracturantes, drenaje y spa, en local o a domicilio.', '💆', B, False),
 
     ('contabilidad', 'Contabilidad y trámites', 'Inicio de actividades, contabilidad para pymes, declaraciones y trámites.', '📊', P, False),
     ('diseno-grafico', 'Diseño gráfico', 'Logos, redes sociales, material impreso e identidad de marca.', '🖌️', P, False),

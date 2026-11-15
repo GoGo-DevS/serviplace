@@ -12,12 +12,17 @@ incompleto. El nombre es el enlace a la ficha; WhatsApp es el botón.
     {% with portada=provider.portadas|first %}{% if portada %}
     <a class="ficha-portada" href="{{ provider.get_absolute_url }}" tabindex="-1" aria-hidden="true"><img src="{{ portada.image.url }}" alt="" loading="lazy" width="480" height="270"></a>
     {% endif %}{% endwith %}
+    {% comment %}15-11-2026: en el listado de una comuna que no es su base, la tarjeta dice que la atiende (cobertura) y abajo, desde dónde.{% endcomment %}
+    {% if selected_commune and provider.commune_id != selected_commune.pk %}
+    <div class="ficha-top"><b>{{ rubro.name }}</b><span>Atiende en {{ selected_commune.name }}</span></div>
+    {% else %}
     <div class="ficha-top"><b>{{ rubro.name }}</b><span>{{ provider.commune.name }}</span></div>
+    {% endif %}
     <div class="ficha-who">
       <div class="ficha-avatar{% if provider.foto %} con-foto{% endif %}" aria-hidden="true">{% if provider.foto %}<img src="{{ provider.foto.url }}" alt="" loading="lazy" width="46" height="52">{% else %}{{ provider.business_name|first|upper }}{% endif %}</div>
       <div>
         <h3><a href="{{ provider.get_absolute_url }}">{{ provider.business_name }}</a>{% if provider.verificado_publico %}{% include 'directory/_check_verificado.html' %}{% endif %}</h3>
-        <p>{{ provider.sector_limpio|default:provider.commune.name }}</p>
+        <p>{% if selected_commune and provider.commune_id != selected_commune.pk %}Desde {{ provider.commune.name }}{% else %}{{ provider.sector_limpio|default:provider.commune.name }}{% endif %}</p>
       </div>
     </div>
 

@@ -559,6 +559,15 @@ body:has(.galeria-visor[open]) { overflow: hidden; }
 .otro-chip:has(input:checked) { border-color: var(--sp-accent); background: var(--sp-blue-light); }
 .otro-chip:has(input:disabled) { opacity: .45; cursor: not-allowed; }
 .otro-chip.es-principal { display: none; }
+/* 15-11-2026 — Cobertura: comunas por región (feedback de Pedro). Mismas fichas
+   que los otros rubros; la región de la comuna base se abre sola. */
+.cobertura-toda { margin: .2rem 0 .5rem; }
+.cobertura-toda input { margin: 0; }
+.cobertura-sectores { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; margin: 0 0 .5rem; }
+.cobertura-sectores .btn.active { background: var(--sp-accent); color: #fff; }
+.cobertura-region { margin: .45rem 0 0; }
+.cobertura-region > summary { cursor: pointer; font-family: var(--font-mono); font-size: .7rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--sp-muted); }
+.cobertura-region[open] > summary { margin-bottom: .35rem; }
 
 /* ---- Sellos que dicen qué se comprobó (30-10-2026) ---- */
 .badge-sello { background: #fff; color: var(--sp-green-dark); border: 1px solid var(--sp-green); font-weight: 700; }

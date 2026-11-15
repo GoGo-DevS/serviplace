@@ -134,6 +134,7 @@
           {% if provider.profession_title %}<dt>Título o profesión</dt><dd>{{ provider.profession_title }}</dd>{% endif %}
           {% if provider.institution %}<dt>Institución</dt><dd>{{ provider.institution }}</dd>{% endif %}
           {% if provider.graduation_year %}<dt>{% if provider.is_student %}Se titula en{% else %}Año de titulación{% endif %}</dt><dd>{{ provider.graduation_year }}</dd>{% endif %}
+          {% if provider.lista_otros_estudios %}<dt>Otros estudios</dt><dd><ul class="mb-0 ps-3">{% for estudio in provider.lista_otros_estudios %}<li>{{ estudio }}</li>{% endfor %}</ul></dd>{% endif %}
           {% if provider.health_registry %}
             <dt>Registro Superintendencia de Salud</dt>
             <dd>N° {{ provider.health_registry }} · <a href="https://rnpi.superdesalud.gob.cl/" target="_blank" rel="noopener">compruébalo en el registro público →</a></dd>
@@ -146,7 +147,10 @@
 
       <div class="detail-block">
         <h2>Zona de atención</h2>
-        <p class="mb-0">{% if provider.service_area %}{{ provider.service_area }}{% else %}{{ provider.commune.name }} y sectores cercanos{% endif %}</p>
+        {% with cobertura=provider.cobertura_texto %}
+        <p class="mb-0">{% if cobertura %}{{ cobertura }}{% elif provider.service_area %}{{ provider.service_area }}{% else %}{{ provider.commune.name }} y sectores cercanos{% endif %}</p>
+        {% if cobertura and provider.service_area %}<p class="small text-muted mt-1 mb-0">{{ provider.service_area }}</p>{% endif %}
+        {% endwith %}
       </div>
 
       <div class="detail-block">
@@ -202,7 +206,7 @@
             {% if provider.website %}<dt>Sitio web</dt><dd><a href="{{ provider.website }}" target="_blank" rel="ugc noopener" data-ga="clic_sitio_web" data-ga-categoria="{{ provider.category.slug }}">{{ provider.website_corto }}</a></dd>{% endif %}
             {% if provider.instagram %}<dt>Instagram</dt><dd><a href="https://www.instagram.com/{{ provider.instagram }}/" target="_blank" rel="ugc noopener" data-ga="clic_instagram" data-ga-categoria="{{ provider.category.slug }}">@{{ provider.instagram }}</a></dd>{% endif %}
             {% if provider.address %}<dt>Dirección</dt><dd>{{ provider.address }}</dd>{% endif %}
-            <dt>Atención</dt><dd>{% if provider.service_area %}{{ provider.service_area }}{% else %}{{ provider.commune.name }}{% endif %}</dd>
+            <dt>Atención</dt><dd>{% if provider.cobertura_texto %}{{ provider.cobertura_texto }}{% elif provider.service_area %}{{ provider.service_area }}{% else %}{{ provider.commune.name }}{% endif %}</dd>
           </dl>
 
           <a class="btn btn-success btn-lg w-100 d-flex align-items-center justify-content-center gap-2 desktop-whatsapp-button"
