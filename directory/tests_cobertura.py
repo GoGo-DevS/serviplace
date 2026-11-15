@@ -228,6 +228,13 @@ class Completitud(Base):
         p = self.publicar(category=self.cat['maquillaje-y-cosmetica'].pk)
         self.assertNotIn('Agrega tu formación o tus cursos', [f['texto'] for f in p.completitud()['faltan']])
 
+    def test_a_una_empresa_cargada_desde_su_sitio_tampoco(self):
+        """Visto en producción el 15-11: el panel le pedía formación a Max Services SpA."""
+        p = self.otro('Max Services SpA', self.maipu, source_name='cliente-gogodevs')
+        self.assertNotIn('Agrega tu formación o tus cursos', [f['texto'] for f in p.completitud()['faltan']])
+        self.assertIn('Agrega tu formación o tus cursos',
+                      [f['texto'] for f in self.otro('Kine Independiente', self.maipu).completitud()['faltan']])
+
     def test_el_panel_lo_muestra_con_enlace_a_esa_parte_del_formulario(self):
         p = self.publicar()
         r = self.client.get(reverse('accounts:dashboard'))

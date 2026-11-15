@@ -476,7 +476,9 @@ class Provider(models.Model):
             (bool(self.attends_home or self.attends_office or self.attends_online), 'Cuenta cómo atiendes', 'modalidad'),
             (bool(self.website or self.instagram), 'Agrega tu Instagram o tu sitio web', 'contacto'),
         ]
-        if not es_tienda:
+        # Ni a una tienda ni a la ficha de una empresa cargada desde su sitio (Max
+        # Services SpA, Salón Amanda): la formación es de las personas.
+        if not es_tienda and not self.de_sitio_oficial:
             puntos.append((self.has_professional_info, 'Agrega tu formación o tus cursos', 'formacion'))
         hechos = sum(1 for ok, _, _ in puntos if ok)
         return {
