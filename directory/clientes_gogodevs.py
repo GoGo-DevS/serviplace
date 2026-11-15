@@ -371,6 +371,15 @@ CLIENTES = [
         'larga': ('Max Services SpA instala y mantiene sistemas de climatización y aire acondicionado, ventilación, '
                   'extracción y presurización de escaleras para empresas, edificios, constructoras, hospitales y '
                   'retail. Trabaja en Santiago desde 2011, con proyectos en la Región Metropolitana y en regiones.'),
+        # Fotos REALES de obras del sitio de Max (commit 9ad015b de maxservicesspa, "fotos reales de
+        # obras"). Las de equipos y ductos del sitio son generadas con IA: no van. Sin la foto de
+        # obra gruesa (es trabajo de la constructora, no de climatización).
+        'fotos': [
+            ('1.webp', 'Fachada lateral de un edificio residencial blanco con balcones, cortinas metálicas y árboles en la vereda'),
+            ('2.webp', 'Torre blanca de un edificio residencial con celosías grises verticales, vista desde abajo con cielo azul'),
+            ('3.webp', 'Acceso de un edificio residencial: caseta vidriada con el nombre del condominio, reja y jardín'),
+            ('4.webp', 'Entrada de un edificio residencial con el número 1840, puertas de vidrio y rampa con pasamanos'),
+        ],
         'fuentes': ['https://maxservicesspa.cl', 'https://maxservicesspa.cl/contacto/',
                     'WhatsApp entregado por Diego Dinamarca en el chat el 13-11-2026'],
     },
@@ -390,6 +399,15 @@ CLIENTES = [
         'larga': ('Vizo Glow es una tienda online de maquillaje y cosmética: paletas de sombras, rubores, polvos '
                   'compactos, skincare y lo último en tendencias. Se compra en vizoglow.cl, con despacho a todas '
                   'las comunas de la Región Metropolitana y a regiones.'),
+        # 1: foto que tomó y mandó la dueña (WhatsApp 27-09). 2-4: fotos de las marcas que ella misma
+        # puso en su tienda (fichas #2994, #2790 y #2800 de vizoglow.cl). Las fotos de producto del
+        # sitio original traen C2PA de OpenAI (generadas): no van.
+        'fotos': [
+            ('1.webp', 'Cinco bálsamos labiales en barra Sweet Dose de Beauty Creations, con estampado de frutas, sobre madera'),
+            ('2.webp', 'Bruma con brillo Misucka aroma Cherry Blossom en estuche fucsia, con llavero de cerezas y flor roja'),
+            ('3.webp', 'Rubor en polvo Dolce Bella Gradient Blush tono durazno, cerrado y abierto, sobre fondo gris'),
+            ('4.webp', 'Sombra en crema Dolce Bella con brillo cobrizo: tapa blanca y frasco de vidrio abierto, fondo gris'),
+        ],
         'fuentes': ['https://vizoglow.cl', 'WhatsApp confirmado por Diego Dinamarca en el chat el 13-11-2026'],
     },
 ]
