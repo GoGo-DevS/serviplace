@@ -1,7 +1,10 @@
 {% load rubros %}{% comment %}
 Cómo atiende, en íconos (20-11-2026, Diego: "las etiquetas como online, domicilio
-también deberían ser íconos, la wea tiene que verse clean"). El texto queda para
-lectores de pantalla y en el title (se ve al pasar el mouse o mantener el dedo).
-Se usa en la tarjeta, en la ficha y en el ejemplo de /profesionales/:
+también deberían ser íconos, la wea tiene que verse clean").
+20-11 (tarde), Diego: "al dejar el mouse encima que aparezca algo que diga atiende a
+domicilio, para que la gente sepa; en el teléfono no se podrá hacer eso". En la tarjeta,
+cada ícono lleva data-tip: con el mouse aparece la etiqueta animada; en el teléfono se
+abre al tocarlo (base.html). En la ficha hay espacio: con_texto=True muestra el texto al
+lado del ícono, siempre visible. El texto queda además para lectores de pantalla.
   {% include 'directory/_modalidades.html' with domicilio=provider.attends_home local=provider.attends_office online=provider.attends_online %}
-{% endcomment %}{% if domicilio %}<span class="modal-ico" title="Atiende a domicilio">{% icono 'casa' %}<span class="visually-hidden">A domicilio</span></span>{% endif %}{% if local %}<span class="modal-ico" title="Atiende en consulta o local">{% icono 'local' %}<span class="visually-hidden">En consulta o local</span></span>{% endif %}{% if online %}<span class="modal-ico" title="Atiende online">{% icono 'pantalla' %}<span class="visually-hidden">Online</span></span>{% endif %}
+{% endcomment %}{% if con_texto %}{% if domicilio %}<span class="modal-ico con-texto">{% icono 'casa' %}<span>A domicilio</span></span>{% endif %}{% if local %}<span class="modal-ico con-texto">{% icono 'local' %}<span>En consulta o local</span></span>{% endif %}{% if online %}<span class="modal-ico con-texto">{% icono 'pantalla' %}<span>Online</span></span>{% endif %}{% else %}{% if domicilio %}<span class="modal-ico" data-tip="Atiende a domicilio" tabindex="0">{% icono 'casa' %}<span class="visually-hidden">A domicilio</span></span>{% endif %}{% if local %}<span class="modal-ico" data-tip="Atiende en consulta o local" tabindex="0">{% icono 'local' %}<span class="visually-hidden">En consulta o local</span></span>{% endif %}{% if online %}<span class="modal-ico" data-tip="Atiende online" tabindex="0">{% icono 'pantalla' %}<span class="visually-hidden">Online</span></span>{% endif %}{% endif %}

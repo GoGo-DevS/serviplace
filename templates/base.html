@@ -223,6 +223,18 @@
         origen: a.dataset.gaOrigen || '', transport_type: 'beacon'
       });
     });
+    // Etiquetas de los íconos (data-tip, 20-11-2026): con mouse aparecen solas al pasar
+    // por encima (CSS); en el teléfono no hay "encima", así que se abren al tocar el ícono
+    // y se cierran al tocar en otro lado.
+    document.addEventListener('click', function (e) {
+      var t = e.target.closest('[data-tip]');
+      document.querySelectorAll('[data-tip].tip-abierto').forEach(function (x) {
+        if (x !== t) x.classList.remove('tip-abierto');
+      });
+      if (!t) return;
+      e.preventDefault();
+      t.classList.toggle('tip-abierto');
+    });
     // Compartir: el menú nativo del teléfono si existe; si no, el enlace a WhatsApp.
     document.querySelectorAll('[data-compartir]').forEach(function (a) {
       a.addEventListener('click', function (e) {

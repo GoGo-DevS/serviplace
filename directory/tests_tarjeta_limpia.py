@@ -58,6 +58,17 @@ class TarjetaLimpia(TestCase):
         self.assertIn('<span class="visually-hidden">Online</span>', t)
         self.assertNotIn('mini-pill', t)
 
+    def test_los_iconos_dicen_que_son_al_pasar_el_mouse_o_tocarlos(self):
+        # 20-11 (Diego): "que al dejar el mouse aparezca algo que diga atiende a domicilio".
+        p = self._perfil('Gásfiter Ayuda', attends_home=True, whatsapp_confirmado_en=timezone.now())
+        t = self._tarjeta('Gásfiter Ayuda')
+        self.assertIn('data-tip="Atiende a domicilio"', t)
+        self.assertIn('data-tip="WhatsApp confirmado', t)
+        # En la ficha hay espacio: el texto va a la vista, sin tener que tocar nada.
+        ficha = self.client.get(p.get_absolute_url()).content.decode()
+        self.assertIn('class="modal-ico con-texto"', ficha)
+        self.assertIn('<span>A domicilio</span>', ficha)
+
     def test_el_rubro_lleva_su_icono(self):
         self._perfil('Gásfiter Soto')
         t = self._tarjeta('Gásfiter Soto')
