@@ -48,10 +48,22 @@ class SellosConIcono(TestCase):
             for sello, texto in (('whatsapp', 'WhatsApp confirmado'), ('salud', 'Registro de salud comprobado'),
                                  ('sec', 'Licencia SEC comprobada')):
                 i = html.index(f'data-sello="{sello}"')
-                # WhatsApp es solo el logo con el visto ("Opción A"); el texto queda oculto
-                # para lectores de pantalla. Salud y SEC siguen con ícono y texto.
-                self.assertIn('class="wa-logo"' if sello == 'whatsapp' else 'class="sello-ico"', html[i:i + 300])
+                # WhatsApp es solo su logo con el visto ("Opción A") y la SEC es el logo de la
+                # SEC (20-11); en los dos el texto queda oculto para lectores de pantalla.
+                # Salud sigue con ícono y texto.
+                icono = {'whatsapp': 'class="wa-logo"', 'sec': 'class="sec-logo"'}.get(sello, 'class="sello-ico"')
+                self.assertIn(icono, html[i:i + 300])
                 self.assertIn(texto, html[i:i + 2400])
+
+    def test_el_logo_de_la_sec_aclara_que_la_revision_la_hace_serviplace(self):
+        # Es el logo de un organismo público: no puede leerse como "la SEC certificó a este maestro".
+        p = self._perfil(licencia_sec_comprobada_en=timezone.now(), licencia_sec='Clase 3 gas')
+        html = self.client.get(p.get_absolute_url()).content.decode()
+        i = html.index('data-sello="sec"')
+        sello = html[html.rindex('<span', 0, i):i + 400]
+        self.assertIn('ServiPlace la revisó en el buscador público de la SEC', sello)
+        self.assertIn('img/sellos/sec', sello)
+        self.assertIn('Licencia SEC comprobada', sello)
 
     def test_sin_comprobar_no_hay_sellos(self):
         html = self.client.get(self._perfil().get_absolute_url()).content.decode()

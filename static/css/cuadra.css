@@ -604,6 +604,11 @@ body:has(.galeria-visor[open]) { overflow: hidden; }
 }
 .sello-wa-logo .wa-check svg { width: .62rem; height: .62rem; fill: none; stroke: #fff; stroke-width: 3.6; stroke-linecap: round; stroke-linejoin: round; }
 .ficha-tags .sello-wa-logo { width: 1.75rem; height: 1.75rem; }
+/* Licencia SEC comprobada: el logo de la SEC (20-11, pedido de Diego), a la altura del de WhatsApp. */
+.sello-sec-logo { display: inline-flex; align-items: center; flex: none; height: 2rem; vertical-align: middle; }
+.sello-sec-logo .sec-logo { display: block; height: 1.6rem; width: auto; }
+.ficha-tags .sello-sec-logo { height: 1.75rem; }
+.ficha-tags .sello-sec-logo .sec-logo { height: 1.4rem; }
 .sellos-lista { margin: 0 0 .8rem; padding-left: 1.1rem; display: grid; gap: .35rem; font-size: .93rem; }
 .confirmar-wa { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .75rem; padding: .85rem 1rem; margin-bottom: 1rem; border-radius: 14px; background: var(--sp-green-light); color: var(--sp-ink); font-size: .9rem; }
 .confirmar-wa > div { flex: 1 1 280px; }
