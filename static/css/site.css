@@ -2,7 +2,7 @@
    SERVIPLACE — Design System v4 "Cuadra" (18-10-2026)
    Identidad: la comuna. Asfalto claro + tinta + un acento naranja de obra.
    Fichas profesionales con estilo de credencial.
-   Fuentes: Bricolage Grotesque (títulos), Atkinson Hyperlegible (texto,
+   Fuentes: Plus Jakarta Sans (títulos, desde el 20-11-2026), Atkinson Hyperlegible (texto,
    pensada para leer fácil: muchos clientes son adultos mayores) e IBM Plex
    Mono (datos de credencial). Se cargan desde base.html, no con @import:
    el @import bloqueaba el render y cargaba las fuentes dos veces.
@@ -47,9 +47,11 @@
   --sp-sh-md:       0 2px 6px rgba(27,31,36,.06), 0 18px 36px -22px rgba(27,31,36,.35);
   --sp-sh-lg:       0 4px 10px rgba(27,31,36,.06), 0 30px 54px -30px rgba(27,31,36,.5);
   --sp-focus:       0 0 0 3px rgba(6,182,212,.45);
-  --font-head:      'Bricolage Grotesque', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-head:      'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-body:      'Atkinson Hyperlegible', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-mono:      'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  /* 20-11-2026: las etiquetas chicas dejan la monoespaciada y usan la de títulos (Diego: "la fuente
+     de la web no me gusta"). Para volver: 'IBM Plex Mono', ui-monospace, monospace. */
+  --font-mono:      'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
 }
 
 /* ---- RESET & BASE ---- */

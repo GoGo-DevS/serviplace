@@ -106,7 +106,7 @@ a:hover { color: var(--sp-blue-dark); }
 .category-tile:hover { transform: translateY(-2px); box-shadow: var(--sp-sh-md); }
 .category-tile.is-empty { border: 2px dashed var(--sp-line); background: transparent; box-shadow: none; }
 .tile-name { font-family: var(--font-head); font-weight: 700; font-size: 1.02rem; letter-spacing: -.02em; }
-.tile-count { font-family: var(--font-mono); font-size: .74rem; font-weight: 600; color: var(--sp-green-dark); }
+.tile-count { font-family: var(--font-head); font-size: .8rem; font-weight: 700; color: var(--sp-green-dark); }  /* 20-11: sin monoespaciada (Diego) */
 .tile-count.is-first { color: var(--sp-accent); }
 
 /* ---- Ficha-credencial (tarjeta del listado) ---- */

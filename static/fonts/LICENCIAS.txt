@@ -1,8 +1,10 @@
 Fuentes servidas desde el propio sitio (18-10-2026), subconjunto latin, bajadas
-de Google Fonts. Las tres tienen licencia SIL Open Font License 1.1, que permite
+de Google Fonts. Todas tienen licencia SIL Open Font License 1.1, que permite
 usarlas, incrustarlas y redistribuirlas:
 
-- Bricolage Grotesque (variable, pesos 500-800) - Ateliertriay
+- Plus Jakarta Sans (variable, pesos 500-800) - Tokotype. Títulos desde el 20-11-2026
+- Bricolage Grotesque (variable, pesos 500-800) - Ateliertriay. Ya no se carga en la web (queda para
+  la imagen de historia de Instagram, directory/historia.py)
 - Atkinson Hyperlegible (400, 400 itálica, 700) - Braille Institute
 - IBM Plex Mono (500, 600) - IBM
 

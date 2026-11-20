@@ -47,7 +47,8 @@ class NadaDeTercerosAntesDelPrimerPintado(TestCase):
         self.assertNotIn('cdn.jsdelivr.net', html)
         self.assertIn('vendor/bootstrap/bootstrap.min.css', html)
         self.assertIn('css/fuentes.css', html)
-        self.assertRegex(html, r'<link rel="preload" href="[^"]+bricolage[^"]+\.woff2" as="font" type="font/woff2" crossorigin>')
+        # La fuente de títulos se precarga (desde el 20-11-2026 es Plus Jakarta Sans).
+        self.assertRegex(html, r'<link rel="preload" href="[^"]+plus-jakarta-sans[^"]+\.woff2" as="font" type="font/woff2" crossorigin>')
 
     def test_el_js_de_bootstrap_no_bloquea(self):
         html = self.client.get('/').content.decode()
