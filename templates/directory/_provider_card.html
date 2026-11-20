@@ -9,8 +9,13 @@ incompleto. El nombre es el enlace a la ficha; WhatsApp es el botón.
 {% with rubro=selected_category|default:provider.category %}
 <div class="col-md-6 col-xl-4">
   <article class="ficha">
+    {% comment %}20-11-2026 (revisión de diseño con GPT): todas las tarjetas tienen el mismo espacio de
+    imagen. Sin foto de un trabajo, el espacio muestra el ícono del rubro: así una tarjeta sin foto
+    no queda más baja ni se ve incompleta al lado de una con foto.{% endcomment %}
     {% with portada=provider.portadas|first %}{% if portada %}
     <a class="ficha-portada" href="{{ provider.get_absolute_url }}" tabindex="-1" aria-hidden="true"><img src="{{ portada.image.url }}" alt="" loading="lazy" width="480" height="270"></a>
+    {% else %}
+    <div class="ficha-portada ficha-portada-vacia" aria-hidden="true">{% icono_rubro rubro %}</div>
     {% endif %}{% endwith %}
     {% comment %}15-11-2026: en el listado de una comuna que no es su base, la tarjeta dice que la atiende (cobertura) y abajo, desde dónde.{% endcomment %}
     {% if selected_commune and provider.commune_id != selected_commune.pk %}

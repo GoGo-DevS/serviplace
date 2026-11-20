@@ -638,6 +638,39 @@ body:has(.galeria-visor[open]) { overflow: hidden; }
 .ficha-tags .sello-salud-ico .sello-ico { width: 1.75rem; height: 1.75rem; }
 .ficha-acciones { flex-wrap: nowrap; }
 .ficha-acciones .ficha-tags { min-width: 0; }
+
+/* ── Pulido del 20-11-2026 (revisión de diseño con GPT, aplicada a mano) ──────────
+   Una sola estructura para todas las tarjetas: mismo espacio de imagen, descripción
+   de 2 líneas con su alto reservado, bloque de formación más liviano y la fila de
+   íconos y WhatsApp siempre abajo. Medidas: padding 16, radio 16, avatar 48. */
+.ficha { padding: 16px; border-radius: 16px; border: 1px solid var(--sp-line-soft); }
+.ficha-portada { margin: -16px -16px 14px; height: 120px; aspect-ratio: auto; border-radius: 16px 16px 0 0; }
+.ficha-link::after { border-radius: 16px; }
+.ficha-portada-vacia { display: grid; place-items: center; background: linear-gradient(160deg, #eaf7fa, #d6f1f7); color: var(--sp-accent); }
+.ficha-portada-vacia .ico-rubro { width: 44px; height: 44px; opacity: .55; stroke-width: 1.6; }
+.ficha-who { grid-template-columns: 48px minmax(0, 1fr); }
+.ficha-avatar { width: 48px; height: 48px; border-radius: 12px; place-items: center; padding-bottom: 0; }
+.ficha-who h3 { font-size: 1.125rem; font-weight: 700; }
+.ficha-who p { font-size: .8125rem; }
+.ficha-otros { margin: .5rem 0 0; font-size: .75rem; color: var(--sp-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ficha-desc { margin-top: .6rem; font-size: .875rem; line-height: 1.5; color: #475569; -webkit-line-clamp: 2; min-height: 3em; }
+.ficha-cred { margin-top: .7rem; padding: 12px; border-radius: 10px; gap: 8px .75rem; font-size: .8rem; }
+.ficha-cred dt { font-size: .625rem; font-weight: 700; color: #64748b; padding-top: .15rem; }
+.ficha-cred dd { font-weight: 600; }
+.ficha-acciones { padding-top: 14px; gap: .6rem; }
+.ficha-acciones .ficha-tags { gap: 6px; }
+.modal-ico { width: 32px; height: 32px; border-radius: 8px; }
+.modal-ico .ico { width: 18px; height: 18px; }
+.ficha-acciones .btn { min-height: 44px; padding-inline: 16px; border-radius: 10px; font-size: .875rem; font-weight: 700; }
+/* Ficha: etiquetas de rubro suaves y modalidades a 32 px */
+.badge-category { background: #eaf7fa; color: var(--sp-accent); }
+.modalidades-ficha .modal-ico { width: 2.25rem; height: 2.25rem; border-radius: 10px; }
+.modalidades-ficha .modal-ico .ico { width: 1.2rem; height: 1.2rem; }
+/* Barra fija de WhatsApp en el teléfono: 48 px y respeta la zona del gesto del iPhone */
+@media (max-width: 767px) {
+  .mobile-whatsapp-bar { padding: 10px 12px calc(10px + env(safe-area-inset-bottom)); }
+  .mobile-whatsapp-bar .btn { min-height: 48px; border-radius: 12px; }
+}
 .ficha-tags .sello-sec-logo .sec-logo { height: 1.4rem; }
 .sellos-lista { margin: 0 0 .8rem; padding-left: 1.1rem; display: grid; gap: .35rem; font-size: .93rem; }
 .confirmar-wa { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .75rem; padding: .85rem 1rem; margin-bottom: 1rem; border-radius: 14px; background: var(--sp-green-light); color: var(--sp-ink); font-size: .9rem; }

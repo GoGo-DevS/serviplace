@@ -65,6 +65,14 @@ class TarjetaLimpia(TestCase):
         self.assertIn('ico-rubro', top)
         self.assertIn('Gasfitería', top)
 
+    def test_sin_foto_el_espacio_de_imagen_muestra_el_icono_del_rubro(self):
+        # Revisión de diseño (20-11): todas las tarjetas con el mismo espacio de imagen.
+        self._perfil('Gásfiter Sin Foto')
+        t = self._tarjeta('Gásfiter Sin Foto')
+        portada = t[t.index('ficha-portada'):t.index('</div>', t.index('ficha-portada'))]
+        self.assertIn('ficha-portada-vacia', portada)
+        self.assertIn('ico-rubro', portada)
+
     def test_si_no_lo_publico_la_persona_se_sigue_avisando(self):
         # Los clientes de GoGoDevS se cargan desde su sitio: no los publicó el dueño en persona.
         # (Un perfil sin dueño no llega a ningún listado público desde el 18-10.)
