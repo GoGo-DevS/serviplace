@@ -6,7 +6,7 @@ from django.urls import include, path
 
 from core.sitemaps import (GuiasSitemap, ListadosSitemap, ProfesionesSitemap, ProviderSitemap,
                            StaticViewSitemap)
-from core.views import robots_txt
+from core.views import llms_txt, robots_txt
 
 SITEMAPS = {
     'static': StaticViewSitemap,
@@ -19,6 +19,7 @@ SITEMAPS = {
 urlpatterns = [
     path('sitemap.xml', sitemap, {'sitemaps': SITEMAPS}, name='django.contrib.sitemaps.views.sitemap'),
     path('robots.txt', robots_txt, name='robots_txt'),
+    path('llms.txt', llms_txt, name='llms_txt'),
     path('', include('core.urls')),
     path('', include('directory.urls')),
     path('', include('accounts.urls')),

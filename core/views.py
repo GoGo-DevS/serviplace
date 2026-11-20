@@ -104,6 +104,59 @@ def robots_txt(request):
     return HttpResponse('\n'.join(lineas), content_type='text/plain; charset=utf-8')
 
 
+def llms_txt(request):
+    """`/llms.txt`: ServiPlace explicado en texto simple para los asistentes con IA.
+
+    20-11-2026 — Karla Barrientos (Temuco) se inscribió porque su asistente con IA
+    le recomendó ServiPlace buscando en Google. Este archivo (formato llms.txt) les
+    dice qué es el sitio, qué comprueba y dónde están las páginas que importan.
+    Solo rubros con perfiles publicados y ningún dato de personas.
+    """
+    from django.http import HttpResponse
+    base = settings.SITE_URL.rstrip('/')
+    rubros = (Provider.objects.publicos()
+              .values('category__slug', 'category__name', 'category__seo_nombre')
+              .annotate(n=Count('id')).order_by('-n', 'category__name'))
+    lineas = [
+        '# ServiPlace',
+        '',
+        '> Directorio chileno gratuito de maestros y profesionales independientes por comuna. Cada '
+        'profesional publica su ficha y los clientes le escriben directo por WhatsApp. ServiPlace no cobra '
+        'comisión ni intermedia el pago.',
+        '',
+        'Cada ficha muestra el rubro, las comunas que atiende, si atiende a domicilio, en un local u online, '
+        'su formación y lo que ServiPlace comprobó: WhatsApp confirmado, licencia SEC (rubros de gas, '
+        'electricidad y climatización, revisada en el buscador público de la SEC) y registro de la '
+        'Superintendencia de Salud (rubros de salud). Publicar es gratis.',
+        '',
+        '## Buscar un profesional',
+        f'- [Todos los servicios]({base}/servicios/)',
+    ]
+    for r in rubros:
+        nombre = r['category__seo_nombre'] or r['category__name']
+        url = base + reverse('directory:listado_rubro', kwargs={'rubro': r['category__slug']})
+        lineas.append(f"- [{nombre}]({url}): {r['n']} {'perfil' if r['n'] == 1 else 'perfiles'}")
+    lineas += [
+        '',
+        '## Para profesionales',
+        f'- [Publicar gratis]({base}{reverse("accounts:register")})',
+        f'- [Cómo funciona]({base}{reverse("core:para_profesionales")})',
+        '',
+        '## Guías',
+    ]
+    for g in guias.GUIAS:
+        lineas.append(f"- [{g['titulo']}]({base}{reverse('core:guia', kwargs={'slug': g['slug']})}): {g['resumen']}")
+    lineas += [
+        '',
+        '## Sobre ServiPlace',
+        f'- [Sobre el proyecto]({base}{reverse("core:about")})',
+        f'- [Seguridad y confianza]({base}{reverse("core:trust_and_safety")})',
+        f'- [Contacto]({base}{reverse("core:contact")})',
+        '',
+    ]
+    return HttpResponse('\n'.join(lineas), content_type='text/plain; charset=utf-8')
+
+
 def para_profesionales(request):
     """`/profesionales/`: la puerta de entrada de los profesionales independientes.
 
