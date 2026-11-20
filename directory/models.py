@@ -519,13 +519,18 @@ class Provider(models.Model):
     def whatsapp_confirmado(self):
         return self.whatsapp_confirmado_en is not None
 
+    # 20-11-2026 (Diego): "un informático no puede tener una certificación SEC, lo
+    # mismo con los de la salud". El formulario ya limpia esos campos si el rubro no
+    # los pide (18-10), pero un perfil que cambió de rubro, o uno cargado antes,
+    # puede traer el dato y la fecha. El sello se muestra solo si ALGUNO de sus
+    # rubros lo pide. El rubro se mira al final: solo cuando hay fecha.
     @property
     def registro_salud_comprobado(self):
-        return bool(self.registro_salud_comprobado_en and self.health_registry)
+        return bool(self.registro_salud_comprobado_en and self.health_registry and self.pide_registro_salud)
 
     @property
     def licencia_sec_comprobada(self):
-        return bool(self.licencia_sec_comprobada_en and self.licencia_sec)
+        return bool(self.licencia_sec_comprobada_en and self.licencia_sec and self.pide_licencia_sec)
 
     @property
     def tiene_sellos(self):

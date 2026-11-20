@@ -1,0 +1,7 @@
+{% load rubros %}{% comment %}
+Cómo atiende, en íconos (20-11-2026, Diego: "las etiquetas como online, domicilio
+también deberían ser íconos, la wea tiene que verse clean"). El texto queda para
+lectores de pantalla y en el title (se ve al pasar el mouse o mantener el dedo).
+Se usa en la tarjeta, en la ficha y en el ejemplo de /profesionales/:
+  {% include 'directory/_modalidades.html' with domicilio=provider.attends_home local=provider.attends_office online=provider.attends_online %}
+{% endcomment %}{% if domicilio %}<span class="modal-ico" title="Atiende a domicilio">{% icono 'casa' %}<span class="visually-hidden">A domicilio</span></span>{% endif %}{% if local %}<span class="modal-ico" title="Atiende en consulta o local">{% icono 'local' %}<span class="visually-hidden">En consulta o local</span></span>{% endif %}{% if online %}<span class="modal-ico" title="Atiende online">{% icono 'pantalla' %}<span class="visually-hidden">Online</span></span>{% endif %}

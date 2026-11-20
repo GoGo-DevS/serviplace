@@ -42,15 +42,16 @@ class SellosConIcono(TestCase):
         ahora = timezone.now()
         p = self._perfil(whatsapp_confirmado_en=ahora, registro_salud_comprobado_en=ahora,
                          health_registry='123456', licencia_sec_comprobada_en=ahora, licencia_sec='SEC-1')
+        # La SEC solo sale si un rubro la pide (20-11): esta kine también es eléctrica.
+        p.otras_categorias.add(Category.objects.get(slug='electricidad'))
         ficha = self.client.get(p.get_absolute_url()).content.decode()
         listado = self.client.get(reverse('directory:listado_rubro', args=['kinesiologia'])).content.decode()
         for html in (ficha, listado):
             for sello, texto in (('whatsapp', 'WhatsApp confirmado'), ('salud', 'Registro de salud comprobado'),
                                  ('sec', 'Licencia SEC comprobada')):
                 i = html.index(f'data-sello="{sello}"')
-                # WhatsApp es solo su logo con el visto ("Opción A") y la SEC es el logo de la
-                # SEC (20-11); en los dos el texto queda oculto para lectores de pantalla.
-                # Salud sigue con ícono y texto.
+                # Los tres son íconos (20-11): WhatsApp su logo con visto, la SEC su logo y
+                # salud el estetoscopio con visto. El texto queda oculto para lectores de pantalla.
                 icono = {'whatsapp': 'class="wa-logo"', 'sec': 'class="sec-logo"'}.get(sello, 'class="sello-ico"')
                 self.assertIn(icono, html[i:i + 300])
                 self.assertIn(texto, html[i:i + 2400])
@@ -58,6 +59,7 @@ class SellosConIcono(TestCase):
     def test_el_logo_de_la_sec_aclara_que_la_revision_la_hace_serviplace(self):
         # Es el logo de un organismo público: no puede leerse como "la SEC certificó a este maestro".
         p = self._perfil(licencia_sec_comprobada_en=timezone.now(), licencia_sec='Clase 3 gas')
+        p.otras_categorias.add(Category.objects.get(slug='gasfiteria'))  # la SEC la pide un rubro de gas
         html = self.client.get(p.get_absolute_url()).content.decode()
         i = html.index('data-sello="sec"')
         sello = html[html.rindex('<span', 0, i):i + 400]

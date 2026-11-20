@@ -129,6 +129,24 @@ a:hover { color: var(--sp-blue-dark); }
 .ficha-acciones .btn { min-height: 44px; display: inline-flex; align-items: center; gap: .4rem; padding-inline: 1rem; }
 .ficha-acciones .ficha-ver { font-size: .92rem; }
 .ficha-estado { margin-top: .6rem; font-size: .78rem; color: var(--sp-muted); }
+/* 20-11-2026 (Diego, "la wea tiene que verse clean"): toda la tarjeta lleva a la ficha.
+   El enlace del nombre se estira sobre la tarjeta; WhatsApp queda encima y sigue siendo su propio botón. */
+.ficha { position: relative; }
+.ficha-link::after { content: ""; position: absolute; inset: 0; border-radius: 18px; z-index: 1; }
+.ficha-acciones .btn { position: relative; z-index: 2; flex: none; }
+.ficha-acciones .ficha-tags { margin-top: 0; align-items: center; }
+/* Ícono del rubro junto a su nombre */
+.ficha-top b { display: inline-flex; align-items: center; gap: .35rem; }
+.ico-rubro { width: 1rem; height: 1rem; flex: none; }
+.badge-category .ico-rubro { width: .95rem; height: .95rem; margin-right: .3rem; vertical-align: -2px; }
+/* Modalidades en íconos (el texto queda para lectores de pantalla y en el title) */
+.modal-ico { display: inline-grid; place-items: center; flex: none; width: 1.9rem; height: 1.9rem; border-radius: 10px; background: var(--sp-bg); color: var(--sp-slate); }
+.modal-ico .ico { width: 1.05rem; height: 1.05rem; }
+.modalidades-ficha .modal-ico { width: 2.4rem; height: 2.4rem; border-radius: 12px; }
+.modalidades-ficha .modal-ico .ico { width: 1.3rem; height: 1.3rem; }
+/* Logo de la institución donde estudió, antes del nombre */
+.ficha-inst { display: flex; align-items: center; gap: .45rem; flex-wrap: wrap; }
+.logo-inst { height: 18px; width: auto; max-width: 96px; object-fit: contain; }
 .ficha-estado.is-ok { color: var(--sp-green-dark); font-weight: 700; }
 
 /* ---- Ficha completa ---- */
@@ -608,6 +626,18 @@ body:has(.galeria-visor[open]) { overflow: hidden; }
 .sello-sec-logo { display: inline-flex; align-items: center; flex: none; height: 2rem; vertical-align: middle; }
 .sello-sec-logo .sec-logo { display: block; height: 1.6rem; width: auto; }
 .ficha-tags .sello-sec-logo { height: 1.75rem; }
+/* Registro de salud comprobado: estetoscopio con visto, a la altura de los otros dos (20-11). */
+.sello-salud-ico { position: relative; display: inline-flex; flex: none; vertical-align: middle; }
+.sello-salud-ico .sello-ico { width: 2rem; height: 2rem; background: #0e7490; }
+.sello-salud-ico .sello-ico svg { width: 1.15rem; height: 1.15rem; }
+.sello-salud-ico .wa-check {
+  position: absolute; right: -4px; bottom: -4px; width: 1rem; height: 1rem; border-radius: 50%;
+  display: grid; place-items: center; background: #16a34a; border: 2px solid #fff;
+}
+.sello-salud-ico .wa-check svg { width: .62rem; height: .62rem; fill: none; stroke: #fff; stroke-width: 3.6; stroke-linecap: round; stroke-linejoin: round; }
+.ficha-tags .sello-salud-ico .sello-ico { width: 1.75rem; height: 1.75rem; }
+.ficha-acciones { flex-wrap: nowrap; }
+.ficha-acciones .ficha-tags { min-width: 0; }
 .ficha-tags .sello-sec-logo .sec-logo { height: 1.4rem; }
 .sellos-lista { margin: 0 0 .8rem; padding-left: 1.1rem; display: grid; gap: .35rem; font-size: .93rem; }
 .confirmar-wa { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .75rem; padding: .85rem 1rem; margin-bottom: 1rem; border-radius: 14px; background: var(--sp-green-light); color: var(--sp-ink); font-size: .9rem; }

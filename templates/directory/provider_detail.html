@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load rubros %}
 
 
 {% block content %}
@@ -11,7 +12,7 @@
       <div class="provider-detail-avatar{% if provider.foto %} con-foto{% endif %}">{% if provider.foto %}<img src="{{ provider.foto.url }}" alt="Logo o foto de {{ provider.business_name }}">{% else %}{{ provider.business_name|first|upper }}{% endif %}</div>
       <div class="provider-detail-info">
         <div class="d-flex flex-wrap gap-2 mb-2 align-items-center">
-          <span class="badge badge-category">{{ provider.category.name }}</span>
+          <span class="badge badge-category">{% icono_rubro provider.category %}{{ provider.category.name }}</span>
           {% for otro in otros_rubros %}<a class="badge badge-category badge-otro" href="{{ otro.url }}">{{ otro.categoria.name }}</a>{% endfor %}
           {% include 'directory/_sellos.html' %}
           {% if not provider.owner %}
@@ -23,8 +24,8 @@
         <p class="lead mb-0">{{ provider.short_description }}</p>
         <p class="text-muted mt-1 mb-0" style="font-size:.95rem">{% if provider.sector_limpio %}{{ provider.sector_limpio }} · {% endif %}{{ provider.commune.name }}</p>
         {% if provider.modalities %}
-        <div class="d-flex gap-2 flex-wrap mt-2">
-          {% for modalidad in provider.modalities %}<span class="mini-pill">{{ modalidad }}</span>{% endfor %}
+        <div class="d-flex gap-2 flex-wrap mt-2 modalidades-ficha">
+          {% include 'directory/_modalidades.html' with domicilio=provider.attends_home local=provider.attends_office online=provider.attends_online %}
         </div>
         {% endif %}
         {% comment %}
@@ -132,7 +133,7 @@
         <h2>Formación</h2>
         <dl class="info-list mb-0">
           {% if provider.profession_title %}<dt>Título o profesión</dt><dd>{{ provider.profession_title }}</dd>{% endif %}
-          {% if provider.institution %}<dt>Institución</dt><dd>{{ provider.institution }}</dd>{% endif %}
+          {% if provider.institution %}<dt>Institución</dt><dd class="ficha-inst">{% logo_institucion provider.institution %}<span>{{ provider.institution }}</span></dd>{% endif %}
           {% if provider.graduation_year %}<dt>{% if provider.is_student %}Se titula en{% else %}Año de titulación{% endif %}</dt><dd>{{ provider.graduation_year }}</dd>{% endif %}
           {% if provider.lista_otros_estudios %}<dt>Otros estudios</dt><dd><ul class="mb-0 ps-3">{% for estudio in provider.lista_otros_estudios %}<li>{{ estudio }}</li>{% endfor %}</ul></dd>{% endif %}
           {% if provider.health_registry %}

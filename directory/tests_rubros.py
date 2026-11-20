@@ -75,7 +75,7 @@ class VariosRubros(TestCase):
         # Los cuatro son de Hogar: en el listado del grupo sale UNA vez.
         r = self.client.get(reverse('directory:listado_rubro', args=[Category.GROUP_SLUGS[Category.HOGAR]]))
         self.assertEqual(r.context['total_resultados'], 1)
-        self.assertEqual(r.content.decode().count(f'<h3><a href="{p.get_absolute_url()}"'), 1)
+        self.assertEqual(r.content.decode().count(f'<h3><a class="ficha-link" href="{p.get_absolute_url()}"'), 1)
         # Y en la búsqueda por texto de un rubro extra, también una vez.
         r = self.client.get(reverse('directory:provider_list'), {'q': 'Soldadura'})
         self.assertEqual(r.context['total_resultados'], 1)
@@ -83,7 +83,10 @@ class VariosRubros(TestCase):
     def test_la_tarjeta_dice_el_rubro_del_listado_y_los_demas(self):
         self._suegro()
         html = self.client.get(reverse('directory:listado_rubro', args=['gasfiteria'])).content.decode()
-        self.assertIn('<div class="ficha-top"><b>Gasfitería</b>', html)
+        # 20-11: la etiqueta del rubro lleva su ícono antes del nombre.
+        top = html[html.index('<div class="ficha-top">'):]
+        self.assertIn('ico-rubro', top[:600])
+        self.assertIn('</svg>Gasfitería</b>', top[:600])
         self.assertIn('También: Construcción, Electricidad, Soldadura', html)
         self.assertIn('data-ga-categoria="gasfiteria"', html)
 

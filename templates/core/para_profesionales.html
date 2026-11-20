@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load rubros %}
 
 {% block content %}
 <!-- HERO -->
@@ -22,7 +23,7 @@
         <div class="ejemplo-wrap">
           <span class="ejemplo-label">Perfil de ejemplo</span>
           <article class="ficha" aria-label="Perfil de ejemplo de una kinesióloga">
-            <div class="ficha-top"><b>Kinesiología</b><span>Concepción</span></div>
+            <div class="ficha-top"><b>{% icono 'pulso' 'ico ico-rubro' %}Kinesiología</b><span>Concepción</span></div>
             <div class="ficha-who">
               <div class="ficha-avatar" aria-hidden="true">C</div>
               <div><p class="ficha-nombre">Camila R. Kinesiología</p><p>Lomas de San Andrés</p></div>
@@ -30,12 +31,11 @@
             <p class="ficha-desc">Rehabilitación musculoesquelética y adulto mayor. Evaluación a domicilio y seguimiento online.</p>
             <dl class="ficha-cred">
               <dt>Título</dt><dd>Kinesióloga · titulada en {{ anio_actual|add:"-1" }}</dd>
-              <dt>Estudió en</dt><dd>Universidad de Concepción</dd>
+              <dt>Estudió en</dt><dd class="ficha-inst">{% logo_institucion 'Universidad de Concepción' %}<span>Universidad de Concepción</span></dd>
               <dt>Registro</dt><dd>N° 000000</dd>
             </dl>
-            <div class="ficha-tags"><span class="mini-pill">A domicilio</span><span class="mini-pill">Online</span></div>
             <div class="ficha-acciones">
-              <span class="ficha-ver" aria-disabled="true">Ver ficha →</span>
+              <div class="ficha-tags">{% include 'directory/_modalidades.html' with domicilio=True online=True %}</div>
               <span class="btn btn-success disabled" aria-disabled="true">WhatsApp</span>
             </div>
           </article>
