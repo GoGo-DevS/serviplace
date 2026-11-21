@@ -21,28 +21,27 @@ from PIL import Image, ImageDraw, ImageFont, ImageOps
 
 # Subirlo cuando cambie el dibujo: cambia la versión de todas las historias
 # (Provider.version_historia) y nadie recibe la imagen vieja guardada.
-DISENO = 2  # 13-11-2026: insignia azul de Verificado junto al nombre
+DISENO = 3  # 21-11-2026: la tarjeta de la historia igual a la tarjeta nueva del sitio
 
 ANCHO, ALTO = 1080, 1920
 FUENTES = Path(__file__).resolve().parent / 'fuentes'
-TITULO = 'bricolage-grotesque.ttf'      # variable: por defecto viene en peso 800
+ICONOS = FUENTES / 'iconos'            # los mismos íconos del sitio, en PNG (iconos/generar.py)
+LOGO_SEC = Path(__file__).resolve().parents[1] / 'static' / 'img' / 'sellos' / 'sec.png'
+TITULO = 'plus-jakarta-sans-800.ttf'    # la fuente de títulos del sitio desde el 20-11-2026
+ETIQUETA = 'plus-jakarta-sans-700.ttf'
 TEXTO = 'atkinson-hyperlegible-400.ttf'
 NEGRITA = 'atkinson-hyperlegible-700.ttf'
 
 FONDO, CUADRICULA = '#1b1f24', '#2a3038'
 TINTA, GRIS, ACENTO, MARCA, VERDE = '#1b1f24', '#5a6068', '#0e7490', '#06b6d4', '#0f7a40'
 AZUL_CHECK = '#1d8cf8'
-CHIPS = {  # fondo, letra: los mismos tonos de las insignias del sitio
-    'verificado': ('#dbeafe', '#1d5fbf'),  # azul, como la insignia
-    'sello': ('#dcefe2', '#0b6233'),
-    'rubro': ('#cffafe', '#155e75'),
-    'modalidad': ('#eef2f6', '#3a4047'),
-}
+SUAVE, ETIQ_GRIS, DESC = '#f1f5f9', '#64748b', '#475569'
 
 # Zona donde cabe la tarjeta, entre la marca de arriba y el enlace de abajo.
 TARJETA_X, TARJETA_ANCHO = 80, 920
 ZONA_ARRIBA, ZONA_ABAJO = 420, 1490
-RELLENO = 56
+RELLENO = 48
+RADIO = 36
 
 # Fuera del alfabeto latino (emojis, símbolos) las fuentes no tienen el
 # dibujo y saldría un cuadrado vacío: se quita.
@@ -159,148 +158,220 @@ def _check(lado):
     return capa.resize((lado, lado), Image.LANCZOS)
 
 
+@lru_cache(maxsize=64)
+def _icono(nombre, lado, opacidad=1.0):
+    """Un ícono del sitio en PNG (directory/fuentes/iconos/), achicado a `lado`.
+    Sin el archivo devuelve None y la historia sale igual, sin ese ícono."""
+    try:
+        imagen = Image.open(ICONOS / f'{nombre}.png').convert('RGBA')
+    except OSError:
+        return None
+    imagen = imagen.resize((lado, lado), Image.LANCZOS)
+    if opacidad < 1:
+        alfa = imagen.getchannel('A').point(lambda v: int(v * opacidad))
+        imagen.putalpha(alfa)
+    return imagen
+
+
+@lru_cache(maxsize=4)
+def _logo_sec(alto):
+    try:
+        imagen = Image.open(LOGO_SEC).convert('RGBA')
+    except OSError:
+        return None
+    return imagen.resize((round(imagen.width * alto / imagen.height), alto), Image.LANCZOS)
+
+
+def _pegar(img, capa, x, y):
+    if capa is not None:
+        img.paste(capa, (int(x), int(y)), capa)
+
+
+def _degradado(ancho, alto, arriba, abajo):
+    """Degradado vertical entre dos colores hex, como el fondo de la tarjeta sin foto."""
+    a = tuple(int(arriba[i:i + 2], 16) for i in (1, 3, 5))
+    b = tuple(int(abajo[i:i + 2], 16) for i in (1, 3, 5))
+    capa = Image.new('RGB', (1, alto))
+    for y in range(alto):
+        t = y / max(1, alto - 1)
+        capa.putpixel((0, y), tuple(round(a[c] + (b[c] - a[c]) * t) for c in range(3)))
+    return capa.resize((ancho, alto))
+
+
+def _mascara_arriba(ancho, alto, radio):
+    """Bordes redondeados solo arriba: la franja de imagen va pegada al borde de la tarjeta."""
+    completa = _mascara(ancho, alto + radio * 2, radio)
+    return completa.crop((0, 0, ancho, alto))
+
+
 def _datos(provider):
-    chips = []
-    if provider.verificado_publico:
-        chips.append(('verificado', 'Verificado'))
-    if provider.whatsapp_confirmado:
-        chips.append(('sello', 'WhatsApp confirmado'))
-    if provider.registro_salud_comprobado:
-        chips.append(('sello', 'Registro de salud comprobado'))
-    if provider.licencia_sec_comprobada:
-        chips.append(('sello', 'Licencia SEC comprobada'))
-    chips += [('rubro', _limpio(c.name)) for c in provider.rubros[1:]]
-    chips += [('modalidad', m) for m in provider.modalities]
+    from directory.templatetags.rubros import nombre_icono_rubro
+    sellos = [n for n, si in (('whatsapp', provider.whatsapp_confirmado),
+                              ('salud', provider.registro_salud_comprobado),
+                              ('sec', provider.licencia_sec_comprobada)) if si]
+    modalidades = [n for n, si in (('casa', provider.attends_home), ('local', provider.attends_office),
+                                   ('pantalla', provider.attends_online)) if si]
+    cred = []
+    if provider.profession_title:
+        titulo = _limpio(provider.profession_title)
+        if provider.graduation_year:
+            titulo += (f' · se titula en {provider.graduation_year}' if provider.is_student
+                       else f' · titulado/a en {provider.graduation_year}')
+        cred.append(('TÍTULO', titulo))
+        if provider.institution:
+            cred.append(('ESTUDIÓ EN', _limpio(provider.institution)))
+        if provider.health_registry:
+            cred.append(('REGISTRO', f'N° {_limpio(provider.health_registry)}'))
+    imagenes = list(provider.images.all())
+    portada = next((i for i in imagenes if i.is_cover), imagenes[0] if imagenes else None)
     return {
+        'icono_rubro': nombre_icono_rubro(provider.category),
         'rubro': _limpio(provider.category.name).upper(),
-        'comuna': _limpio(provider.commune.name),
+        'comuna': _limpio(provider.commune.name).upper(),
         'nombre': _limpio(provider.business_name) or 'ServiPlace',
         'verificado': provider.verificado_publico,
-        'subtitulo': _limpio(provider.profession_title or provider.sector),
+        'sector': _limpio(provider.sector_limpio or provider.commune.name),
+        'otros': [_limpio(c.name) for c in provider.rubros[1:]],
         'descripcion': _limpio(provider.short_description),
-        'chips': chips,
+        'cred': cred,
+        'sellos': sellos,
+        'modalidades': modalidades,
         'foto': _abrir(provider.foto) if provider.foto else None,
-        'trabajos': [f for f in (_abrir(i.image) for i in list(provider.images.all())[:3]) if f],
+        'portada': _abrir(portada.image) if portada else None,
     }
-
-
-def _filas_de_chips(chips, ancho):
-    """Reparte los chips en hasta dos filas; los que no caben se quedan fuera."""
-    fuente = _fuente(NEGRITA, 26)
-    filas, fila, usado = [], [], 0
-    for tipo, texto in chips:
-        largo = fuente.getlength(texto) + 44
-        if fila and usado + 12 + largo > ancho:
-            filas.append(fila)
-            if len(filas) == 2:
-                return filas
-            fila, usado = [], 0
-        if largo <= ancho:
-            fila.append((tipo, texto, largo))
-            usado += (12 if usado else 0) + largo
-    if fila:
-        filas.append(fila)
-    return filas
 
 
 def _nombre(texto, ancho):
     """El nombre lo más grande posible en dos líneas como máximo."""
-    for tamano in (72, 66, 60, 54, 50):
-        fuente = _fuente(TITULO, tamano)
+    for tamano in (64, 58, 52, 48, 44):
+        fuente = _fuente(ETIQUETA, tamano)
         lineas = _partir(texto, fuente, ancho, 3)
         if len(lineas) <= 2:
             return fuente, lineas
     return fuente, _partir(texto, fuente, ancho, 2)
 
 
-def _tarjeta(img, y0, datos, lineas_descripcion):
-    """Dibuja la tarjeta desde y0 y devuelve su alto. Con img=None solo mide."""
+def _espaciado(lapiz, x, y, texto, fuente, color, aire):
+    """Texto en mayúsculas con aire entre letras, como las etiquetas del sitio.
+    Devuelve dónde termina; con lapiz=None solo mide."""
+    for letra in texto:
+        if lapiz:
+            lapiz.text((x, y), letra, font=fuente, fill=color, anchor='lm')
+        x += fuente.getlength(letra) + aire
+    return x
+
+
+def _tarjeta(img, y0, datos, lineas_descripcion, banda=270):
+    """Dibuja la tarjeta desde y0 y devuelve su alto. Con img=None solo mide.
+    Es la tarjeta del sitio (21-11-2026): franja de imagen, rubro con ícono, avatar
+    cuadrado, nombre con el visto, descripción, formación y la fila de íconos con
+    el botón de WhatsApp."""
     x0, interior = TARJETA_X + RELLENO, TARJETA_ANCHO - 2 * RELLENO
     lapiz = ImageDraw.Draw(img) if img else None
-    y = y0 + RELLENO
 
-    # Rubro principal y comuna, como la cabecera de la tarjeta del sitio.
-    if lapiz:
-        x = x0
-        for letra in datos['rubro']:
-            lapiz.text((x, y), letra, font=_fuente(NEGRITA, 26), fill=ACENTO, anchor='la')
-            x += _fuente(NEGRITA, 26).getlength(letra) + 3
-        lapiz.text((x0 + interior, y), datos['comuna'], font=_fuente(TEXTO, 28), fill=GRIS, anchor='ra')
-    y += 34 + 34
+    # 1. Franja de imagen: la foto de un trabajo, o el ícono del rubro sobre el celeste.
+    if img:
+        if datos['portada']:
+            franja = ImageOps.fit(datos['portada'], (TARJETA_ANCHO, banda), Image.BICUBIC)
+        else:
+            franja = _degradado(TARJETA_ANCHO, banda, '#eaf7fa', '#d6f1f7')
+            icono = _icono(datos['icono_rubro'], 132, 0.55)
+            if icono is not None:
+                franja.paste(icono, ((TARJETA_ANCHO - 132) // 2, (banda - 132) // 2), icono)
+        img.paste(franja, (TARJETA_X, y0), _mascara_arriba(TARJETA_ANCHO, banda, RADIO))
+    y = y0 + banda + 40
 
-    # Foto o inicial, nombre y profesión.
-    avatar = 164
-    ancho_texto = interior - avatar - 36
-    lado_check = 52 if datos.get('verificado') else 0
-    fuente_nombre, lineas_nombre = _nombre(datos['nombre'], ancho_texto - (lado_check + 14 if lado_check else 0))
-    alto_linea_nombre = int(fuente_nombre.size * 1.08)
-    lineas_sub = _partir(datos['subtitulo'], _fuente(TEXTO, 32), ancho_texto, 2) if datos['subtitulo'] else []
-    alto_texto = len(lineas_nombre) * alto_linea_nombre + (10 + 40 * len(lineas_sub) if lineas_sub else 0)
+    # 2. Rubro con su ícono a la izquierda, comuna a la derecha.
+    fuente_etq = _fuente(ETIQUETA, 27)
+    if img:
+        _pegar(img, _icono(datos['icono_rubro'], 36), x0, y)
+        _espaciado(lapiz, x0 + 48, y + 18, datos['rubro'], fuente_etq, ACENTO, 2)
+        ancho_comuna = _espaciado(None, 0, 0, datos['comuna'], fuente_etq, GRIS, 2)
+        _espaciado(lapiz, x0 + interior - ancho_comuna, y + 18, datos['comuna'], fuente_etq, GRIS, 2)
+    y += 36 + 30
+
+    # 3. Avatar cuadrado redondeado, nombre con el visto y el sector.
+    avatar = 136
+    ancho_texto = interior - avatar - 32
+    lado_check = 50 if datos['verificado'] else 0
+    fuente_nombre, lineas_nombre = _nombre(datos['nombre'], ancho_texto - (lado_check + 12 if lado_check else 0))
+    alto_linea = int(fuente_nombre.size * 1.12)
+    alto_texto = len(lineas_nombre) * alto_linea + 44
     alto_fila = max(avatar, alto_texto)
     if img:
         ya = y + (alto_fila - avatar) // 2
         if datos['foto']:
-            _pegar_foto(img, datos['foto'], x0, ya, avatar, avatar, elipse=True)
+            _pegar_foto(img, datos['foto'], x0, ya, avatar, avatar, radio=32)
         else:
-            _forma(img, x0, ya, avatar, avatar, '#cffafe', elipse=True)
+            img.paste(_degradado(avatar, avatar, '#e0f7fb', '#b8ebf3'), (x0, int(ya)), _mascara(avatar, avatar, 32))
             lapiz.text((x0 + avatar / 2, ya + avatar / 2), datos['nombre'][0].upper(),
-                       font=_fuente(TITULO, 84), fill=ACENTO, anchor='mm')
-        yt = y + (alto_fila - alto_texto) // 2
+                       font=_fuente(TITULO, 64), fill='#155e75', anchor='mm')
+        xt, yt = x0 + avatar + 32, y + (alto_fila - alto_texto) // 2
         for i, linea in enumerate(lineas_nombre):
-            lapiz.text((x0 + avatar + 36, yt), linea, font=fuente_nombre, fill=TINTA, anchor='la')
+            lapiz.text((xt, yt), linea, font=fuente_nombre, fill=TINTA, anchor='la')
             if lado_check and i == len(lineas_nombre) - 1:
-                # Junto a la última línea del nombre, centrada en la altura de las letras.
-                xc = int(x0 + avatar + 36 + fuente_nombre.getlength(linea) + 14)
-                caja = lapiz.textbbox((x0 + avatar + 36, yt), linea, font=fuente_nombre, anchor='la')
+                caja = lapiz.textbbox((xt, yt), linea, font=fuente_nombre, anchor='la')
                 yc = int((caja[1] + caja[3]) / 2 - lado_check / 2)
-                img.paste(_check(lado_check), (xc, yc), _check(lado_check))
-            yt += alto_linea_nombre
-        yt += 10
-        for linea in lineas_sub:
-            lapiz.text((x0 + avatar + 36, yt), linea, font=_fuente(TEXTO, 32), fill=GRIS, anchor='la')
-            yt += 40
-    y += alto_fila + 36
+                img.paste(_check(lado_check), (int(xt + fuente_nombre.getlength(linea) + 12), yc), _check(lado_check))
+            yt += alto_linea
+        lapiz.text((xt, yt + 6), datos['sector'], font=_fuente(TEXTO, 30), fill=GRIS, anchor='la')
+    y += alto_fila + 22
 
-    # Lo que hace, en sus palabras.
-    lineas = _partir(datos['descripcion'], _fuente(TEXTO, 38), interior, lineas_descripcion)
+    # 4. Otros rubros, en una línea.
+    if datos['otros']:
+        linea = _partir('También: ' + ', '.join(datos['otros']), _fuente(TEXTO, 26), interior, 1)[0]
+        if lapiz:
+            lapiz.text((x0, y), linea, font=_fuente(TEXTO, 26), fill=GRIS, anchor='la')
+        y += 40
+
+    # 5. Lo que hace, en sus palabras.
+    lineas = _partir(datos['descripcion'], _fuente(TEXTO, 34), interior, lineas_descripcion)
     if lapiz:
         for i, linea in enumerate(lineas):
-            lapiz.text((x0, y + i * 50), linea, font=_fuente(TEXTO, 38), fill=TINTA, anchor='la')
-    y += len(lineas) * 50
+            lapiz.text((x0, y + i * 46), linea, font=_fuente(TEXTO, 34), fill=DESC, anchor='la')
+    y += len(lineas) * 46
 
-    # Sellos, otros rubros y modalidades.
-    filas = _filas_de_chips(datos['chips'], interior)
-    if filas:
-        y += 28
-        for fila in filas:
-            if lapiz:
-                x = x0
-                for tipo, texto, largo in fila:
-                    fondo, letra = CHIPS[tipo]
-                    _forma(img, x, y, largo, 52, fondo, radio=26)
-                    lapiz.text((x + largo / 2, y + 26), texto, font=_fuente(NEGRITA, 26), fill=letra, anchor='mm')
-                    x += largo + 12
-            y += 52 + 12
-        y -= 12
-
-    # Fotos de trabajos: lo que más convence a quien está mirando.
-    if datos['trabajos']:
-        y += 36
-        lado = (interior - 2 * 16) // 3
-        x = x0 + (interior - len(datos['trabajos']) * (lado + 16) + 16) // 2
+    # 6. Formación, en su recuadro gris.
+    if datos['cred']:
+        y += 26
+        col, valor_ancho = 210, interior - 2 * 28 - 210
+        filas = [(etq, _partir(valor, _fuente(NEGRITA, 29), valor_ancho, 2)) for etq, valor in datos['cred']]
+        alto_caja = 28 * 2 + sum(len(v) * 38 for _, v in filas) + 14 * (len(filas) - 1)
         if img:
-            for foto in datos['trabajos']:
-                _pegar_foto(img, foto, x, y, lado, lado, radio=20)
-                x += lado + 16
-        y += lado
+            _forma(img, x0, y, interior, alto_caja, SUAVE, radio=22)
+            yy = y + 28
+            for etq, valores in filas:
+                _espaciado(lapiz, x0 + 28, yy + 19, etq, _fuente(ETIQUETA, 21), ETIQ_GRIS, 1.5)
+                for j, v in enumerate(valores):
+                    lapiz.text((x0 + 28 + col, yy + j * 38), v, font=_fuente(NEGRITA, 29), fill=TINTA, anchor='la')
+                yy += len(valores) * 38 + 14
+        y += alto_caja
 
-    # El botón de la ficha: dice qué pasa al tocar el enlace.
-    y += 40
+    # 7. Sellos y modalidades en íconos, con el botón de WhatsApp a la derecha.
+    y += 34
+    boton_ancho, alto_fila = 300, 92
     if img:
-        _forma(img, x0, y, interior, 100, VERDE, radio=22)
-        lapiz.text((x0 + interior / 2, y + 50), 'Contactar por WhatsApp', font=_fuente(NEGRITA, 38),
+        x, limite = x0, x0 + interior - boton_ancho - 16
+        piezas = []
+        for sello in datos['sellos']:
+            piezas.append(_logo_sec(54) if sello == 'sec' else _icono(f'sello-{sello}', 80))
+        for nombre in datos['modalidades']:
+            cuadro = Image.new('RGBA', (76, 76), (0, 0, 0, 0))
+            cuadro.paste(Image.new('RGBA', (76, 76), SUAVE), (0, 0), _mascara(76, 76, 18))
+            icono = _icono(nombre, 42)
+            if icono is not None:
+                cuadro.paste(icono, (17, 17), icono)
+            piezas.append(cuadro)
+        for pieza in piezas:
+            if pieza is None or x + pieza.width > limite:
+                continue
+            _pegar(img, pieza, x, y + (alto_fila - pieza.height) // 2)
+            x += pieza.width + 12
+        bx = x0 + interior - boton_ancho
+        _forma(img, bx, y, boton_ancho, alto_fila, VERDE, radio=22)
+        lapiz.text((bx + boton_ancho / 2, y + alto_fila / 2), 'WhatsApp', font=_fuente(ETIQUETA, 36),
                    fill='white', anchor='mm')
-    y += 100 + RELLENO
+    y += alto_fila + RELLENO
     return y - y0
 
 
@@ -323,7 +394,7 @@ def _fondo(img):
 
     # Abajo, donde va el sticker de enlace.
     lapiz.text((ANCHO / 2, 1536), 'Ficha completa y contacto en', font=_fuente(TEXTO, 32), fill='#cbd5e1', anchor='mt')
-    fuente = _fuente(TITULO, 60)
+    fuente = _fuente(TITULO, 58)
     ancho_pildora = fuente.getlength('serviplace.cl') + 80
     _forma(img, (ANCHO - ancho_pildora) / 2, 1590, ancho_pildora, 96, MARCA, radio=22)
     lapiz.text((ANCHO / 2, 1638), 'serviplace.cl', font=fuente, fill='#0b1216', anchor='mm')
@@ -334,15 +405,16 @@ def dibujar(provider):
     comuna, otros rubros e imágenes ya cargados (select/prefetch_related)."""
     datos = _datos(provider)
     zona = ZONA_ABAJO - ZONA_ARRIBA
-    for lineas in (4, 3, 2):  # la descripción cede líneas antes que la tarjeta se salga
-        alto = _tarjeta(None, 0, datos, lineas)
+    # Si no cabe, primero cede la descripción y después se achica la franja de imagen.
+    for lineas, banda in ((3, 270), (2, 270), (2, 210), (2, 160)):
+        alto = _tarjeta(None, 0, datos, lineas, banda)
         if alto <= zona:
             break
     img = Image.new('RGB', (ANCHO, ALTO), FONDO)
     _fondo(img)
     y0 = ZONA_ARRIBA + max(0, (zona - alto) // 2)
-    _forma(img, TARJETA_X, y0, TARJETA_ANCHO, alto, 'white', radio=36)
-    _tarjeta(img, y0, datos, lineas)
+    _forma(img, TARJETA_X, y0, TARJETA_ANCHO, alto, 'white', radio=RADIO)
+    _tarjeta(img, y0, datos, lineas, banda)
 
     salida = io.BytesIO()
     img.save(salida, 'JPEG', quality=88, optimize=True, progressive=True)

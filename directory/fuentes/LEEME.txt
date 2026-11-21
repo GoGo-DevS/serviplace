@@ -3,3 +3,10 @@ Son las mismas de static/fonts/ (subconjunto latin, licencia SIL Open Font
 License 1.1: ver static/fonts/LICENCIAS.txt), pasadas de woff2 a ttf con
 fontTools para no depender de que el Pillow del servidor sepa leer woff2.
 No se sirven al público: no van en static/.
+
+21-11-2026: la historia usa Plus Jakarta Sans, como el sitio. plus-jakarta-sans-700.ttf
+y -800.ttf son instancias fijas del woff2 variable del sitio (fontTools.varLib.instancer).
+bricolage-grotesque.ttf queda sin uso.
+
+iconos/: los íconos del sitio (rubros, modalidades y sellos) en PNG transparente, para
+que la historia use los mismos dibujos que la tarjeta. Se regeneran con iconos/generar.py.

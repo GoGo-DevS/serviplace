@@ -89,11 +89,16 @@ def svg(nombre, clase='ico'):
         f'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{_TRAZOS[nombre]}</svg>')
 
 
+def nombre_icono_rubro(rubro):
+    """El nombre del ícono de un rubro: el suyo si lo tiene, si no el de su grupo.
+    Lo usan la tarjeta del sitio y la historia de Instagram (directory/historia.py)."""
+    return _ICONO_RUBRO.get(getattr(rubro, 'slug', ''), _ICONO_GRUPO.get(getattr(rubro, 'group', ''), 'maletin'))
+
+
 @register.simple_tag
 def icono_rubro(rubro):
     """El ícono de un rubro: el suyo si lo tiene, si no el de su grupo."""
-    nombre = _ICONO_RUBRO.get(getattr(rubro, 'slug', ''), _ICONO_GRUPO.get(getattr(rubro, 'group', ''), 'maletin'))
-    return svg(nombre, 'ico ico-rubro')
+    return svg(nombre_icono_rubro(rubro), 'ico ico-rubro')
 
 
 @register.simple_tag
