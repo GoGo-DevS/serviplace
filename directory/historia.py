@@ -17,11 +17,11 @@ import re
 from functools import lru_cache
 from pathlib import Path
 
-from PIL import Image, ImageDraw, ImageFilter, ImageFont, ImageOps
+from PIL import Image, ImageDraw, ImageFont, ImageOps
 
 # Subirlo cuando cambie el dibujo: cambia la versión de todas las historias
 # (Provider.version_historia) y nadie recibe la imagen vieja guardada.
-DISENO = 4  # 23-11-2026: tarjeta de geometría fija, igual para todos los perfiles
+DISENO = 5  # 23-11-2026: geometría fija; portada vertical recortada desde arriba
 
 ANCHO, ALTO = 1080, 1920
 FUENTES = Path(__file__).resolve().parent / 'fuentes'
@@ -298,8 +298,10 @@ def _espaciado(lapiz, x, y, texto, fuente, color, aire):
 
 def _franja(datos):
     """La imagen de arriba de la tarjeta, siempre del mismo tamaño. Una foto apaisada se
-    recorta; una vertical (un afiche, por ejemplo) se muestra entera sobre ella misma
-    desenfocada, para no cortarle el texto. Sin foto: el ícono del rubro sobre el celeste."""
+    recorta al centro. Una vertical (un pantallazo del celular o un afiche) se recorta desde
+    arriba (saltando las barras del celular) a todo el ancho: ahí suele estar lo importante, y mostrarla entera en una franja
+    de 300 px dejaba un celular diminuto (23-11-2026, la ficha de Diego). Sin foto: el ícono
+    del rubro sobre el celeste."""
     ancho, alto = TARJETA_ANCHO, BANDA
     foto = datos['portada']
     if foto is None:
@@ -308,13 +310,9 @@ def _franja(datos):
         if icono is not None:
             franja.paste(icono, ((ancho - 140) // 2, (alto - 140) // 2), icono)
         return franja
-    if foto.width / foto.height >= 1.0:
-        return ImageOps.fit(foto, (ancho, alto), Image.BICUBIC, centering=(0.5, 0.4))
-    fondo = ImageOps.fit(foto, (ancho, alto), Image.BICUBIC).filter(ImageFilter.GaussianBlur(24))
-    fondo = Image.blend(fondo, Image.new('RGB', (ancho, alto), '#1b1f24'), 0.25)
-    entera = ImageOps.contain(foto, (ancho - 40, alto - 24), Image.BICUBIC)
-    fondo.paste(entera, ((ancho - entera.width) // 2, (alto - entera.height) // 2))
-    return fondo
+    vertical = foto.width < foto.height
+    # 0.12 y no 0: en un pantallazo de celular lo primero son la barra de estado y la del navegador.
+    return ImageOps.fit(foto, (ancho, alto), Image.BICUBIC, centering=(0.5, 0.12 if vertical else 0.4))
 
 
 def _tarjeta(img, datos):
@@ -327,6 +325,8 @@ def _tarjeta(img, datos):
 
     # 1. Franja de imagen (0 a BANDA).
     img.paste(_franja(datos), (TARJETA_X, y0), _mascara_arriba(TARJETA_ANCHO, BANDA, RADIO))
+    # Línea fina bajo la imagen: una foto clara (un pantallazo blanco) no se funde con la tarjeta.
+    lapiz.rectangle((TARJETA_X, y0 + BANDA - 2, TARJETA_X + TARJETA_ANCHO - 1, y0 + BANDA - 1), fill='#dfe5ec')
 
     # 2. Rubro con su ícono y comuna.
     y = y0 + BANDA + 34

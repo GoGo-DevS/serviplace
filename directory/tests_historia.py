@@ -251,3 +251,15 @@ class HistoriaDeInstagram(TestCase):
         self.assertGreaterEqual(len(filas), 2)
         self.assertEqual(filas[0], ('ATIENDE EN', 'Maipú'))
         self.assertNotIn('TÍTULO', [etq for etq, _ in filas])  # no se inventa formación
+
+    def test_una_portada_vertical_se_recorta_desde_arriba_y_llena_la_franja(self):
+        # 23-11: el pantallazo de celular de Diego salía diminuto en medio de un desenfoque.
+        vertical = Image.new('RGB', (400, 900), ROJO)
+        vertical.paste(Image.new('RGB', (400, 450), AZUL), (0, 450))  # abajo, azul
+        datos = historia._datos(self.p)
+        datos['portada'] = vertical
+        franja = historia._franja(datos)
+        self.assertEqual(franja.size, (historia.TARJETA_ANCHO, historia.BANDA))
+        colores = franja.getcolors(maxcolors=1 << 20)
+        rojos = sum(n for n, c in colores if c[0] > 180 and c[2] < 80)
+        self.assertGreater(rojos / (franja.width * franja.height), 0.95)  # la parte de arriba, a todo el ancho
