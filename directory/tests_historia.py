@@ -30,6 +30,7 @@ from directory.models import Category, Commune, Provider, ProviderImage, Region
 User = get_user_model()
 MEDIA_TMP = tempfile.mkdtemp(prefix='serviplace-test-historia-')
 ROJO, AZUL = (220, 30, 30), (20, 60, 220)
+ALTO_IMG = 1920
 
 
 def png(color, lado=400):
@@ -214,3 +215,39 @@ class HistoriaDeInstagram(TestCase):
         with CaptureQueriesContext(connection) as con_tres:
             self.client.get(url)
         self.assertEqual(len(con_tres), len(con_una))
+
+    # ── Geometría fija (23-11-2026, Diego: "que midan lo mismo, independiente de si falta info") ──
+
+    def test_completa_o_minima_la_tarjeta_mide_y_se_ubica_igual(self):
+        completo = Provider.objects.create(
+            owner=User.objects.create_user('rodrigo', password='clave-larga-de-verdad-99'),
+            business_name='Rodrigo Saavedra con un nombre bastante largo', category=self.cat, commune=self.maipu,
+            sector='Ciudad Satélite', short_description='Instalación y mantención de calefont, filtraciones y '
+            'destapes en Maipú y Cerrillos, con presupuesto sin costo y garantía por escrito de cada trabajo.',
+            profession_title='Instalador de gas clase 3 SEC', institution='INACAP', graduation_year=2011,
+            whatsapp_number='56911111111', attends_home=True, attends_online=True, is_active=True)
+        minimo = Provider.objects.create(
+            owner=User.objects.create_user('min', password='clave-larga-de-verdad-99'),
+            business_name='Gas', category=self.cat, commune=self.maipu, sector='Maipú',
+            short_description='Gasfitería.', whatsapp_number='56922222222', is_active=True)
+
+        def bordes(provider):
+            img = Image.open(io.BytesIO(historia.dibujar(provider))).convert('RGB')
+            x = historia.TARJETA_X + historia.TARJETA_ANCHO // 2
+            blancos = [y for y in range(ALTO_IMG) if sum(img.getpixel((x, y))) > 740]
+            return blancos[0], blancos[-1]
+
+        self.assertEqual(bordes(completo), bordes(minimo))
+        arriba, abajo = bordes(minimo)
+        self.assertLessEqual(abs(abajo - (historia.TARJETA_Y + historia.TARJETA_ALTO)), 4)
+
+    def test_el_nombre_con_barra_se_separa_en_nombre_y_subtitulo(self):
+        self.assertEqual(historia._separar_nombre('Karla Barrientos | Asesoría en formalización (Temuco)'),
+                         ('Karla Barrientos', 'Asesoría en formalización (Temuco)'))
+        self.assertEqual(historia._separar_nombre('Gasfitería Camila'), ('Gasfitería Camila', ''))
+
+    def test_el_recuadro_siempre_tiene_al_menos_dos_filas_reales(self):
+        filas = historia._datos(self.p)['filas']
+        self.assertGreaterEqual(len(filas), 2)
+        self.assertEqual(filas[0], ('ATIENDE EN', 'Maipú'))
+        self.assertNotIn('TÍTULO', [etq for etq, _ in filas])  # no se inventa formación
