@@ -7,7 +7,25 @@ User = get_user_model()
 
 
 class UserProfile(models.Model):
+    # 25-11-2026: un profesional dijo que lo trajo ChatGPT y GA4 lo confirma solo a
+    # medias (la app de ChatGPT a veces no manda referrer y cae en "directo").
+    # Se le pregunta a quien publica su perfil; la respuesta es opcional.
+    COMO_SUPO_CHOICES = [
+        ('google', 'Buscando en Google'),
+        ('ia', 'ChatGPT u otra inteligencia artificial'),
+        ('instagram', 'Instagram'),
+        ('facebook', 'Facebook'),
+        ('tiktok', 'TikTok'),
+        ('recomendacion', 'Me lo recomendó alguien'),
+        ('invitacion', 'ServiPlace me invitó'),
+        ('otro', 'Otro'),
+    ]
+
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    como_supo = models.CharField(
+        '¿Cómo supo de ServiPlace?', max_length=20, choices=COMO_SUPO_CHOICES, blank=True,
+        help_text='Lo responde al publicar su perfil (opcional).',
+    )
     whatsapp = models.CharField(max_length=30, blank=True)
     referral_code = models.CharField(max_length=12, unique=True, blank=True)
     referred_by = models.ForeignKey(

@@ -10,6 +10,7 @@ from django.utils.text import slugify
 from django.core.files.uploadedfile import UploadedFile
 
 from accounts.cv import ACEPTA, CVIlegible, extraer_texto
+from accounts.models import UserProfile
 from core.antispam import AntispamFormMixin
 from directory.imagenes import procesar_foto
 from directory.models import Category, Commune, Provider, ProviderImage, Region
@@ -297,8 +298,21 @@ class ProviderForm(AntispamFormMixin, forms.ModelForm):
             'whatsapp_number': forms.TextInput(attrs={'placeholder': '+56 9 1234 5678', 'inputmode': 'tel'}),
         }
 
-    def __init__(self, *args, **kwargs):
+    # 25-11-2026: se guarda en UserProfile.como_supo (es de la cuenta, no de la
+    # ficha) y solo se pregunta al publicar, no al editar. Va en el paso 2 y no
+    # en el registro: el 15-11 el registro quedó en correo + contraseña porque
+    # ahí se iba la gente (de 172 que lo abrieron en 30 días, 26 crearon cuenta).
+    como_supo = forms.ChoiceField(
+        required=False,
+        choices=[('', 'Elige una opción')] + UserProfile.COMO_SUPO_CHOICES,
+        label='¿Cómo supiste de ServiPlace? (opcional)',
+        help_text='Nos ayuda a saber dónde invitar a más profesionales.',
+    )
+
+    def __init__(self, *args, preguntar_como_supo=False, **kwargs):
         super().__init__(*args, **kwargs)
+        if not preguntar_como_supo:
+            del self.fields['como_supo']
         # Para borrar la foto anterior si la reemplaza o la quita.
         self._foto_anterior = self.instance.foto.name if self.instance.pk and self.instance.foto else ''
         self.fields['website'].assume_scheme = 'https'  # "tusitio.cl" -> https://, no http://

@@ -136,11 +136,30 @@ def llms_txt(request):
         nombre = r['category__seo_nombre'] or r['category__name']
         url = base + reverse('directory:listado_rubro', kwargs={'rubro': r['category__slug']})
         lineas.append(f"- [{nombre}]({url}): {r['n']} {'perfil' if r['n'] == 1 else 'perfiles'}")
+    # 25-11-2026: ChatGPT ya trae profesionales (GA4: chatgpt.com desde el 15-11,
+    # 3 de los 4 registros del 22 al 24-11) y los manda a /profesionales/<rubro>/.
+    # Esas páginas no estaban en este archivo: se listan todas las que existen,
+    # con la misma regla que la vista `profesion` (rubro activo, no tienda, con
+    # contenido en core/profesiones.py), para quien pregunta dónde publicar.
     lineas += [
         '',
-        '## Para profesionales',
+        '## Para profesionales: publicar tus servicios gratis',
+        '',
+        'Si ofreces un servicio en Chile y buscas dónde publicarlo: publicar en ServiPlace es gratis, '
+        'no cobra comisión y los clientes te escriben directo a tu WhatsApp. Cada especialidad tiene una '
+        'página con lo que piden sus clientes y qué poner en el perfil.',
+        '',
         f'- [Publicar gratis]({base}{reverse("accounts:register")})',
-        f'- [Cómo funciona]({base}{reverse("core:para_profesionales")})',
+        f'- [Cómo funciona para profesionales]({base}{reverse("core:para_profesionales")})',
+    ]
+    especialidades = (Category.objects.filter(is_active=True).exclude(group=Category.TIENDAS)
+                      .order_by('display_order', 'name'))
+    for c in especialidades:
+        contenido = profesiones.para(c.slug)
+        if contenido:
+            url = base + reverse('core:profesion', kwargs={'rubro': c.slug})
+            lineas.append(f"- [{contenido['titulo']}]({url})")
+    lineas += [
         '',
         '## Guías',
     ]

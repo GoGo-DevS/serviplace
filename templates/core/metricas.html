@@ -100,6 +100,17 @@
     </article>
 
     <article class="metricas-tabla">
+      <h2>Cómo supieron de ServiPlace</h2>
+      <p class="metricas-nota">Lo que respondieron al publicar las cuentas creadas en el período. GA4 no ve a quien llega desde la app de ChatGPT sin referrer.</p>
+      {% if como_supo %}
+      <div class="tabla-scroll"><table>
+        <thead><tr><th>Respuesta</th><th class="num">Cuentas</th></tr></thead>
+        <tbody>{% for f in como_supo %}<tr><td>{{ f.etiqueta }}</td><td class="num">{{ f.n }}</td></tr>{% endfor %}</tbody>
+      </table></div>
+      {% else %}<p class="metricas-vacio">Ninguna cuenta nueva en el período.</p>{% endif %}
+    </article>
+
+    <article class="metricas-tabla">
       <h2>Dónde hay oferta</h2>
       <p class="metricas-nota">Comuna y especialidad con más perfiles activos: los candidatos a mercado inicial.</p>
       <div class="tabla-scroll"><table>

@@ -626,3 +626,28 @@ rubros" y aparece en los dos listados.
 Pruebas: 3 nuevas + la de contenido que exige página a cada rubro;
 4 mutaciones detectadas (sin sinónimos, sin patrón de CV, sin página, sin aviso).
 ---
+
+## [25-11-2026] ChatGPT trae profesionales: /llms.txt los manda a publicar y se pregunta "¿Cómo supiste?"
+GA4 (11 al 24-11): chatgpt.com / ai-assistant aparece desde el 15-11 con 9
+sesiones que dieron 3 sign_up y 2 publicar_perfil; del 22 al 24-11 fueron 3 de
+los 4 registros. Entran por /profesionales/<rubro>/. Un profesional nuevo se lo
+confirmó a Diego por WhatsApp. OK de Diego a las dos cosas.
+  · /llms.txt: la sección "Para profesionales" pasa a "publicar tus servicios
+    gratis" con una frase (gratis, sin comisión, contacto directo por WhatsApp)
+    y la lista de TODAS las páginas /profesionales/<rubro>/ que existen, con la
+    misma regla que la vista `profesion` (rubro activo, no tienda, con contenido
+    en core/profesiones.py). Antes solo enlazaba /profesionales/.
+  · "¿Cómo supiste de ServiPlace? (opcional)" al publicar el perfil (paso 2),
+    no en el registro: el registro quedó en correo + contraseña el 15-11 a
+    propósito. Se guarda en UserProfile.como_supo (migración aditiva 0004), una
+    vez por cuenta (un segundo perfil no la vuelve a preguntar ni la pisa), no
+    aparece al editar. Admin de perfiles: columna y filtro. /cuenta/metricas/:
+    tabla "Cómo supieron de ServiPlace" con las cuentas creadas en el período
+    (una consulta agregada). Motivo: la app de ChatGPT a veces no manda
+    referrer y GA4 lo cuenta como directo.
+Pruebas: 8 nuevas (accounts/tests_como_supo.py) + 2 en core/tests_llms.py, una
+de ellas al revés (toda URL de /profesionales/ listada responde 200 y ninguna
+tienda aparece). Desarmado el guardado de la respuesta, la prueba falla.
+Pendiente aparte: la ficha de Damián tiene una oración como nombre (cambiarlo
+no cambia el slug: el slug solo se genera al crear, no hay 404).
+---

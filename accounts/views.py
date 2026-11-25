@@ -180,8 +180,10 @@ def leer_cv(request):
 def provider_create(request):
     profile, _ = UserProfile.objects.get_or_create(user=request.user)
     borrador = request.session.get('cv_borrador') or {}
+    # Se pregunta una vez por cuenta: quien ya respondió no la ve en un segundo perfil.
+    preguntar = not profile.como_supo
     if request.method == 'POST':
-        form = ProviderForm(request.POST, request.FILES)
+        form = ProviderForm(request.POST, request.FILES, preguntar_como_supo=preguntar)
         ip = ip_cliente(request)
         limite, minutos = settings.LIMITE_PERFILES_POR_IP
         if excede_limite_ip(Provider, ip, limite, minutos):
@@ -204,6 +206,9 @@ def provider_create(request):
             provider.save()
             form.save_m2m()  # los otros rubros: con commit=False no se guardan solos
             form.guardar_fotos(provider)
+            if preguntar and form.cleaned_data.get('como_supo'):
+                profile.como_supo = form.cleaned_data['como_supo']
+                profile.save(update_fields=['como_supo'])
             request.session.pop('cv_borrador', None)
             if provider.is_active:
                 request.session['ga4_eventos'] = request.session.get('ga4_eventos', []) + ['publicar_perfil']
@@ -222,7 +227,7 @@ def provider_create(request):
         if profile.whatsapp and 'whatsapp_number' not in inicial:
             inicial['whatsapp_number'] = formatear_telefono(profile.whatsapp)
             inicial.setdefault('phone', inicial['whatsapp_number'])
-        form = ProviderForm(initial=inicial)
+        form = ProviderForm(initial=inicial, preguntar_como_supo=preguntar)
     _marcar_desde_cv(form, borrador)
 
     return render(request, 'accounts/provider_form.html', {

@@ -168,6 +168,12 @@
             <div class="col-12">{% include "accounts/_campo.html" with campo=form.address %}</div>
           </div>
 
+          {% if form.como_supo %}
+          <div class="row g-3 mb-4">
+            <div class="col-md-6">{% include "accounts/_campo.html" with campo=form.como_supo %}</div>
+          </div>
+          {% endif %}
+
           <div class="d-flex gap-2 flex-wrap">
             <button type="submit" class="btn btn-primary btn-lg" data-enviando="{% if is_create %}Publicando…{% else %}Guardando…{% endif %}">
               {% if is_create %}Publicar perfil ahora{% else %}Guardar cambios{% endif %}

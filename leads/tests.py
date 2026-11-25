@@ -143,7 +143,8 @@ class PanelDeMetricas(Base):
         staff = User.objects.create_user('staff', password='clave-larga-de-verdad-99', is_staff=True)
         self.client.force_login(staff)
         self.client.get(reverse('core:metricas'))
-        with self.assertNumQueries(18) as pocos:
+        # 19 desde el 25-11-2026: +1 consulta agregada fija ("Cómo supieron de ServiPlace").
+        with self.assertNumQueries(19) as pocos:
             self.client.get(reverse('core:metricas'))
         # Leído YA: cada petición siguiente limpia el registro de consultas.
         base = len(pocos.captured_queries)

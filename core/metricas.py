@@ -17,6 +17,7 @@ from django.http import Http404
 from django.shortcuts import render
 from django.utils import timezone
 
+from accounts.models import UserProfile
 from directory.models import Category, Commune, Provider
 from leads.models import LeadEvent
 
@@ -123,6 +124,13 @@ def metricas(request):
         activos.values('commune__name', 'category__name').annotate(n=Count('id')).order_by('-n')[:12]
     )
     usuarios_nuevos = get_user_model().objects.filter(date_joined__gte=desde).count()
+    # 25-11-2026: de dónde dicen venir las cuentas nuevas (una sola consulta agregada).
+    etiquetas = dict(UserProfile.COMO_SUPO_CHOICES)
+    como_supo = [
+        {'etiqueta': etiquetas.get(f['como_supo'], 'Sin respuesta'), 'n': f['n']}
+        for f in (UserProfile.objects.filter(user__date_joined__gte=desde)
+                  .values('como_supo').annotate(n=Count('id')).order_by('-n'))
+    ]
 
     contexto = {
         'dias': dias, 'periodos': PERIODOS,
@@ -133,7 +141,7 @@ def metricas(request):
         'visitantes': visitantes,
         'registros_iniciados': registros_iniciados, 'cuentas': cuentas, 'publicados': publicados,
         'tasa_registro': _tasa(cuentas, registros_iniciados), 'tasa_publicacion': _tasa(publicados, cuentas),
-        'usuarios_nuevos': usuarios_nuevos,
+        'usuarios_nuevos': usuarios_nuevos, 'como_supo': como_supo,
         'sin_resultado_top': sin_resultado_top, 'buscado_top': buscado_top, 'perfiles_top': perfiles_top,
         'serie_dias': serie_dias, 'oferta': oferta, 'grupos': grupos, 'incompletos': incompletos,
         'mercado': mercado,
